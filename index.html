@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SadeTrade — Crypto Signal Terminal v3</title>
+<title>SadeTrade — Crypto Signal Terminal v4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
@@ -231,7 +231,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 
 <header class="header">
   <div class="brand">⚡ Sade<span class="brand-mark">Trade</span>
-    <span style="color:var(--muted);font-size:10px;font-weight:400;margin-left:2px">TERMINAL v3</span>
+    <span style="color:var(--muted);font-size:10px;font-weight:400;margin-left:2px">TERMINAL v4</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <div class="ws-pill"><div class="dot blink"></div>Binance Live</div>
@@ -762,14 +762,46 @@ function computeSignalFromCandles(coin,candles){
 
   const net=bull-bear;
   const total=Math.max(bull+bear,1);
-  const conf=Math.min(93,Math.max(42,Math.round((Math.max(bull,bear)/total)*100)));
 
+  // ═══ SIGNAL TYPE — SIDEWAYS haizalishi BUY/SELL ═══
   let type,trend,orderType;
   if(net>=5){type='BUY';trend='BULLISH';orderType=RSI<35||(BB&&current<BB.lower)?'Buy Market':'Buy Limit';}
   else if(net<=-5){type='SELL';trend='BEARISH';orderType=RSI>65||(BB&&current>BB.upper)?'Sell Market':'Sell Limit';}
   else if(net>=2){type='BUY';trend='BULLISH';orderType='Buy Limit';}
   else if(net<=-2){type='SELL';trend='BEARISH';orderType='Sell Limit';}
-  else{type='NEUTRAL';trend='SIDEWAYS';orderType='Subiri — Hakuna Signal';}
+  else{type='NEUTRAL';trend='SIDEWAYS';orderType='Subiri — Soko Halina Mwelekeo';}
+
+  // ═══ SIDEWAYS override: kama trend ni SIDEWAYS, signal ni NEUTRAL ═══
+  // Hii inaepuka upingano wa SIDEWAYS + SELL/BUY
+  if(trend==='SIDEWAYS'){
+    type='NEUTRAL';
+    orderType='Subiri — Soko Halina Mwelekeo';
+  }
+
+  // ═══ SELL karibu na Resistance — ukaguzi wa ziada ═══
+  // Kama SELL lakini bei iko mbali sana na resistance, signal ni dhaifu
+  if(type==='SELL'&&distToRes>3){
+    // Bei iko mbali na resistance — SELL si salama
+    reasons.unshift('⚠ Bei mbali na Resistance ('+distToRes.toFixed(1)+'%) — Signal dhaifu');
+    if(net>=-3){type='NEUTRAL';trend='SIDEWAYS';orderType='Subiri — SELL Dhaifu';}
+  }
+
+  // ═══ CONFIDENCE sahihi — hesabu moja tu ═══
+  // Tumia wingi wa ushahidi, siyo fraction ya bull vs bear
+  // Hii inaepuka upingano wa "50% juu" lakini "67% chini"
+  let conf;
+  if(type==='NEUTRAL'){
+    // Kwa NEUTRAL, uhakika ni mdogo kwa asili
+    conf=Math.min(55,Math.max(35,Math.round(35+(total*2))));
+  } else {
+    // Kwa BUY/SELL: hesabu kulingana na nguvu ya ushahidi
+    const dominantScore=type==='BUY'?bull:bear;
+    const weakScore=type==='BUY'?bear:bull;
+    // Ratio ya ushahidi wa dominant vs total
+    const ratio=dominantScore/total;
+    // Kiwango cha uhakika: 50-93% kulingana na ushahidi
+    conf=Math.min(93,Math.max(50,Math.round(50+(ratio*50))));
+  }
 
   // ═══ ENTRY sahihi zaidi ═══
   let entry;
@@ -797,17 +829,23 @@ function computeSignalFromCandles(coin,candles){
     entry=current;
   }
 
-  // ═══ SL/TP sahihi zaidi (ATR-based na Structure) ═══
-  const tfMult=S.tf==='1m'?1.2:S.tf==='5m'?1.5:S.tf==='15m'?1.8:S.tf==='1h'?2.2:S.tf==='4h'?2.8:3.5;
+  // ═══ TF Multiplier — M1 ina noise nyingi, SL lazima iwe kubwa zaidi ═══
+  // M1: 2.0x (ilikuwa 1.2x — ilikuwa ndogo sana kwa Bitcoin noise)
+  const tfMult=S.tf==='1m'?2.0:S.tf==='5m'?2.0:S.tf==='15m'?2.2:S.tf==='1h'?2.8:S.tf==='4h'?3.2:4.0;
   const atrSL=ATR*tfMult;
 
+  // ═══ SL/TP sahihi zaidi (ATR-based na Structure) ═══
   let sl_p,tp_p;
+  // Kiwango cha chini kabisa cha SL: angalau 0.5% ya entry (Bitcoin ina noise kubwa)
+  const minSLpct=0.005;
 
   if(type==='BUY'){
     // SL: chini ya support au ATR kutoka entry — lolote lililo chini zaidi
     const slByATR=entry-atrSL;
     const slBySupport=support-ATR*0.5; // Kidogo chini ya support
     sl_p=Math.max(slByATR,slBySupport); // Tumia ile iliyo karibu zaidi (chini sana ni hatari)
+    // Lazima SL iwe angalau 0.5% chini ya entry
+    sl_p=Math.min(sl_p,entry*(1-minSLpct));
     // Lakini usizidi 8% ya entry
     sl_p=Math.max(sl_p,entry*(1-0.08));
 
@@ -825,6 +863,8 @@ function computeSignalFromCandles(coin,candles){
     const slByATR=entry+atrSL;
     const slByResistance=resistance+ATR*0.5;
     sl_p=Math.min(slByATR,slByResistance);
+    // Lazima SL iwe angalau 0.5% juu ya entry
+    sl_p=Math.max(sl_p,entry*(1+minSLpct));
     sl_p=Math.min(sl_p,entry*(1+0.08));
 
     const rrTarget=conf>=75?3.0:conf>=65?2.5:2.0;
@@ -843,6 +883,22 @@ function computeSignalFromCandles(coin,candles){
   const tpDistance=Math.abs(tp_p-entry);
   const rrRatio=(tpDistance/Math.max(slDistance,0.0001)).toFixed(1);
   const longPct=type==='BUY'?Math.min(85,55+Math.floor(bull)*3):type==='SELL'?Math.max(15,45-Math.floor(bear)*3):50;
+
+  // ═══ Hakikisha reasons zipo kila wakati — kamwe si tupu ═══
+  // Kama reasons ni chache, ongeza maelezo ya viashiria vya msingi
+  if(reasons.length===0){
+    reasons.push('RSI: '+RSI.toFixed(1)+' — '+(RSI<40?'Oversold':RSI>60?'Overbought':'Wastani'));
+    if(SMA20&&SMA50)reasons.push('SMA20 '+(SMA20>SMA50?'juu ya':'chini ya')+' SMA50 — '+(SMA20>SMA50?'Uptrend':'Downtrend'));
+    if(MACD)reasons.push('MACD: '+(MACD.line>0?'Chanya (bullish)':'Hasi (bearish)'));
+    if(BB){
+      const bbPos=(current-BB.lower)/(BB.upper-BB.lower);
+      reasons.push('BB Position: '+(bbPos*100).toFixed(0)+'% — '+(bbPos<0.3?'Karibu Lower Band':bbPos>0.7?'Karibu Upper Band':'Katikati ya Bands'));
+    }
+    reasons.push('Soko SIDEWAYS — Viashiria havijatoa ishara wazi ya BUY au SELL');
+  }
+  if(reasons.length<2){
+    reasons.push('StochRSI: '+StochRSI.toFixed(0)+' — '+(StochRSI<30?'Oversold':StochRSI>70?'Overbought':'Wastani'));
+  }
 
   S.signals[coin.id]={
     type,trend,orderType,conf,entry,sl:sl_p,tp:tp_p,rr:rrRatio,
@@ -894,14 +950,17 @@ function updateSignalUI(){
   const slSubEl=document.getElementById('slSub');if(slSubEl)slSubEl.textContent='-'+slPct+'% kutoka Entry';
   const tpSubEl=document.getElementById('tpSub');if(tpSubEl)tpSubEl.textContent='+'+tpPct+'% kutoka Entry';
   const confEl=document.getElementById('confFill');const confPctEl=document.getElementById('confPct');
-  const confColor=sig.conf>=70?'var(--buy)':sig.conf<=50?'var(--sell)':'var(--warn)';
+  const confColor=sig.conf>=70?'var(--buy)':sig.conf<=55?'var(--sell)':'var(--warn)';
   if(confEl){confEl.style.width=sig.conf+'%';confEl.style.background=confColor;}
-  if(confPctEl){confPctEl.textContent=sig.conf+'%';confPctEl.style.color=confColor;}
+  if(confPctEl){confPctEl.textContent=sig.conf+'% '+(sig.conf>=70?'(Imara)':sig.conf>=55?'(Wastani)':'(Dhaifu)');confPctEl.style.color=confColor;}
   const lsEl=document.getElementById('lsFill');if(lsEl)lsEl.style.width=sig.longPct+'%';
   const lsLong=document.getElementById('lsLongPct');const lsShort=document.getElementById('lsShortPct');
   if(lsLong)lsLong.textContent='Long '+sig.longPct+'%';if(lsShort)lsShort.textContent='Short '+(100-sig.longPct)+'%';
   const reasonsEl=document.getElementById('reasonsList');
-  if(reasonsEl)reasonsEl.innerHTML=sig.reasons.map(r=>`<li><span class="r-arrow">→</span>${r}</li>`).join('')||'<li><span class="r-arrow">→</span>Inakusanya data...</li>';
+  if(reasonsEl){
+    const items=sig.reasons&&sig.reasons.length>0?sig.reasons:['RSI: '+(sig.rsi?sig.rsi.toFixed(1):'—')+' — Inachanganua viashiria...'];
+    reasonsEl.innerHTML=items.map(r=>`<li><span class="r-arrow">→</span>${r}</li>`).join('');
+  }
 }
 
 // ═══════════════════════════════════
@@ -1022,6 +1081,7 @@ function renderSingle(coin){
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <button class="alert-btn ${hasAlert?'active-alert':''}" id="alertBtn" onclick="openAlertModal()">🔔 ${hasAlert?'Tahadhari Imewekwa':'Weka Tahadhari'}</button>
+          ${S.tf==='1m'?'<div style="background:var(--warn-light);border:1px solid rgba(230,138,0,.35);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--warn);font-weight:700">⚠ M1 — Noise Nyingi. Tumia M5/M15 kwa usahihi zaidi</div>':''}
           <div class="badges">
             <span class="badge ${ordClass}">📋 ${sig.orderType}</span>
             <span class="badge ${tClass}">${tIcon} ${sig.trend}</span>
@@ -1030,6 +1090,7 @@ function renderSingle(coin){
         </div>
       </div>
       <div class="sig-body">
+        ${sig.trend==='SIDEWAYS'?`<div style="background:var(--warn-light);border:1px solid rgba(230,138,0,.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--warn);font-family:var(--mono)">⚠ <strong>Soko ni SIDEWAYS</strong> — Hakuna mwelekeo wazi. Signal za BUY/SELL ni dhaifu sana. Subiri breakout imara kabla ya kuingia.</div>`:''}
         <div class="validity-bar">
           <div>
             <div class="validity-label">⏱ Uhalali wa Signal (${S.tf.toUpperCase()})</div>
@@ -1049,8 +1110,12 @@ function renderSingle(coin){
           <div class="sig-cell" style="border-left:3px solid var(--sell)"><div class="sc-lbl">📕 Resistance</div><div class="sc-val sl" id="resistanceVal">${sig.resistance?fP(sig.resistance):'—'}</div><div class="sc-sub">Kiwango cha Juu</div></div>
         </div>
         <div class="conf-wrap">
-          <div class="conf-top"><span class="conf-lbl">Kiwango cha Uhakika (Bull: ${sig.bull} Bear: ${sig.bear})</span><span class="conf-pct" id="confPct" style="color:${confColor}">${sig.conf}%</span></div>
+          <div class="conf-top">
+            <span class="conf-lbl">Nguvu ya Signal — Ishara za Bull: <strong style="color:var(--buy)">${sig.bull}</strong> | Ishara za Bear: <strong style="color:var(--sell)">${sig.bear}</strong> | Jumla: ${sig.bull+sig.bear}</span>
+            <span class="conf-pct" id="confPct" style="color:${confColor}">${sig.conf}% ${sig.conf>=70?'(Imara)':sig.conf>=55?'(Wastani)':'(Dhaifu)'}</span>
+          </div>
           <div class="conf-track"><div class="conf-fill" id="confFill" style="width:${sig.conf}%;background:${confColor}"></div></div>
+          ${sig.bull===0&&sig.bear===0?`<div style="font-size:10px;color:var(--sell);margin-top:5px;font-family:var(--mono)">⚠ Hakuna ushahidi wa kutosha — signal hii si ya kuaminiwa. Subiri viashiria zaidi.</div>`:''}
         </div>
         <div class="reason-box ${sc}">
           <div class="r-title">Sababu za Signal (Viashiria vya Kiufundi)</div>
