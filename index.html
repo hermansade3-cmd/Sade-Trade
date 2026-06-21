@@ -1,1653 +1,1658 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SadeTrade — Crypto Signal Terminal v4</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
-<style>
-:root{
-  --bg:#f0f4f8;--bg2:#ffffff;--panel:#ffffff;--panel2:#f5f8fc;
-  --border:#dde3ef;--border2:#c8d2e8;
-  --buy:#00b87a;--buy-light:#e6f9f3;
-  --sell:#e8334a;--sell-light:#fdedf0;
-  --neutral:#4b6cf7;--neut-light:#eef1fe;
-  --warn:#e68a00;--warn-light:#fff4e0;
-  --text:#1e2d4a;--muted:#7a8db3;--dim:#c2ccde;--white:#ffffff;
-  --mono:'IBM Plex Mono','Courier New',monospace;
-  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;min-height:100vh;overflow-x:hidden}
-.header{background:var(--white);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(30,45,74,0.06)}
-.brand{font-family:var(--mono);font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;color:var(--text)}
-.brand-mark{background:linear-gradient(135deg,#00b87a,#4b6cf7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.ws-pill{display:flex;align-items:center;gap:6px;background:var(--buy-light);border:1px solid rgba(0,184,122,0.3);border-radius:6px;padding:4px 12px;font-family:var(--mono);font-size:11px;color:var(--buy)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--buy)}
-.blink{animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.tick-counter{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:3px 10px}
-.tick-counter span{color:var(--buy);font-weight:700}
-.hdr-right{display:flex;align-items:center;gap:10px}
-.last-update{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.layout{display:grid;grid-template-columns:205px 1fr;min-height:calc(100vh - 52px)}
-.sidebar{background:var(--white);border-right:1px solid var(--border);padding:12px 8px;overflow-y:auto;position:sticky;top:52px;height:calc(100vh - 52px);scrollbar-width:thin}
-.sb-label{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 6px;margin-bottom:8px}
-.coin-btn{display:flex;align-items:center;gap:7px;width:100%;padding:7px 8px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--text);cursor:pointer;transition:background .1s;margin-bottom:2px;font-family:var(--sans);font-size:12px;text-align:left}
-.coin-btn:hover{background:var(--panel2);border-color:var(--border)}
-.coin-btn.active{background:var(--neut-light);border-color:var(--border2)}
-.coin-sym{font-weight:700;font-size:12px;flex:1}
-.coin-price-sb{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.coin-price-sb.up{color:var(--buy)}.coin-price-sb.dn{color:var(--sell)}
-.sig-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.sb-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
-.tf-row{display:flex;gap:4px;flex-wrap:wrap;padding:0 4px}
-.tf-btn{flex:1;padding:5px 3px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:600;cursor:pointer;transition:all .1s;text-align:center;min-width:28px}
-.tf-btn.active{background:var(--neut-light);border-color:var(--neutral);color:var(--neutral)}
-.btn-all{width:100%;margin-top:8px;padding:7px;border-radius:6px;border:1px dashed var(--border2);background:transparent;color:var(--neutral);font-family:var(--mono);font-size:10px;cursor:pointer}
-.btn-all:hover{background:var(--neut-light)}
-.main{padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--panel2) 50%,var(--border) 75%);background-size:400% 100%;animation:shimmer 1.2s infinite;border-radius:6px}
-@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-.sk-header{height:80px;border-radius:12px;margin-bottom:12px}
-.sk-card{height:300px;border-radius:12px;margin-bottom:12px}
-.sk-chart{height:200px;border-radius:12px}
-.coin-header{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.coin-title{display:flex;align-items:center;gap:10px}
-.coin-em{font-size:26px}
-.coin-sym-big{font-family:var(--mono);font-size:20px;font-weight:700}
-.coin-fullname{font-size:10px;color:var(--muted)}
-.live-price-wrap{text-align:right}
-.live-price{font-family:var(--mono);font-size:28px;font-weight:700;will-change:color}
-.live-price.flash-up{color:var(--buy)}.live-price.flash-dn{color:var(--sell)}
-.price-chg{font-family:var(--mono);font-size:12px;margin-top:2px}
-.up{color:var(--buy)}.dn{color:var(--sell)}
-.meta-row{display:flex;gap:14px;flex-wrap:wrap}
-.meta-item{text-align:center}
-.meta-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
-.meta-val{font-family:var(--mono);font-size:11px;font-weight:600;margin-top:2px}
-.sig-card{background:var(--white);border:2px solid var(--border2);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(30,45,74,0.07)}
-.sig-card.is-buy{border-color:rgba(0,184,122,0.4)}
-.sig-card.is-sell{border-color:rgba(232,51,74,0.4)}
-.sig-card.is-neut{border-color:rgba(75,108,247,0.35)}
-.sig-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border)}
-.sig-head.buy-bg{background:var(--buy-light)}.sig-head.sell-bg{background:var(--sell-light)}.sig-head.neut-bg{background:var(--neut-light)}
-.sig-type{font-family:var(--mono);font-size:24px;font-weight:700;display:flex;align-items:center;gap:8px}
-.sig-type.buy{color:var(--buy)}.sig-type.sell{color:var(--sell)}.sig-type.neut{color:var(--neutral)}
-.sig-arrow{font-size:32px;line-height:1}
-.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.badge{font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px}
-.b-buy{background:var(--buy-light);color:var(--buy);border:1px solid rgba(0,184,122,.35)}
-.b-sell{background:var(--sell-light);color:var(--sell);border:1px solid rgba(232,51,74,.35)}
-.b-neut{background:var(--neut-light);color:var(--neutral);border:1px solid rgba(75,108,247,.3)}
-.b-bull{background:var(--buy-light);color:var(--buy);border:1px solid rgba(0,184,122,.25)}
-.b-bear{background:var(--sell-light);color:var(--sell);border:1px solid rgba(232,51,74,.25)}
-.b-side{background:var(--warn-light);color:var(--warn);border:1px solid rgba(230,138,0,.25)}
-.b-conf-h{background:var(--buy-light);color:var(--buy);border:1px solid rgba(0,184,122,.25)}
-.b-conf-m{background:var(--warn-light);color:var(--warn);border:1px solid rgba(230,138,0,.25)}
-.b-conf-l{background:var(--sell-light);color:var(--sell);border:1px solid rgba(232,51,74,.25)}
-.sig-body{background:var(--white);padding:16px 18px}
-.sig-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.sig-cell{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-.sc-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px}
-.sc-val{font-family:var(--mono);font-size:15px;font-weight:700}
-.sc-val.entry{color:var(--neutral)}.sc-val.sl{color:var(--sell)}.sc-val.tp{color:var(--buy)}.sc-val.rr{color:var(--warn)}
-.sc-sub{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
-.conf-wrap{margin-bottom:14px}
-.conf-top{display:flex;justify-content:space-between;margin-bottom:5px}
-.conf-lbl{font-size:10px;color:var(--muted);font-weight:500}
-.conf-pct{font-family:var(--mono);font-size:12px;font-weight:700}
-.conf-track{height:7px;background:var(--panel2);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
-.conf-fill{height:100%;border-radius:4px;transition:width .5s ease}
-.validity-bar{background:var(--warn-light);border:1px solid rgba(230,138,0,.25);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.validity-label{font-size:10px;color:var(--warn);font-weight:600;font-family:var(--mono);display:flex;align-items:center;gap:5px}
-.validity-timer{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--warn)}
-.validity-note{font-size:10px;color:var(--muted)}
-.reason-box{background:var(--panel2);border:1px solid var(--border);border-left:3px solid;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:14px}
-.reason-box.buy{border-left-color:var(--buy)}.reason-box.sell{border-left-color:var(--sell)}.reason-box.neut{border-left-color:var(--neutral)}
-.r-title{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
-.r-points{list-style:none}
-.r-points li{font-size:11px;color:var(--text);padding:3px 0;line-height:1.5;display:flex;align-items:flex-start;gap:5px}
-.r-arrow{color:var(--muted);flex-shrink:0}
-.ind-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.ind-cell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;text-align:center}
-.ind-name{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
-.ind-val{font-family:var(--mono);font-size:12px;font-weight:700}
-.ind-val.bull{color:var(--buy)}.ind-val.bear{color:var(--sell)}.ind-val.neut{color:var(--warn)}
-.pos-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.pos-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.pos-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
-.pos-input-wrap{display:flex;flex-direction:column;gap:4px}
-.pos-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
-.pos-input{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:100%}
-.pos-input:focus{border-color:var(--neutral)}
-.pos-results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pos-res-cell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
-.pos-res-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
-.pos-res-val{font-family:var(--mono);font-size:14px;font-weight:700}
-.pos-warning{font-size:10px;color:var(--sell);margin-top:8px;font-weight:600;display:none}
-.sent-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.sent-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.sent-block{display:flex;flex-direction:column;gap:8px}
-.sent-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.fg-arc-wrap{display:flex;align-items:center;gap:10px}
-.fg-num{font-family:var(--mono);font-size:28px;font-weight:700}
-.fg-label{font-size:10px;color:var(--muted)}
-.ls-bar-wrap{display:flex;flex-direction:column;gap:4px}
-.ls-bar-track{height:10px;border-radius:5px;overflow:hidden;background:var(--sell-light);border:1px solid var(--border)}
-.ls-bar-fill{height:100%;background:var(--buy);border-radius:5px;transition:width .4s}
-.ls-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px}
-/* FOREX PANEL */
-.forex-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.forex-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.forex-cell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;cursor:default}
-.forex-pair{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px;font-weight:700}
-.forex-rate{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)}
-.forex-chg{font-family:var(--mono);font-size:9px;margin-top:2px}
-.chart-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.chart-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.chart-title-txt{font-size:12px;font-weight:700}
-.chart-meta{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.alert-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-family:var(--mono);font-size:11px;cursor:pointer;font-weight:600}
-.alert-btn.active-alert{background:var(--buy-light);border-color:var(--buy);color:var(--buy)}
-.ov-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.ov-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
-.ov-title{font-size:12px;font-weight:700}
-.ov-table{width:100%;border-collapse:collapse}
-.ov-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--panel2)}
-.ov-table td{padding:10px 14px;font-family:var(--mono);font-size:11px;border-bottom:1px solid var(--border);white-space:nowrap}
-.ov-table tbody tr{cursor:pointer}
-.ov-table tbody tr:hover td{background:var(--panel2)}
-.ov-table tbody tr:last-child td{border-bottom:none}
-.ov-coin{display:flex;align-items:center;gap:7px}
-.ov-em{font-size:14px}
-.ov-sym2{font-weight:700}.ov-full2{font-size:9px;color:var(--muted);font-family:var(--sans)}
-.td-buy{color:var(--buy)!important;font-weight:700}.td-sell{color:var(--sell)!important;font-weight:700}.td-neut{color:var(--neutral)!important;font-weight:700}
-.up-txt{color:var(--buy)}.dn-txt{color:var(--sell)}
-.ord-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700}
-.ord-buy{background:var(--buy-light);color:var(--buy)}.ord-sell{background:var(--sell-light);color:var(--sell)}.ord-neut{background:var(--neut-light);color:var(--neutral)}
-.loading-ovl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:60px}
-.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--buy);border-radius:50%;animation:spin .75s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.load-txt{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.err-box{background:var(--sell-light);border:1px solid rgba(232,51,74,0.3);border-radius:8px;padding:14px;font-size:12px;color:var(--sell);font-family:var(--mono);line-height:1.7}
-.disclaimer{background:var(--warn-light);border:1px solid rgba(230,138,0,0.2);border-radius:8px;padding:9px 14px;font-size:11px;color:var(--muted);line-height:1.6}
-.disclaimer strong{color:var(--warn)}
-.ws-status{font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.ws-ok{color:var(--buy)}.ws-err{color:var(--sell)}.ws-wait{color:var(--warn)}
-.ai-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 1px 6px rgba(30,45,74,0.05)}
-.ai-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.ai-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
-.ai-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b22,#ffa50022);border:1px solid var(--border2);color:#e65c00;font-weight:700}
-.ai-ask-btn{padding:10px;border-radius:7px;border:none;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;width:100%}
-.ai-ask-btn:disabled{opacity:.5;cursor:not-allowed}
-.ai-output{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:60px;font-size:12px;line-height:1.7;font-family:var(--sans);white-space:pre-wrap;word-break:break-word}
-.ai-output.loading{color:var(--muted);font-style:italic}
-.ai-output.error{color:var(--sell)}
-.ai-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.ai-field-cell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
-.ai-field-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
-.ai-field-val{font-family:var(--mono);font-size:13px;font-weight:700}
-.ai-field-val.entry{color:var(--neutral)}.ai-field-val.sl{color:var(--sell)}.ai-field-val.tp{color:var(--buy)}
-.ai-disclaimer{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5}
-#toasts{position:fixed;bottom:18px;right:18px;z-index:999;display:flex;flex-direction:column;gap:5px}
-.toast{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:11px;box-shadow:0 4px 20px rgba(30,45,74,0.12);animation:slideUp .2s ease;max-width:300px}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,45,74,.35);z-index:500;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;width:340px;box-shadow:0 8px 40px rgba(30,45,74,.15)}
-.modal-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
-.modal-input{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:13px;outline:none;margin-bottom:10px}
-.modal-input:focus{border-color:var(--neutral)}
-.modal-note{font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.5}
-.modal-btns{display:flex;gap:8px}
-.modal-confirm{flex:1;padding:9px;border-radius:8px;border:none;background:var(--neutral);color:var(--white);font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer}
-.modal-cancel{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;cursor:pointer}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-@media(max-width:880px){
-  .layout{grid-template-columns:1fr}
-  .sidebar{position:static;height:auto;display:flex;flex-wrap:wrap;gap:8px;padding:10px}
-  .sig-grid{grid-template-columns:repeat(2,1fr)}
-  .ind-row{grid-template-columns:repeat(3,1fr)}
-  .pos-grid{grid-template-columns:1fr 1fr}
-  .pos-results{grid-template-columns:1fr 1fr}
-  .sent-row{grid-template-columns:1fr}
-  .forex-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:540px){
-  .sig-grid{grid-template-columns:1fr 1fr}
-  .ind-row{grid-template-columns:repeat(2,1fr)}
-  .pos-grid{grid-template-columns:1fr}
-  .pos-results{grid-template-columns:1fr}
-  .forex-grid{grid-template-columns:repeat(2,1fr)}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Android 16 Launcher</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: 'Roboto', 'Segoe UI', sans-serif; }
+        :root { --primary: #1a73e8; --surface: #ffffff; --background: #f0f2f5; --on-surface: #202124; --on-background: #5f6368; --accent: #34a853; --error: #ea4335; --warning: #fbbc05; --shadow: 0 2px 8px rgba(0,0,0,0.12); --shadow-lg: 0 8px 24px rgba(0,0,0,0.15); --radius: 16px; --radius-sm: 8px; --status-height: 28px; }
+        [data-theme="dark"] { --surface: #1f1f1f; --background: #121212; --on-surface: #e8eaed; --on-background: #9aa0a6; }
+        body { background: #000; overflow: hidden; height: 100vh; width: 100vw; }
+        #device-frame { width: 100%; height: 100vh; max-width: 430px; margin: 0 auto; background: var(--background); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .status-bar { height: var(--status-height); background: transparent; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; font-weight: 600; color: var(--on-surface); z-index: 1000; position: absolute; top: 0; left: 0; right: 0; }
+        .status-left { display: flex; align-items: center; gap: 6px; }
+        .status-right { display: flex; align-items: center; gap: 6px; }
+        .status-icon { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+        .battery-level { display: flex; align-items: center; gap: 2px; }
+        .battery-icon { width: 18px; height: 10px; border: 1.5px solid var(--on-surface); border-radius: 2px; position: relative; display: flex; align-items: center; padding: 1px; }
+        .battery-icon::after { content: ''; position: absolute; right: -3px; width: 2px; height: 4px; background: var(--on-surface); border-radius: 0 1px 1px 0; }
+        .battery-fill { height: 100%; background: var(--accent); border-radius: 1px; transition: width 0.3s; }
+        .screens-container { flex: 1; position: relative; overflow: hidden; }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--background); padding-top: var(--status-height); scrollbar-width: none; }
+        .screen::-webkit-scrollbar { display: none; }
+        .screen.hidden { transform: translateX(100%); pointer-events: none; }
+        .screen.slide-left { transform: translateX(-30%); }
+        .home-screen { background-size: cover; background-position: center; display: flex; flex-direction: column; }
+        .wallpaper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); z-index: 0; }
+        .wallpaper::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); }
+        .home-content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding: 16px; }
+        .clock-widget { text-align: center; padding: 40px 0 20px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .clock-time { font-size: 64px; font-weight: 300; letter-spacing: -2px; line-height: 1; }
+        .clock-date { font-size: 16px; font-weight: 400; margin-top: 8px; opacity: 0.9; }
+        .search-bar { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; margin: 0 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(10px); cursor: pointer; }
+        [data-theme="dark"] .search-bar { background: rgba(48,48,48,0.95); }
+        .search-icon { width: 20px; height: 20px; opacity: 0.5; }
+        .search-text { flex: 1; font-size: 15px; color: var(--on-background); background: none; border: none; outline: none; user-select: text; }
+        .search-mic { width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; border-radius: var(--radius-sm); transition: transform 0.15s, background 0.15s; cursor: pointer; position: relative; }
+        .app-item:active { transform: scale(0.92); background: rgba(255,255,255,0.1); }
+        .app-icon { width: 56px; height: 56px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
+        .app-icon::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%); }
+        .app-name { font-size: 12px; color: white; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+        .app-badge { position: absolute; top: 4px; right: 4px; min-width: 18px; height: 18px; background: var(--error); color: white; border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; z-index: 2; }
+        .dock { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border-radius: var(--radius) var(--radius) 0 0; padding: 12px 16px 24px; display: flex; justify-content: space-around; align-items: center; margin: 0 -16px -16px; }
+        .dock .app-item { padding: 4px; }
+        .dock .app-icon { width: 52px; height: 52px; }
+        .dock .app-name { display: none; }
+        .app-drawer { background: var(--background); border-radius: var(--radius) var(--radius) 0 0; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; display: flex; flex-direction: column; }
+        .app-drawer.open { transform: translateY(0); }
+        .drawer-handle { width: 40px; height: 4px; background: var(--on-background); border-radius: 2px; margin: 12px auto; opacity: 0.3; }
+        .drawer-search { padding: 0 16px 12px; }
+        .drawer-search input { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: none; background: var(--surface); color: var(--on-surface); font-size: 15px; outline: none; box-shadow: var(--shadow); }
+        .drawer-apps { flex: 1; overflow-y: auto; padding: 0 16px; }
+        .drawer-apps .app-grid { grid-template-columns: repeat(4, 1fr); }
+        .drawer-apps .app-item .app-name { color: var(--on-surface); text-shadow: none; }
+        .drawer-apps .app-icon { width: 52px; height: 52px; font-size: 24px; }
+        .notification-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .notification-panel.open { opacity: 1; pointer-events: all; }
+        .notification-content { background: var(--surface); border-radius: 0 0 var(--radius) var(--radius); max-height: 70%; overflow-y: auto; transform: translateY(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: var(--status-height) 16px 16px; }
+        .notification-panel.open .notification-content { transform: translateY(0); }
+        .notification-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .notification-title { font-size: 14px; font-weight: 600; color: var(--on-surface); }
+        .notification-clear { font-size: 13px; color: var(--primary); cursor: pointer; }
+        .notification-item { padding: 16px; background: var(--background); border-radius: var(--radius-sm); margin-top: 8px; display: flex; gap: 12px; align-items: flex-start; }
+        .notification-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .notification-body { flex: 1; }
+        .notification-app-name { font-size: 13px; font-weight: 600; color: var(--on-surface); }
+        .notification-text { font-size: 13px; color: var(--on-background); margin-top: 2px; }
+        .notification-time { font-size: 11px; color: var(--on-background); opacity: 0.7; }
+        .quick-settings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; background: var(--background); border-radius: var(--radius); margin-top: 12px; }
+        .qs-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+        .qs-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.2s; box-shadow: var(--shadow); }
+        .qs-tile.active .qs-icon { background: var(--primary); color: white; }
+        .qs-label { font-size: 11px; color: var(--on-background); }
+        .qs-slider { grid-column: span 4; display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+        .qs-slider input[type="range"] { flex: 1; height: 4px; -webkit-appearance: none; background: var(--surface); border-radius: 2px; outline: none; }
+        .qs-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: var(--shadow); }
+        .app-screen { background: var(--background); z-index: 50; }
+        .app-header { background: var(--surface); padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; }
+        .app-back { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--on-surface); cursor: pointer; transition: background 0.15s; }
+        .app-back:active { background: var(--background); }
+        .app-title { flex: 1; font-size: 20px; font-weight: 600; color: var(--on-surface); }
+        .app-actions { display: flex; gap: 8px; }
+        .app-action { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--on-surface); cursor: pointer; }
+        .app-action:active { background: var(--background); }
+        .app-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .phone-dialer { display: flex; flex-direction: column; height: 100%; }
+        .dial-display { padding: 24px 16px; text-align: center; font-size: 32px; font-weight: 300; color: var(--on-surface); min-height: 80px; display: flex; align-items: center; justify-content: center; word-break: break-all; }
+        .dial-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--background); }
+        .dial-key { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface); font-size: 28px; font-weight: 400; color: var(--on-surface); cursor: pointer; transition: background 0.1s; }
+        .dial-key:active { background: var(--background); }
+        .dial-key span { font-size: 11px; color: var(--on-background); margin-top: 2px; letter-spacing: 2px; }
+        .dial-actions { display: flex; justify-content: center; gap: 32px; padding: 16px; }
+        .dial-call { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; cursor: pointer; box-shadow: var(--shadow-lg); }
+        .dial-delete { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--on-background); cursor: pointer; }
+        .contact-list { display: flex; flex-direction: column; gap: 1px; }
+        .contact-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
+        .contact-item:active { background: var(--background); }
+        .contact-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: 500; }
+        .contact-info { flex: 1; }
+        .contact-name { font-size: 16px; font-weight: 500; color: var(--on-surface); }
+        .contact-number { font-size: 13px; color: var(--on-background); }
+        .contact-actions { display: flex; gap: 8px; }
+        .contact-action-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px; }
+        .sms-list { display: flex; flex-direction: column; gap: 1px; }
+        .sms-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
+        .sms-item.unread .contact-name { font-weight: 700; }
+        .sms-item.unread .sms-preview { font-weight: 500; color: var(--on-surface); }
+        .sms-preview { font-size: 13px; color: var(--on-background); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sms-time { font-size: 12px; color: var(--on-background); opacity: 0.7; }
+        .sms-thread { display: flex; flex-direction: column; height: 100%; }
+        .sms-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .sms-bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .sms-bubble.sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .sms-bubble.received { align-self: flex-start; background: var(--surface); color: var(--on-surface); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+        .sms-bubble .msg-status { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+        .sms-input-area { padding: 12px 16px; background: var(--surface); display: flex; align-items: center; gap: 12px; }
+        .sms-input { flex: 1; padding: 10px 16px; border-radius: 20px; border: none; background: var(--background); color: var(--on-surface); font-size: 15px; outline: none; }
+        .sms-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; cursor: pointer; }
+        .sms-send:disabled { opacity: 0.5; cursor: not-allowed; }
+        .sms-send.sending::after { content: ''; width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .calculator { display: flex; flex-direction: column; height: 100%; max-width: 100%; }
+        .calc-display { padding: 24px 16px; text-align: right; background: var(--surface); }
+        .calc-history { font-size: 14px; color: var(--on-background); min-height: 20px; }
+        .calc-result { font-size: 48px; font-weight: 300; color: var(--on-surface); word-break: break-all; }
+        .calc-pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--background); flex: 1; }
+        .calc-btn { display: flex; align-items: center; justify-content: center; background: var(--surface); font-size: 24px; color: var(--on-surface); cursor: pointer; transition: background 0.1s; border: none; }
+        .calc-btn:active { background: var(--background); }
+        .calc-btn.operator { color: var(--primary); font-size: 28px; }
+        .calc-btn.equals { background: var(--primary); color: white; }
+        .calc-btn.equals:active { background: #1557b0; }
+        .calc-btn.zero { grid-column: span 2; }
+        .file-toolbar { display: flex; gap: 8px; padding: 0 0 16px; overflow-x: auto; }
+        .file-toolbar::-webkit-scrollbar { display: none; }
+        .file-tool { padding: 8px 16px; border-radius: 20px; background: var(--surface); color: var(--on-surface); font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; box-shadow: var(--shadow); border: none; }
+        .file-tool:active { background: var(--background); }
+        .file-categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .file-category { padding: 20px; background: var(--surface); border-radius: var(--radius); display: flex; align-items: center; gap: 16px; cursor: pointer; box-shadow: var(--shadow); }
+        .file-category-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .file-category-info { flex: 1; }
+        .file-category-name { font-size: 15px; font-weight: 600; color: var(--on-surface); }
+        .file-category-count { font-size: 13px; color: var(--on-background); }
+        .file-list { display: flex; flex-direction: column; gap: 1px; }
+        .file-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
+        .file-item:active { background: var(--background); }
+        .file-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; background: var(--background); }
+        .file-info { flex: 1; min-width: 0; }
+        .file-name { font-size: 15px; color: var(--on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-meta { font-size: 12px; color: var(--on-background); margin-top: 2px; }
+        .file-menu { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--on-background); font-size: 20px; }
+        .settings-list { display: flex; flex-direction: column; gap: 1px; }
+        .settings-section { margin-top: 16px; }
+        .settings-section-title { padding: 16px; font-size: 13px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .settings-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface); cursor: pointer; }
+        .settings-item:active { background: var(--background); }
+        .settings-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .settings-info { flex: 1; }
+        .settings-label { font-size: 16px; color: var(--on-surface); }
+        .settings-desc { font-size: 13px; color: var(--on-background); margin-top: 2px; }
+        .settings-toggle { width: 48px; height: 28px; border-radius: 14px; background: var(--background); position: relative; cursor: pointer; transition: background 0.2s; }
+        .settings-toggle.active { background: var(--primary); }
+        .settings-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .settings-toggle.active::after { transform: translateX(20px); }
+        .lock-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .lock-screen.hidden { transform: translateY(-100%); }
+        .lock-clock { text-align: center; color: white; margin-bottom: 60px; }
+        .lock-time { font-size: 72px; font-weight: 300; letter-spacing: -2px; }
+        .lock-date { font-size: 18px; margin-top: 12px; opacity: 0.8; }
+        .lock-pin { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+        .pin-dots { display: flex; gap: 16px; }
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); transition: all 0.2s; }
+        .pin-dot.filled { background: white; border-color: white; }
+        .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .pin-key { width: 72px; height: 72px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; font-size: 28px; cursor: pointer; transition: background 0.15s; border: none; }
+        .pin-key:active { background: rgba(255,255,255,0.2); }
+        .pin-key span { font-size: 10px; opacity: 0.6; letter-spacing: 2px; margin-top: 2px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal { background: var(--surface); border-radius: var(--radius); width: 85%; max-width: 320px; overflow: hidden; transform: scale(0.9); transition: transform 0.2s; }
+        .modal-overlay.open .modal { transform: scale(1); }
+        .modal-header { padding: 20px 20px 0; }
+        .modal-title { font-size: 18px; font-weight: 600; color: var(--on-surface); }
+        .modal-body { padding: 16px 20px; font-size: 14px; color: var(--on-background); }
+        .modal-input { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--background); background: var(--background); color: var(--on-surface); font-size: 15px; outline: none; margin-top: 8px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 12px 12px; }
+        .modal-btn { padding: 10px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--primary); }
+        .modal-btn.primary { background: var(--primary); color: white; }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--on-surface); color: var(--surface); padding: 12px 24px; border-radius: 24px; font-size: 14px; z-index: 10000; opacity: 0; transition: all 0.3s; white-space: nowrap; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .bottom-nav { display: flex; justify-content: space-around; padding: 8px 0 20px; background: var(--surface); border-top: 1px solid rgba(0,0,0,0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 16px; cursor: pointer; color: var(--on-background); }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease; }
+        .animate-slideUp { animation: slideUp 0.3s ease; }
+        ::-webkit-scrollbar { width: 0; height: 0; }
+        @media (min-width: 431px) { #device-frame { border-radius: 40px; height: 90vh; margin-top: 5vh; box-shadow: 0 0 60px rgba(0,0,0,0.3); } }
+        .browser-app { display: flex; flex-direction: column; height: 100%; }
+        .browser-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .browser-nav-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--on-surface); cursor: pointer; border: none; background: transparent; }
+        .browser-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .browser-address-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--background); border-radius: 20px; padding: 6px 12px; }
+        .browser-address-bar input { flex: 1; border: none; background: transparent; color: var(--on-surface); font-size: 14px; outline: none; }
+        .browser-content { flex: 1; overflow-y: auto; background: var(--background); }
+        .search-results { padding: 12px; }
+        .search-result-item { background: var(--surface); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: var(--shadow); }
+        .search-result-item:active { transform: scale(0.98); }
+        .search-result-title { font-size: 15px; font-weight: 600; color: var(--primary); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .search-result-url { font-size: 12px; color: var(--accent); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .search-result-desc { font-size: 13px; color: var(--on-background); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        .search-loading { text-align: center; padding: 40px; color: var(--on-background); }
+        .search-loading-spinner { width: 40px; height: 40px; border: 3px solid var(--background); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        .web-frame { width: 100%; height: 100%; border: none; background: white; }
+        .browser-tabs { display: flex; gap: 4px; padding: 4px 8px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); overflow-x: auto; }
+        .browser-tabs::-webkit-scrollbar { display: none; }
+        .browser-tab { padding: 6px 12px; border-radius: 12px; background: var(--background); font-size: 12px; color: var(--on-surface); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; max-width: 120px; }
+        .browser-tab.active { background: var(--primary); color: white; }
+        .browser-tab-close { font-size: 14px; opacity: 0.7; }
+        .email-list { display: flex; flex-direction: column; gap: 1px; }
+        .email-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); cursor: pointer; }
+        .email-item.unread { border-left: 3px solid var(--primary); }
+        .email-item.unread .email-sender { font-weight: 700; }
+        .email-item.unread .email-subject { font-weight: 600; }
+        .email-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; font-weight: 500; flex-shrink: 0; }
+        .email-info { flex: 1; min-width: 0; }
+        .email-sender { font-size: 15px; color: var(--on-surface); }
+        .email-subject { font-size: 14px; color: var(--on-surface); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .email-preview { font-size: 13px; color: var(--on-background); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .email-meta { text-align: right; flex-shrink: 0; }
+        .email-time { font-size: 12px; color: var(--on-background); }
+        .email-compose { display: flex; flex-direction: column; height: 100%; }
+        .email-compose-fields { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .email-field { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--background); }
+        .email-field:last-child { border-bottom: none; }
+        .email-field-label { font-size: 14px; color: var(--on-background); width: 60px; flex-shrink: 0; }
+        .email-field input, .email-field textarea { flex: 1; border: none; background: transparent; color: var(--on-surface); font-size: 15px; outline: none; }
+        .email-compose-body { flex: 1; padding: 16px; }
+        .email-compose-body textarea { width: 100%; height: 100%; border: none; background: transparent; color: var(--on-surface); font-size: 15px; line-height: 1.6; resize: none; outline: none; }
+        .email-compose-actions { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface); border-top: 1px solid rgba(0,0,0,0.05); }
+        .email-send-btn { padding: 10px 24px; border-radius: 20px; background: var(--primary); color: white; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .email-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .email-send-btn.sending { background: var(--on-background); }
+        .email-read { display: flex; flex-direction: column; height: 100%; }
+        .email-read-header { padding: 16px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .email-read-subject { font-size: 18px; font-weight: 600; color: var(--on-surface); margin-bottom: 12px; }
+        .email-read-sender-row { display: flex; align-items: center; gap: 12px; }
+        .email-read-body { flex: 1; padding: 16px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--on-surface); }
+        .connection-status { position: fixed; top: var(--status-height); left: 0; right: 0; padding: 6px 16px; font-size: 12px; text-align: center; z-index: 999; transition: all 0.3s; }
+        .connection-status.online { background: var(--accent); color: white; }
+        .connection-status.offline { background: var(--error); color: white; }
+        .connection-status.syncing { background: var(--warning); color: var(--on-surface); }
+        .connection-status.hidden { transform: translateY(-100%); opacity: 0; }
+    </style>
 </head>
 <body>
-
-<header class="header">
-  <div class="brand">⚡ Sade<span class="brand-mark">Trade</span>
-    <span style="color:var(--muted);font-size:10px;font-weight:400;margin-left:2px">TERMINAL v4</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="ws-pill"><div class="dot blink"></div>Binance Live</div>
-    <div class="ws-status" id="wsStatus"><span class="ws-wait">⏳ Inaunganika...</span></div>
-  </div>
-  <div class="hdr-right">
-    <div class="tick-counter">Ticks: <span id="tickCount">0</span></div>
-    <div class="last-update" id="lastUpd">—</div>
-  </div>
-</header>
-
-<div class="layout">
-  <aside class="sidebar" id="sidebarEl">
-    <div style="padding:0 4px;margin-bottom:8px">
-      <div class="sb-label">Crypto</div>
-      <div id="coinList"></div>
-      <button class="btn-all" onclick="showAll()">☰ Angalia Zote</button>
-    </div>
-    <hr class="sb-divider">
-    <div style="padding:0 4px;margin-bottom:8px">
-      <div class="sb-label">Madini & Forex</div>
-      <div id="metalList">
-        <div class="coin-btn" style="cursor:default"><span style="font-size:14px">🥇</span><span class="coin-sym" style="font-size:11px">XAU/USD</span><span class="coin-price-sb" id="metal_XAU">—</span></div>
-        <div class="coin-btn" style="cursor:default"><span style="font-size:14px">🥈</span><span class="coin-sym" style="font-size:11px">XAG/USD</span><span class="coin-price-sb" id="metal_XAG">—</span></div>
-        <div class="coin-btn" style="cursor:default"><span style="font-size:12px">💱</span><span class="coin-sym" style="font-size:10px">EUR/USD</span><span class="coin-price-sb" id="forex_EURUSD">—</span></div>
-        <div class="coin-btn" style="cursor:default"><span style="font-size:12px">💱</span><span class="coin-sym" style="font-size:10px">GBP/USD</span><span class="coin-price-sb" id="forex_GBPUSD">—</span></div>
-        <div class="coin-btn" style="cursor:default"><span style="font-size:12px">💱</span><span class="coin-sym" style="font-size:10px">USD/JPY</span><span class="coin-price-sb" id="forex_USDJPY">—</span></div>
-      </div>
-    </div>
-    <hr class="sb-divider">
-    <div style="padding:0 4px">
-      <div class="sb-label" style="margin-bottom:6px">Chart Muda</div>
-      <div class="tf-row">
-        <button class="tf-btn active" onclick="setTF(this,'1m')">1m</button>
-        <button class="tf-btn" onclick="setTF(this,'5m')">5m</button>
-        <button class="tf-btn" onclick="setTF(this,'15m')">15m</button>
-        <button class="tf-btn" onclick="setTF(this,'1h')">1h</button>
-        <button class="tf-btn" onclick="setTF(this,'4h')">4h</button>
-        <button class="tf-btn" onclick="setTF(this,'1d')">1d</button>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main" id="mainArea">
-    <div class="skeleton sk-header"></div>
-    <div class="skeleton sk-card"></div>
-    <div class="skeleton sk-chart"></div>
-  </main>
-</div>
-
-<div class="modal-overlay" id="alertModal">
-  <div class="modal">
-    <div class="modal-title">🔔 Weka Tahadhari ya Bei</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Coin: <strong id="alertCoinName">—</strong> &nbsp;|&nbsp; Bei: <strong id="alertCurrentPrice">—</strong></div>
-    <input class="modal-input" type="number" id="alertPriceInput" placeholder="Ingiza bei (USD)..." step="0.01">
-    <div class="modal-note">⚡ Utapata taarifa mara bei itakapofikia lengo.</div>
-    <div class="modal-btns">
-      <button class="modal-confirm" onclick="confirmAlert()">✓ Weka Tahadhari</button>
-      <button class="modal-cancel" onclick="closeAlertModal()">Ghairi</button>
-    </div>
-  </div>
-</div>
-
-<div id="toasts"></div>
-
-<script>
-(function(){
-  var s=document.createElement('script');
-  s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-  s.async=true;
-  document.head.appendChild(s);
-})();
-</script>
-
-<script>
-'use strict';
-
-// ═══════════════════════════════════
-//  API KEYS
-// ═══════════════════════════════════
-const KEYS={
-  xai:'65KTZ22AKF6JGL4E',
-  alphavantage:'e3f85901a6b24a5d853e8deafe7c3103',
-  twelvedata:'d8mmfd1r01qn3045iro0',
-  finnhub:'d8mmfd1r01qn3045irog',
-  metal:'2952a78c9779331373b7f8dec2d6708d'
-};
-
-// ═══════════════════════════════════
-//  COINS
-// ═══════════════════════════════════
-const COINS=[
-  {id:'BTC',name:'Bitcoin',em:'₿',ws:'btcusdt'},
-  {id:'ETH',name:'Ethereum',em:'Ξ',ws:'ethusdt'},
-  {id:'BNB',name:'BNB',em:'◈',ws:'bnbusdt'},
-  {id:'SOL',name:'Solana',em:'◎',ws:'solusdt'},
-  {id:'XRP',name:'XRP',em:'✕',ws:'xrpusdt'},
-  {id:'DOGE',name:'Dogecoin',em:'Ð',ws:'dogeusdt'},
-  {id:'ADA',name:'Cardano',em:'₳',ws:'adausdt'},
-  {id:'AVAX',name:'Avalanche',em:'▲',ws:'avaxusdt'},
-  {id:'DOT',name:'Polkadot',em:'●',ws:'dotusdt'},
-  {id:'LINK',name:'Chainlink',em:'⬡',ws:'linkusdt'},
-  {id:'TRX',name:'TRON',em:'⬟',ws:'trxusdt'},
-  {id:'SHIB',name:'Shiba Inu',em:'🐕',ws:'shibusdt'},
-  {id:'LTC',name:'Litecoin',em:'Ł',ws:'ltcusdt'},
-  {id:'BCH',name:'Bitcoin Cash',em:'Ƀ',ws:'bchusdt'},
-  {id:'UNI',name:'Uniswap',em:'🦄',ws:'uniusdt'},
-  {id:'ATOM',name:'Cosmos',em:'⚛',ws:'atomusdt'},
-  {id:'NEAR',name:'NEAR Protocol',em:'Ⓝ',ws:'nearusdt'},
-  {id:'ARB',name:'Arbitrum',em:'🔵',ws:'arbusdt'},
-  {id:'OP',name:'Optimism',em:'🔴',ws:'opusdt'},
-  {id:'INJ',name:'Injective',em:'💎',ws:'injusdt'},
-  {id:'SUI',name:'Sui',em:'🌊',ws:'suiusdt'},
-  {id:'APT',name:'Aptos',em:'🅰',ws:'aptusdt'},
-  {id:'FIL',name:'Filecoin',em:'⌂',ws:'filusdt'},
-  {id:'MATIC',name:'Polygon',em:'⬡',ws:'maticusdt'},
-  {id:'ICP',name:'Internet Cmp',em:'∞',ws:'icpusdt'},
-  {id:'RENDER',name:'Render',em:'🖥',ws:'renderusdt'},
-  {id:'FET',name:'Fetch.ai',em:'🤖',ws:'fetusdt'},
-  {id:'PEPE',name:'Pepe',em:'🐸',ws:'pepeusdt'},
-  {id:'WIF',name:'dogwifhat',em:'🎩',ws:'wifusdt'},
-  {id:'TON',name:'Toncoin',em:'💎',ws:'tonusdt'},
-  {id:'XLM',name:'Stellar',em:'★',ws:'xlmusdt'},
-  {id:'ALGO',name:'Algorand',em:'◆',ws:'algousdt'},
-  {id:'VET',name:'VeChain',em:'✦',ws:'vetusdt'},
-  {id:'HBAR',name:'Hedera',em:'ℏ',ws:'hbarusdt'},
-  {id:'AAVE',name:'Aave',em:'👻',ws:'aaveusdt'},
-  {id:'CRV',name:'Curve',em:'〰',ws:'crvusdt'},
-  {id:'MKR',name:'Maker',em:'🏛',ws:'mkrusdt'},
-  {id:'SNX',name:'Synthetix',em:'⚗',ws:'snxusdt'},
-  {id:'GRT',name:'The Graph',em:'📊',ws:'grtusdt'},
-  {id:'LDO',name:'Lido DAO',em:'🧪',ws:'ldousdt'},
-  {id:'SAND',name:'The Sandbox',em:'🏖',ws:'sandusdt'},
-  {id:'MANA',name:'Decentraland',em:'🌐',ws:'manausdt'},
-  {id:'AXS',name:'Axie Infinity',em:'🎮',ws:'axsusdt'},
-  {id:'CHZ',name:'Chiliz',em:'⚽',ws:'chzusdt'},
-  {id:'EOS',name:'EOS',em:'◉',ws:'eosusdt'},
-  {id:'XMR',name:'Monero',em:'ɱ',ws:'xmrusdt'},
-  {id:'EGLD',name:'MultiversX',em:'⚡',ws:'egldusdt'},
-  {id:'THETA',name:'Theta Network',em:'θ',ws:'thetausdt'},
-  {id:'FTM',name:'Fantom',em:'👻',ws:'ftmusdt'},
-  {id:'RUNE',name:'THORChain',em:'⚔',ws:'runeusdt'},
-];
-
-const COINCAP_IDS={
-  BTC:'bitcoin',ETH:'ethereum',BNB:'binance-coin',SOL:'solana',
-  XRP:'xrp',DOGE:'dogecoin',ADA:'cardano',AVAX:'avalanche',
-  DOT:'polkadot',LINK:'chainlink',TRX:'tron',SHIB:'shiba-inu',
-  LTC:'litecoin',BCH:'bitcoin-cash',UNI:'uniswap',ATOM:'cosmos',
-  NEAR:'near-protocol',ARB:'arbitrum',OP:'optimism',INJ:'injective-protocol',
-  SUI:'sui',APT:'aptos',FIL:'filecoin',MATIC:'polygon',
-  ICP:'internet-computer',RENDER:'render-token',FET:'fetch',
-  PEPE:'pepe',WIF:'dogwifcoin',TON:'toncoin',XLM:'stellar',
-  ALGO:'algorand',VET:'vechain',HBAR:'hedera-hashgraph',AAVE:'aave',
-  CRV:'curve-dao-token',MKR:'maker',SNX:'synthetix-network-token',
-  GRT:'the-graph',LDO:'lido-dao',SAND:'the-sandbox',MANA:'decentraland',
-  AXS:'axie-infinity',CHZ:'chiliz',EOS:'eos',XMR:'monero',
-  EGLD:'elrond-erd-2',THETA:'theta-network',FTM:'fantom',RUNE:'thorchain',
-};
-const COINCAP_REV=Object.fromEntries(Object.entries(COINCAP_IDS).map(([k,v])=>[v,k]));
-
-// ═══════════════════════════════════
-//  STATE — persist selected coin
-// ═══════════════════════════════════
-const savedCoinId=localStorage.getItem('st_selected')||'BTC';
-const defaultCoin=COINS.find(c=>c.id===savedCoinId)||COINS[0];
-const savedTF=localStorage.getItem('st_tf')||'1m';
-
-const S={
-  prices:{},candles:{},signals:{},
-  selected:defaultCoin,tf:savedTF,view:'single',
-  tickCount:0,ws:null,wsBatches:[],wsToastShown:false,
-  klineWs:null,chartInst:null,ready:false,
-  alerts:{},metals:{},forex:{},_validityInterval:null,
-};
-
-// ═══════════════════════════════════
-//  FORMAT helpers
-// ═══════════════════════════════════
-const fP=p=>{
-  if(!p&&p!==0)return'—';
-  if(p>=1000)return'$'+p.toLocaleString('en-US',{maximumFractionDigits:2});
-  if(p>=1)return'$'+p.toFixed(4);
-  if(p>=0.0001)return'$'+p.toFixed(6);
-  return'$'+p.toFixed(8);
-};
-const fPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
-const fVol=v=>{
-  if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';
-  if(v>=1e6)return'$'+(v/1e6).toFixed(2)+'M';
-  if(v>=1e3)return'$'+(v/1e3).toFixed(2)+'K';
-  return'$'+v.toFixed(2);
-};
-const nowStr=()=>new Date().toLocaleTimeString('sw-TZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-const TF_VALIDITY={'1m':180,'5m':900,'15m':2700,'1h':7200,'4h':28800,'1d':86400};
-const TF_LABEL={'1m':'Dakika 3','5m':'Dakika 15','15m':'Dakika 45','1h':'Masaa 2','4h':'Masaa 8','1d':'Siku 1'};
-
-// ═══════════════════════════════════
-//  PRICE STORE
-// ═══════════════════════════════════
-function storePrice(d){
-  const sym=d.symbol?d.symbol.replace('USDT',''):d.s?d.s.replace('USDT',''):null;
-  if(!sym)return;
-  const price=parseFloat(d.lastPrice||d.c||0);
-  if(!price)return;
-  S.prices[sym]={
-    price,
-    open:parseFloat(d.openPrice||d.o||price),
-    high:parseFloat(d.highPrice||d.h||price),
-    low:parseFloat(d.lowPrice||d.l||price),
-    close:price,
-    vol:parseFloat(d.volume||d.v||0)*price,
-    chg24h:parseFloat(d.priceChangePercent||d.P||0),
-    bid:parseFloat(d.bidPrice||d.b||price),
-    ask:parseFloat(d.askPrice||d.a||price),
-    trades:parseInt(d.count||d.n||0),
-  };
-}
-
-// ═══════════════════════════════════
-//  PRICE LOADING
-// ═══════════════════════════════════
-async function preloadPricesREST(){
-  openCoinCapWS();
-  try{
-    const symbols=COINS.map(c=>'"'+c.id+'USDT"').join(',');
-    const r=await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=[${symbols}]`,{signal:AbortSignal.timeout(6000)});
-    if(r.ok){
-      const arr=await r.json();
-      if(Array.isArray(arr)){
-        arr.forEach(d=>storePrice(d));
-        if(!S.ready){
-          S.ready=true;
-          renderSingle(S.selected);
-          buildSidebar();
-          fetchKlines(S.selected,S.tf);
-          connectKlineWS(S.selected,S.tf);
-        }else buildSidebar();
-      }
-    }
-  }catch(e){}
-}
-
-function openCoinCapWS(){
-  const url='wss://ws.coincap.io/prices?assets='+COINS.map(c=>COINCAP_IDS[c.id]||c.id.toLowerCase()).join(',');
-  const ws=new WebSocket(url);
-  S.wsBatches.push(ws);
-  ws.onopen=()=>{
-    setWsStatus('ok','● CoinCap Live');
-    if(!S.wsToastShown){toast('✅ CoinCap — Imeunganishwa!');S.wsToastShown=true;}
-  };
-  ws.onmessage=e=>{
-    let data;try{data=JSON.parse(e.data);}catch{return;}
-    Object.entries(data).forEach(([geckoId,priceStr])=>{
-      const sym=COINCAP_REV[geckoId];if(!sym)return;
-      const price=parseFloat(priceStr);if(!price)return;
-      const old=S.prices[sym];
-      S.prices[sym]={price,open:old?.open||price,high:old?.high?Math.max(old.high,price):price,
-        low:old?.low?Math.min(old.low,price):price,close:price,vol:old?.vol||0,
-        chg24h:old?.chg24h||0,bid:price*0.9999,ask:price*1.0001,trades:0};
-      S.tickCount++;
-      if(S.tickCount%5===0){
-        const tc=document.getElementById('tickCount');const lu=document.getElementById('lastUpd');
-        if(tc)tc.textContent=S.tickCount;if(lu)lu.textContent=nowStr();
-      }
-      flashSidebarPrice(sym);
-      checkPriceAlert(sym,price,old?.price||price);
-      if(sym===S.selected.id&&S.view==='single'){
-        updateLivePrice(sym);
-        if(S.tickCount%5===0)recomputeAndUpdateSignal(sym);
-      }
-      if(!S.ready&&sym===S.selected.id){
-        S.ready=true;renderSingle(S.selected);buildSidebar();
-        fetchKlines(S.selected,S.tf);connectKlineWS(S.selected,S.tf);
-      }
-      if(S.tickCount%30===0)buildSidebar();
-    });
-  };
-  ws.onerror=()=>setWsStatus('err','✕ CoinCap Error');
-  ws.onclose=()=>{setWsStatus('wait','⏳ Inaunganika tena...');setTimeout(openCoinCapWS,3000);};
-}
-
-function openBinanceWSIfNeeded(){
-  if(S.tickCount>0)return;
-  const BATCH=10,base='wss://stream.binance.com:9443';
-  for(let i=0;i<COINS.length;i+=BATCH)openBatchWS(COINS.slice(i,i+BATCH),base,i===0);
-}
-
-function openBatchWS(coins,base,isPrimary){
-  const streams=coins.map(c=>c.ws+'@ticker').join('/');
-  const ws=new WebSocket(`${base}/stream?streams=${streams}`);
-  ws.onopen=()=>{if(isPrimary&&!S.wsToastShown){setWsStatus('ok','● Binance Live');toast('✅ Binance — Imeunganishwa!');S.wsToastShown=true;}};
-  ws.onmessage=e=>{
-    let msg;try{msg=JSON.parse(e.data);}catch{return;}
-    const d=msg.data;if(!d||d.e!=='24hrTicker')return;
-    const sym=d.s.replace('USDT','');
-    const oldPrice=S.prices[sym]?.price||0;
-    storePrice({...d,symbol:d.s});
-    S.tickCount++;
-    if(S.tickCount%5===0){const tc=document.getElementById('tickCount');const lu=document.getElementById('lastUpd');if(tc)tc.textContent=S.tickCount;if(lu)lu.textContent=nowStr();}
-    flashSidebarPrice(sym);
-    checkPriceAlert(sym,parseFloat(d.c),oldPrice);
-    if(sym===S.selected.id&&S.view==='single'){updateLivePrice(sym);if(S.tickCount%5===0)recomputeAndUpdateSignal(sym);}
-    if(!S.ready&&sym===S.selected.id){S.ready=true;renderSingle(S.selected);buildSidebar();fetchKlines(S.selected,S.tf);connectKlineWS(S.selected,S.tf);setWsStatus('ok','● Binance Live');}
-    if(S.tickCount%30===0)buildSidebar();
-  };
-  ws.onerror=()=>{if(isPrimary)setWsStatus('err','✕ WS Error');};
-  ws.onclose=()=>setTimeout(()=>openBatchWS(coins,base,isPrimary),5000);
-  S.wsBatches.push(ws);
-}
-
-function setWsStatus(cls,txt){const el=document.getElementById('wsStatus');if(el)el.innerHTML=`<span class="ws-${cls}">${txt}</span>`;}
-
-// ═══════════════════════════════════
-//  KLINES
-// ═══════════════════════════════════
-async function fetchKlines(coin,interval){
-  const key=coin.id+'_'+interval;
-  try{
-    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${coin.id}USDT&interval=${interval}&limit=150`);
-    if(!r.ok)return;
-    const raw=await r.json();
-    S.candles[key]=raw.map(k=>({t:k[0],o:parseFloat(k[1]),h:parseFloat(k[2]),l:parseFloat(k[3]),c:parseFloat(k[4]),v:parseFloat(k[5])}));
-    if(S.view==='single'&&S.selected.id===coin.id)drawChart(coin,interval);
-    computeSignalFromCandles(coin,S.candles[key]);
-  }catch(e){}
-}
-
-function connectKlineWS(coin,interval){
-  if(S.klineWs){S.klineWs.close();S.klineWs=null;}
-  const ws=new WebSocket(`wss://stream.binance.com:9443/ws/${coin.ws}@kline_${interval}`);
-  ws.onmessage=e=>{
-    let msg;try{msg=JSON.parse(e.data);}catch{return;}
-    const k=msg.k;if(!k)return;
-    const key=coin.id+'_'+interval;if(!S.candles[key])return;
-    const candle={t:k.t,o:parseFloat(k.o),h:parseFloat(k.h),l:parseFloat(k.l),c:parseFloat(k.c),v:parseFloat(k.v)};
-    const last=S.candles[key][S.candles[key].length-1];
-    if(last&&last.t===k.t)S.candles[key][S.candles[key].length-1]=candle;
-    else{S.candles[key].push(candle);if(S.candles[key].length>200)S.candles[key].shift();}
-    if(S.view==='single'&&S.selected.id===coin.id)drawChart(coin,interval);
-    computeSignalFromCandles(coin,S.candles[key]);
-  };
-  S.klineWs=ws;
-}
-
-// ═══════════════════════════════════
-//  TECHNICAL ANALYSIS
-// ═══════════════════════════════════
-const sma=(arr,n)=>arr.length<n?null:arr.slice(-n).reduce((a,b)=>a+b,0)/n;
-function ema(arr,n){
-  if(arr.length<n)return null;
-  const k=2/(n+1);let v=arr.slice(0,n).reduce((a,b)=>a+b,0)/n;
-  for(let i=n;i<arr.length;i++)v=arr[i]*k+v*(1-k);
-  return v;
-}
-function rsi(prices,n=14){
-  if(prices.length<n+1)return 50;
-  let g=0,l=0;const s=prices.slice(-n-1);
-  for(let i=1;i<s.length;i++){const d=s[i]-s[i-1];d>0?g+=d:l+=Math.abs(d);}
-  const ag=g/n,al=l/n;return al===0?100:100-(100/(1+ag/al));
-}
-function macd(prices){
-  if(prices.length<26)return null;
-  const e12=ema(prices,12),e26=ema(prices,26);
-  if(!e12||!e26)return null;
-  const line=e12-e26;return{line,signal:line*0.85,hist:line*0.15};
-}
-function bb(prices,n=20,mult=2){
-  if(prices.length<n)return null;
-  const sl=prices.slice(-n);
-  const mean=sl.reduce((a,b)=>a+b,0)/n;
-  const std=Math.sqrt(sl.reduce((a,b)=>a+(b-mean)**2,0)/n);
-  return{upper:mean+mult*std,mid:mean,lower:mean-mult*std,std};
-}
-function atr(candles,n=14){
-  if(candles.length<n+1)return candles[candles.length-1]?.c*0.01||1;
-  let sum=0;
-  for(let i=candles.length-n;i<candles.length;i++){
-    const tr=Math.max(candles[i].h-candles[i].l,Math.abs(candles[i].h-candles[i-1].c),Math.abs(candles[i].l-candles[i-1].c));
-    sum+=tr;
-  }
-  return Math.max(sum/n,candles[candles.length-1].c*0.003);
-}
-function stochRSI(prices,period=14){
-  const r=rsi(prices,period);
-  const s=prices.slice(-period);
-  const mn=Math.min(...s),mx=Math.max(...s);
-  return mx===mn?50:((prices[prices.length-1]-mn)/(mx-mn))*100;
-}
-// Swing highs/lows kwa kuona support/resistance halisi
-function findSwingLevels(candles,lookback=30){
-  const n=Math.min(lookback,candles.length);
-  const recent=candles.slice(-n);
-  const highs=recent.map(c=>c.h);
-  const lows=recent.map(c=>c.l);
-  // Cluster-based: pata kiwango kinachoonekana mara nyingi
-  const resistance=Math.max(...highs);
-  const support=Math.min(...lows);
-  // Kiwango cha kati (pivot)
-  const pivot=(resistance+support+recent[recent.length-1].c)/3;
-  const r1=2*pivot-support;
-  const s1=2*pivot-resistance;
-  return{resistance,support,pivot,r1,s1};
-}
-
-// ═══════════════════════════════════
-//  SIGNAL ENGINE (Iliyoboreshwa)
-// ═══════════════════════════════════
-function computeSignalFromCandles(coin,candles){
-  if(!candles||candles.length<20)return;
-  const closes=candles.map(c=>c.c);
-  const highs=candles.map(c=>c.h);
-  const lows=candles.map(c=>c.l);
-  const vols=candles.map(c=>c.v);
-  const current=closes[closes.length-1];
-  const prevClose=closes[closes.length-2]||current;
-  const d=S.prices[coin.id]||{price:current,chg24h:0};
-
-  const RSI=rsi(closes,14);
-  const SMA20=sma(closes,Math.min(20,closes.length));
-  const SMA50=sma(closes,Math.min(50,closes.length));
-  const EMA9=ema(closes,Math.min(9,closes.length));
-  const EMA12=ema(closes,Math.min(12,closes.length));
-  const EMA26=ema(closes,Math.min(26,closes.length));
-  const BB=bb(closes,Math.min(20,closes.length));
-  const MACD=macd(closes);
-  const ATR=atr(candles,Math.min(14,candles.length-1));
-  const StochRSI=stochRSI(closes,14);
-
-  const avgVol=vols.slice(-10).reduce((a,b)=>a+b,0)/10;
-  const volMomentum=vols[vols.length-1]/Math.max(avgVol,0.0001);
-  const roc5=closes.length>5?((current-closes[closes.length-6])/closes[closes.length-6])*100:0;
-  const roc3=closes.length>3?((current-closes[closes.length-4])/closes[closes.length-4])*100:0;
-
-  // Swing levels
-  const swings=findSwingLevels(candles,30);
-  const {resistance,support,pivot,r1,s1}=swings;
-  const distToRes=(resistance-current)/current*100;
-  const distToSup=(current-support)/current*100;
-
-  // Candle pattern
-  const lastCandle=candles[candles.length-1];
-  const prevCandle=candles[candles.length-2]||lastCandle;
-  const candleBody=Math.abs(lastCandle.c-lastCandle.o);
-  const candleRange=lastCandle.h-lastCandle.l||0.001;
-  const upperWick=(lastCandle.h-Math.max(lastCandle.o,lastCandle.c))/candleRange;
-  const lowerWick=(Math.min(lastCandle.o,lastCandle.c)-lastCandle.l)/candleRange;
-  const isBullishEngulf=lastCandle.c>lastCandle.o&&prevCandle.c<prevCandle.o&&lastCandle.c>prevCandle.o&&lastCandle.o<prevCandle.c;
-  const isBearishEngulf=lastCandle.c<lastCandle.o&&prevCandle.c>prevCandle.o&&lastCandle.c<prevCandle.o&&lastCandle.o>prevCandle.c;
-
-  let bull=0,bear=0,reasons=[],inds={};
-
-  // RSI
-  if(RSI<25){bull+=4;reasons.push('RSI '+RSI.toFixed(0)+' — Oversold Kali: rebound inatarajiwa');inds.rsi='bull';}
-  else if(RSI<35){bull+=3;reasons.push('RSI '+RSI.toFixed(0)+' — Oversold: nguvu ya kununua');inds.rsi='bull';}
-  else if(RSI<45){bull+=1;inds.rsi='bull';}
-  else if(RSI>75){bear+=4;reasons.push('RSI '+RSI.toFixed(0)+' — Overbought Kali: marekebisho yanaweza kutokea');inds.rsi='bear';}
-  else if(RSI>65){bear+=3;reasons.push('RSI '+RSI.toFixed(0)+' — Overbought: hatari ya kushuka');inds.rsi='bear';}
-  else if(RSI>55){bear+=1;inds.rsi='bear';}
-  else inds.rsi='neut';
-
-  // SMA
-  if(SMA20&&SMA50){
-    if(SMA20>SMA50*1.002){bull+=2;reasons.push('SMA20 > SMA50 — Uptrend (Golden Cross)');inds.sma='bull';}
-    else if(SMA20<SMA50*0.998){bear+=2;reasons.push('SMA20 < SMA50 — Downtrend (Death Cross)');inds.sma='bear';}
-    else inds.sma='neut';
-  }else inds.sma='neut';
-
-  // EMA
-  if(EMA12&&EMA26){
-    if(EMA12>EMA26*1.001){bull+=2;reasons.push('EMA12 juu ya EMA26 — Momentum ya kununua');inds.ema='bull';}
-    else if(EMA12<EMA26*0.999){bear+=2;reasons.push('EMA12 chini ya EMA26 — Momentum ya kuuza');inds.ema='bear';}
-    else inds.ema='neut';
-  }else inds.ema='neut';
-
-  // Bollinger Bands
-  if(BB){
-    const bbRange=BB.upper-BB.lower;
-    const bbPos=(current-BB.lower)/Math.max(bbRange,0.0001);
-    if(current<BB.lower){bull+=3;reasons.push('Bei CHINI ya BB Lower ('+fP(BB.lower)+') — Bounce inawezekana');inds.bb='bull';}
-    else if(current>BB.upper){bear+=3;reasons.push('Bei JUU ya BB Upper ('+fP(BB.upper)+') — Pullback inatarajiwa');inds.bb='bear';}
-    else if(bbPos<0.2){bull+=2;reasons.push('Bei karibu na BB Lower — Support ya kiufundi');inds.bb='bull';}
-    else if(bbPos>0.8){bear+=2;reasons.push('Bei karibu na BB Upper — Resistance ya kiufundi');inds.bb='bear';}
-    else inds.bb='neut';
-  }else inds.bb='neut';
-
-  // MACD
-  if(MACD){
-    if(MACD.line>0&&MACD.hist>0){bull+=2;reasons.push('MACD Chanya ('+MACD.line.toFixed(4)+') — Nguvu ya kununua');inds.macd='bull';}
-    else if(MACD.line<0&&MACD.hist<0){bear+=2;reasons.push('MACD Hasi ('+MACD.line.toFixed(4)+') — Nguvu ya kuuza');inds.macd='bear';}
-    else if(MACD.line>0)inds.macd='bull';
-    else if(MACD.line<0)inds.macd='bear';
-    else inds.macd='neut';
-  }else inds.macd='neut';
-
-  // Stoch RSI
-  if(StochRSI<15){bull+=2;reasons.push('Stoch RSI '+StochRSI.toFixed(0)+' — Oversold kali');}
-  else if(StochRSI<25)bull+=1;
-  else if(StochRSI>85){bear+=2;reasons.push('Stoch RSI '+StochRSI.toFixed(0)+' — Overbought kali');}
-  else if(StochRSI>75)bear+=1;
-
-  // Volume
-  if(volMomentum>2.0){bull+=2;reasons.push('Volume ('+volMomentum.toFixed(1)+'x avg) — Nguvu kubwa ya soko');}
-  else if(volMomentum>1.5)bull+=1;
-
-  // Momentum
-  if(roc5>4){bull+=2;reasons.push('Momentum: +'+roc5.toFixed(1)+'% — Nguvu ya juu');}
-  else if(roc5>2)bull+=1;
-  else if(roc5<-4){bear+=2;reasons.push('Momentum: '+roc5.toFixed(1)+'% — Udhaifu mkubwa');}
-  else if(roc5<-2)bear+=1;
-
-  // 24h change
-  if(d.chg24h>8){bull+=2;reasons.push('Nguvu ya soko: +'+d.chg24h.toFixed(1)+'% leo — Trend nzuri');}
-  else if(d.chg24h>4)bull+=1;
-  else if(d.chg24h<-8){bear+=2;reasons.push('Udhaifu wa soko: '+d.chg24h.toFixed(1)+'% — Shinikizo la kuuza');}
-  else if(d.chg24h<-4)bear+=1;
-
-  // Candlestick patterns
-  if(isBullishEngulf){bull+=2;reasons.push('Bullish Engulfing Pattern — Mwelekeo wa kununua');}
-  if(isBearishEngulf){bear+=2;reasons.push('Bearish Engulfing Pattern — Mwelekeo wa kuuza');}
-  if(lowerWick>0.6&&RSI<50){bull+=1;reasons.push('Lower wick ndefu — Wanunuzi wanaingilia');}
-  if(upperWick>0.6&&RSI>50){bear+=1;reasons.push('Upper wick ndefu — Wauzaji wanaingilia');}
-
-  // Support/Resistance proximity
-  if(distToSup<1.5&&distToSup>0){bull+=1;reasons.push('Bei karibu na Support ($'+support.toFixed(4)+') — Bounce inawezekana');}
-  if(distToRes<1.5&&distToRes>0){bear+=1;reasons.push('Bei karibu na Resistance ($'+resistance.toFixed(4)+') — Marekebisho yanawezekana');}
-
-  const net=bull-bear;
-  const total=Math.max(bull+bear,1);
-
-  // ═══ SIGNAL TYPE — SIDEWAYS haizalishi BUY/SELL ═══
-  let type,trend,orderType;
-  if(net>=5){type='BUY';trend='BULLISH';orderType=RSI<35||(BB&&current<BB.lower)?'Buy Market':'Buy Limit';}
-  else if(net<=-5){type='SELL';trend='BEARISH';orderType=RSI>65||(BB&&current>BB.upper)?'Sell Market':'Sell Limit';}
-  else if(net>=2){type='BUY';trend='BULLISH';orderType='Buy Limit';}
-  else if(net<=-2){type='SELL';trend='BEARISH';orderType='Sell Limit';}
-  else{type='NEUTRAL';trend='SIDEWAYS';orderType='Subiri — Soko Halina Mwelekeo';}
-
-  // ═══ SIDEWAYS override: kama trend ni SIDEWAYS, signal ni NEUTRAL ═══
-  // Hii inaepuka upingano wa SIDEWAYS + SELL/BUY
-  if(trend==='SIDEWAYS'){
-    type='NEUTRAL';
-    orderType='Subiri — Soko Halina Mwelekeo';
-  }
-
-  // ═══ SELL karibu na Resistance — ukaguzi wa ziada ═══
-  // Kama SELL lakini bei iko mbali sana na resistance, signal ni dhaifu
-  if(type==='SELL'&&distToRes>3){
-    // Bei iko mbali na resistance — SELL si salama
-    reasons.unshift('⚠ Bei mbali na Resistance ('+distToRes.toFixed(1)+'%) — Signal dhaifu');
-    if(net>=-3){type='NEUTRAL';trend='SIDEWAYS';orderType='Subiri — SELL Dhaifu';}
-  }
-
-  // ═══ CONFIDENCE sahihi — hesabu moja tu ═══
-  // Tumia wingi wa ushahidi, siyo fraction ya bull vs bear
-  // Hii inaepuka upingano wa "50% juu" lakini "67% chini"
-  let conf;
-  if(type==='NEUTRAL'){
-    // Kwa NEUTRAL, uhakika ni mdogo kwa asili
-    conf=Math.min(55,Math.max(35,Math.round(35+(total*2))));
-  } else {
-    // Kwa BUY/SELL: hesabu kulingana na nguvu ya ushahidi
-    const dominantScore=type==='BUY'?bull:bear;
-    const weakScore=type==='BUY'?bear:bull;
-    // Ratio ya ushahidi wa dominant vs total
-    const ratio=dominantScore/total;
-    // Kiwango cha uhakika: 50-93% kulingana na ushahidi
-    conf=Math.min(93,Math.max(50,Math.round(50+(ratio*50))));
-  }
-
-  // ═══ ENTRY sahihi zaidi ═══
-  let entry;
-  if(type==='BUY'){
-    if(orderType==='Buy Market'){
-      entry=current; // Market order — ingia sasa hivi
-    }else{
-      // Limit order — subiri pullback kidogo
-      const pullback=ATR*0.3;
-      entry=Math.max(current-pullback,support*1.001);
-      // Kama bei iko juu ya EMA9, ingia karibu na EMA9
-      if(EMA9&&EMA9<current)entry=Math.min(entry,EMA9*1.002);
-      entry=Math.min(entry,current); // Usizidi bei ya sasa kwa BUY
-    }
-  }else if(type==='SELL'){
-    if(orderType==='Sell Market'){
-      entry=current;
-    }else{
-      const bounce=ATR*0.3;
-      entry=Math.min(current+bounce,resistance*0.999);
-      if(EMA9&&EMA9>current)entry=Math.max(entry,EMA9*0.998);
-      entry=Math.max(entry,current); // Usishuke chini ya bei ya sasa kwa SELL
-    }
-  }else{
-    entry=current;
-  }
-
-  // ═══ TF Multiplier — M1 ina noise nyingi, SL lazima iwe kubwa zaidi ═══
-  // M1: 2.0x (ilikuwa 1.2x — ilikuwa ndogo sana kwa Bitcoin noise)
-  const tfMult=S.tf==='1m'?2.0:S.tf==='5m'?2.0:S.tf==='15m'?2.2:S.tf==='1h'?2.8:S.tf==='4h'?3.2:4.0;
-  const atrSL=ATR*tfMult;
-
-  // ═══ SL/TP sahihi zaidi (ATR-based na Structure) ═══
-  let sl_p,tp_p;
-  // Kiwango cha chini kabisa cha SL: angalau 0.5% ya entry (Bitcoin ina noise kubwa)
-  const minSLpct=0.005;
-
-  if(type==='BUY'){
-    // SL: chini ya support au ATR kutoka entry — lolote lililo chini zaidi
-    const slByATR=entry-atrSL;
-    const slBySupport=support-ATR*0.5; // Kidogo chini ya support
-    sl_p=Math.max(slByATR,slBySupport); // Tumia ile iliyo karibu zaidi (chini sana ni hatari)
-    // Lazima SL iwe angalau 0.5% chini ya entry
-    sl_p=Math.min(sl_p,entry*(1-minSLpct));
-    // Lakini usizidi 8% ya entry
-    sl_p=Math.max(sl_p,entry*(1-0.08));
-
-    // TP: kuelekea resistance au R:R ratio
-    const rrTarget=conf>=75?3.0:conf>=65?2.5:2.0;
-    const slDistance=Math.abs(entry-sl_p);
-    const tpByRR=entry+slDistance*rrTarget;
-    const tpByResistance=resistance*0.995;
-    // Tumia ile ya chini (conservative) kati ya RR na Resistance
-    tp_p=Math.min(tpByRR,tpByResistance);
-    // Kama TP ni ndogo sana, tumia RR bila kuzingatia resistance
-    if(tp_p<=entry)tp_p=tpByRR;
-
-  }else if(type==='SELL'){
-    const slByATR=entry+atrSL;
-    const slByResistance=resistance+ATR*0.5;
-    sl_p=Math.min(slByATR,slByResistance);
-    // Lazima SL iwe angalau 0.5% juu ya entry
-    sl_p=Math.max(sl_p,entry*(1+minSLpct));
-    sl_p=Math.min(sl_p,entry*(1+0.08));
-
-    const rrTarget=conf>=75?3.0:conf>=65?2.5:2.0;
-    const slDistance=Math.abs(sl_p-entry);
-    const tpByRR=entry-slDistance*rrTarget;
-    const tpBySupport=support*1.005;
-    tp_p=Math.max(tpByRR,tpBySupport);
-    if(tp_p>=entry)tp_p=tpByRR;
-
-  }else{
-    sl_p=entry-atrSL;
-    tp_p=entry+atrSL*2;
-  }
-
-  const slDistance=Math.abs(entry-sl_p);
-  const tpDistance=Math.abs(tp_p-entry);
-  const rrRatio=(tpDistance/Math.max(slDistance,0.0001)).toFixed(1);
-  const longPct=type==='BUY'?Math.min(85,55+Math.floor(bull)*3):type==='SELL'?Math.max(15,45-Math.floor(bear)*3):50;
-
-  // ═══ Hakikisha reasons zipo kila wakati — kamwe si tupu ═══
-  // Kama reasons ni chache, ongeza maelezo ya viashiria vya msingi
-  if(reasons.length===0){
-    reasons.push('RSI: '+RSI.toFixed(1)+' — '+(RSI<40?'Oversold':RSI>60?'Overbought':'Wastani'));
-    if(SMA20&&SMA50)reasons.push('SMA20 '+(SMA20>SMA50?'juu ya':'chini ya')+' SMA50 — '+(SMA20>SMA50?'Uptrend':'Downtrend'));
-    if(MACD)reasons.push('MACD: '+(MACD.line>0?'Chanya (bullish)':'Hasi (bearish)'));
-    if(BB){
-      const bbPos=(current-BB.lower)/(BB.upper-BB.lower);
-      reasons.push('BB Position: '+(bbPos*100).toFixed(0)+'% — '+(bbPos<0.3?'Karibu Lower Band':bbPos>0.7?'Karibu Upper Band':'Katikati ya Bands'));
-    }
-    reasons.push('Soko SIDEWAYS — Viashiria havijatoa ishara wazi ya BUY au SELL');
-  }
-  if(reasons.length<2){
-    reasons.push('StochRSI: '+StochRSI.toFixed(0)+' — '+(StochRSI<30?'Oversold':StochRSI>70?'Overbought':'Wastani'));
-  }
-
-  S.signals[coin.id]={
-    type,trend,orderType,conf,entry,sl:sl_p,tp:tp_p,rr:rrRatio,
-    rsi:RSI,sma20:SMA20,ema9:EMA9,ema12:EMA12,ema26:EMA26,bb:BB,macd:MACD,
-    stochRSI:StochRSI,atr:ATR,reasons:reasons.slice(0,6),inds,
-    bull,bear,longPct,support,resistance,pivot,r1,s1,
-    generatedAt:Date.now(),tf:S.tf,
-  };
-
-  if(S.view==='single'&&S.selected.id===coin.id)updateSignalUI();
-}
-
-// ═══════════════════════════════════
-//  LIVE PRICE UPDATE
-// ═══════════════════════════════════
-function updateLivePrice(sym){
-  const d=S.prices[sym];if(!d)return;
-  const priceEl=document.getElementById('liveMainPrice');if(!priceEl)return;
-  const prev=parseFloat(priceEl.dataset.prev||d.price);
-  priceEl.textContent=fP(d.price);priceEl.dataset.prev=d.price;
-  if(d.price!==prev){priceEl.className='live-price '+(d.price>prev?'flash-up':'flash-dn');setTimeout(()=>{if(priceEl)priceEl.className='live-price';},350);}
-  const chgEl=document.getElementById('liveChg');
-  if(chgEl){chgEl.textContent=fPct(d.chg24h)+' (24h)';chgEl.className='price-chg '+(d.chg24h>=0?'up':'dn');}
-  const highEl=document.getElementById('mainHigh');if(highEl)highEl.textContent=fP(d.high);
-  const lowEl=document.getElementById('mainLow');if(lowEl)lowEl.textContent=fP(d.low);
-  const volEl=document.getElementById('mainVol');if(volEl)volEl.textContent=fVol(d.vol);
-}
-
-function recomputeAndUpdateSignal(sym){
-  const coin=COINS.find(c=>c.id===sym);if(!coin)return;
-  const key=sym+'_'+S.tf;if(S.candles[key])computeSignalFromCandles(coin,S.candles[key]);
-}
-
-// ═══════════════════════════════════
-//  UPDATE SIGNAL UI
-// ═══════════════════════════════════
-function updateSignalUI(){
-  const sig=S.signals[S.selected.id];if(!sig)return;
-  const sc=sig.type==='BUY'?'buy':sig.type==='SELL'?'sell':'neut';
-  const typeEl=document.getElementById('sigTypeEl');
-  if(typeEl){typeEl.className='sig-type '+sc;const arrow=sig.type==='BUY'?'▲':sig.type==='SELL'?'▼':'→';typeEl.innerHTML=`<span class="sig-arrow">${arrow}</span> ${sig.type}`;}
-  const cardEl=document.getElementById('sigCard');if(cardEl)cardEl.className='sig-card is-'+sc;
-  const slPct=((Math.abs(sig.entry-sig.sl)/sig.entry)*100).toFixed(2);
-  const tpPct=((Math.abs(sig.tp-sig.entry)/sig.entry)*100).toFixed(2);
-  const updates={entryVal:fP(sig.entry),slVal:fP(sig.sl),tpVal:fP(sig.tp),rrVal:'1 : '+sig.rr,
-    supportVal:sig.support?fP(sig.support):'—',resistanceVal:sig.resistance?fP(sig.resistance):'—',
-    pivotVal:sig.pivot?fP(sig.pivot):'—'};
-  Object.entries(updates).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.textContent=val;});
-  const slSubEl=document.getElementById('slSub');if(slSubEl)slSubEl.textContent='-'+slPct+'% kutoka Entry';
-  const tpSubEl=document.getElementById('tpSub');if(tpSubEl)tpSubEl.textContent='+'+tpPct+'% kutoka Entry';
-  const confEl=document.getElementById('confFill');const confPctEl=document.getElementById('confPct');
-  const confColor=sig.conf>=70?'var(--buy)':sig.conf<=55?'var(--sell)':'var(--warn)';
-  if(confEl){confEl.style.width=sig.conf+'%';confEl.style.background=confColor;}
-  if(confPctEl){confPctEl.textContent=sig.conf+'% '+(sig.conf>=70?'(Imara)':sig.conf>=55?'(Wastani)':'(Dhaifu)');confPctEl.style.color=confColor;}
-  const lsEl=document.getElementById('lsFill');if(lsEl)lsEl.style.width=sig.longPct+'%';
-  const lsLong=document.getElementById('lsLongPct');const lsShort=document.getElementById('lsShortPct');
-  if(lsLong)lsLong.textContent='Long '+sig.longPct+'%';if(lsShort)lsShort.textContent='Short '+(100-sig.longPct)+'%';
-  const reasonsEl=document.getElementById('reasonsList');
-  if(reasonsEl){
-    const items=sig.reasons&&sig.reasons.length>0?sig.reasons:['RSI: '+(sig.rsi?sig.rsi.toFixed(1):'—')+' — Inachanganua viashiria...'];
-    reasonsEl.innerHTML=items.map(r=>`<li><span class="r-arrow">→</span>${r}</li>`).join('');
-  }
-}
-
-// ═══════════════════════════════════
-//  VALIDITY COUNTDOWN
-// ═══════════════════════════════════
-function startValidityTimer(sig){
-  if(S._validityInterval)clearInterval(S._validityInterval);
-  const el=document.getElementById('validityTimer');if(!el)return;
-  const validSecs=TF_VALIDITY[sig.tf]||3600;
-  const tick=()=>{
-    const remaining=Math.max(0,validSecs-Math.floor((Date.now()-sig.generatedAt)/1000));
-    el.textContent=Math.floor(remaining/60)+':'+(remaining%60<10?'0':'')+(remaining%60);
-  };
-  tick();S._validityInterval=setInterval(tick,1000);
-}
-
-// ═══════════════════════════════════
-//  POSITION SIZING
-// ═══════════════════════════════════
-function calcPositionSize(){
-  const capitalEl=document.getElementById('psCapital');const riskEl=document.getElementById('psRisk');
-  const sig=S.signals[S.selected.id];if(!capitalEl||!riskEl||!sig)return;
-  const capital=parseFloat(capitalEl.value)||0;const riskPct=parseFloat(riskEl.value)||1;
-  const entry=sig.entry,sl=sig.sl;
-  const slPct=Math.abs(entry-sl)/entry;
-  const riskUSD=capital*(riskPct/100);
-  const positionUSD=slPct>0?riskUSD/slPct:0;
-  const potentialProfit=positionUSD*(parseFloat(sig.rr)||2)*slPct;
-  const r=document.getElementById('psRiskUSD');const p=document.getElementById('psPositionUSD');const pr=document.getElementById('psProfit');
-  if(r)r.textContent=capital>0?'$'+riskUSD.toFixed(2):'—';
-  if(p)p.textContent=positionUSD>0?'$'+positionUSD.toFixed(2):'—';
-  if(pr){pr.textContent=potentialProfit>0?'$'+potentialProfit.toFixed(2):'—';pr.style.color=potentialProfit>0?'var(--buy)':'var(--text)';}
-  const warn=document.getElementById('psWarning');if(warn)warn.style.display=(positionUSD>capital*0.5&&capital>0)?'block':'none';
-}
-
-// ═══════════════════════════════════
-//  PRICE ALERTS
-// ═══════════════════════════════════
-function openAlertModal(){
-  const sym=S.selected.id;const d=S.prices[sym];
-  document.getElementById('alertCoinName').textContent=sym;
-  document.getElementById('alertCurrentPrice').textContent=d?fP(d.price):'—';
-  document.getElementById('alertPriceInput').value=S.alerts[sym]||'';
-  document.getElementById('alertModal').classList.add('open');
-}
-function closeAlertModal(){document.getElementById('alertModal').classList.remove('open');}
-function confirmAlert(){
-  const sym=S.selected.id;const val=parseFloat(document.getElementById('alertPriceInput').value);
-  if(!val||val<=0){toast('⚠ Ingiza bei halali',true);return;}
-  S.alerts[sym]=val;closeAlertModal();toast('🔔 Tahadhari: '+sym+' @ '+fP(val));
-  const btn=document.getElementById('alertBtn');if(btn)btn.classList.add('active-alert');
-}
-function checkPriceAlert(sym,currentPrice,prevPrice){
-  const target=S.alerts[sym];if(!target)return;
-  if((prevPrice<target&&currentPrice>=target)||(prevPrice>target&&currentPrice<=target)){
-    toast('🔔 TAHADHARI! '+sym+' @ '+fP(currentPrice));
-    delete S.alerts[sym];
-    const btn=document.getElementById('alertBtn');if(btn&&S.selected.id===sym)btn.classList.remove('active-alert');
-  }
-}
-
-// ═══════════════════════════════════
-//  FULL RENDER
-// ═══════════════════════════════════
-function renderSingle(coin){
-  const d=S.prices[coin.id];if(!d)return;
-  const sig=S.signals[coin.id]||{
-    type:'NEUTRAL',trend:'SIDEWAYS',orderType:'Inachanganua...',conf:50,
-    entry:d.price,sl:d.price*0.985,tp:d.price*1.03,rr:'2.0',
-    rsi:50,sma20:null,ema12:null,ema26:null,bb:null,macd:null,stochRSI:50,
-    atr:d.price*0.01,reasons:['Inakusanya data...'],inds:{rsi:'neut',sma:'neut',ema:'neut',bb:'neut',macd:'neut'},
-    bull:0,bear:0,longPct:50,support:d.price*0.98,resistance:d.price*1.02,
-    pivot:d.price,r1:d.price*1.01,s1:d.price*0.99,generatedAt:Date.now(),tf:S.tf,
-  };
-
-  const sc=sig.type==='BUY'?'buy':sig.type==='SELL'?'sell':'neut';
-  const sBg=sig.type==='BUY'?'buy-bg':sig.type==='SELL'?'sell-bg':'neut-bg';
-  const tClass=sig.trend==='BULLISH'?'b-bull':sig.trend==='BEARISH'?'b-bear':'b-side';
-  const tIcon=sig.trend==='BULLISH'?'▲':sig.trend==='BEARISH'?'▼':'→';
-  const confClass=sig.conf>=70?'b-conf-h':sig.conf<=50?'b-conf-l':'b-conf-m';
-  const confColor=sig.conf>=70?'var(--buy)':sig.conf<=50?'var(--sell)':'var(--warn)';
-  const ordClass=sig.type==='BUY'?'b-buy':sig.type==='SELL'?'b-sell':'b-neut';
-  const pctCls=d.chg24h>=0?'up':'dn';
-  const arrow=sig.type==='BUY'?'▲':sig.type==='SELL'?'▼':'→';
-  const longPct=sig.longPct||50;
-  const hasAlert=!!S.alerts[coin.id];
-  const fgScore=sig.type==='BUY'?Math.min(90,40+sig.bull*8):sig.type==='SELL'?Math.max(10,60-sig.bear*8):50;
-  const fgLabel=fgScore>=75?'Tamaa Kubwa':fgScore>=55?'Tamaa':fgScore>=45?'Wastani':fgScore>=25?'Hofu':'Hofu Kubwa';
-  const fgColor=fgScore>=75?'var(--sell)':fgScore>=55?'var(--warn)':fgScore>=45?'var(--muted)':'var(--buy)';
-  const slPct=((Math.abs(sig.entry-sig.sl)/sig.entry)*100).toFixed(2);
-  const tpPct=((Math.abs(sig.tp-sig.entry)/sig.entry)*100).toFixed(2);
-
-  document.getElementById('mainArea').innerHTML=`
-    <div class="disclaimer"><strong>⚠ Tahadhari:</strong> Signals zinatokana na data halisi za Binance + viashiria vya kiufundi (RSI, MACD, BB, ATR, Candles). Si ushauri wa uwekezaji.</div>
-
-    <div class="coin-header">
-      <div class="coin-title">
-        <div class="coin-em">${coin.em}</div>
-        <div><div class="coin-sym-big">${coin.id}/USDT</div><div class="coin-fullname">${coin.name} · Binance Live</div></div>
-      </div>
-      <div class="meta-row">
-        <div class="meta-item"><div class="meta-lbl">Juu (24h)</div><div class="meta-val" id="mainHigh">${fP(d.high)}</div></div>
-        <div class="meta-item"><div class="meta-lbl">Chini (24h)</div><div class="meta-val" id="mainLow">${fP(d.low)}</div></div>
-        <div class="meta-item"><div class="meta-lbl">Volume</div><div class="meta-val" id="mainVol">${fVol(d.vol)}</div></div>
-        <div class="meta-item"><div class="meta-lbl">ATR (14)</div><div class="meta-val">${sig.atr?fP(sig.atr):'—'}</div></div>
-      </div>
-      <div class="live-price-wrap">
-        <div class="live-price" id="liveMainPrice" data-prev="${d.price}">${fP(d.price)}</div>
-        <div class="price-chg ${pctCls}" id="liveChg">${fPct(d.chg24h)} (24h)</div>
-      </div>
-    </div>
-
-    <div class="sig-card is-${sc}" id="sigCard">
-      <div class="sig-head ${sBg}">
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <div class="sig-type ${sc}" id="sigTypeEl"><span class="sig-arrow">${arrow}</span> ${sig.type}</div>
-          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">TF: <strong style="color:var(--text)">${S.tf.toUpperCase()}</strong> &nbsp;|&nbsp; ATR: <strong>${sig.atr?fP(sig.atr):'—'}</strong></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <button class="alert-btn ${hasAlert?'active-alert':''}" id="alertBtn" onclick="openAlertModal()">🔔 ${hasAlert?'Tahadhari Imewekwa':'Weka Tahadhari'}</button>
-          ${S.tf==='1m'?'<div style="background:var(--warn-light);border:1px solid rgba(230,138,0,.35);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--warn);font-weight:700">⚠ M1 — Noise Nyingi. Tumia M5/M15 kwa usahihi zaidi</div>':''}
-          <div class="badges">
-            <span class="badge ${ordClass}">📋 ${sig.orderType}</span>
-            <span class="badge ${tClass}">${tIcon} ${sig.trend}</span>
-            <span class="badge ${confClass}">🎯 ${sig.conf}% Uhakika</span>
-          </div>
-        </div>
-      </div>
-      <div class="sig-body">
-        ${sig.trend==='SIDEWAYS'?`<div style="background:var(--warn-light);border:1px solid rgba(230,138,0,.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--warn);font-family:var(--mono)">⚠ <strong>Soko ni SIDEWAYS</strong> — Hakuna mwelekeo wazi. Signal za BUY/SELL ni dhaifu sana. Subiri breakout imara kabla ya kuingia.</div>`:''}
-        <div class="validity-bar">
-          <div>
-            <div class="validity-label">⏱ Uhalali wa Signal (${S.tf.toUpperCase()})</div>
-            <div class="validity-note">Sahihi kwa ${TF_LABEL[S.tf]||'—'}. Baada ya hapo tathmini upya.</div>
-          </div>
-          <div class="validity-timer" id="validityTimer">—:——</div>
-        </div>
-        <div class="sig-grid">
-          <div class="sig-cell"><div class="sc-lbl">🎯 Bei ya Kuingia</div><div class="sc-val entry" id="entryVal">${fP(sig.entry)}</div><div class="sc-sub">${sig.orderType}</div></div>
-          <div class="sig-cell"><div class="sc-lbl">🛑 Stop Loss</div><div class="sc-val sl" id="slVal">${fP(sig.sl)}</div><div class="sc-sub" id="slSub">-${slPct}% kutoka Entry</div></div>
-          <div class="sig-cell"><div class="sc-lbl">✅ Take Profit</div><div class="sc-val tp" id="tpVal">${fP(sig.tp)}</div><div class="sc-sub" id="tpSub">+${tpPct}% kutoka Entry</div></div>
-          <div class="sig-cell"><div class="sc-lbl">⚖ Risk / Reward</div><div class="sc-val rr" id="rrVal">1 : ${sig.rr}</div><div class="sc-sub">${parseFloat(sig.rr)>=2?'✅ R:R Nzuri':'⚠ R:R Ndogo'}</div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-          <div class="sig-cell" style="border-left:3px solid var(--buy)"><div class="sc-lbl">📗 Support</div><div class="sc-val tp" id="supportVal">${sig.support?fP(sig.support):'—'}</div><div class="sc-sub">Kiwango cha Chini</div></div>
-          <div class="sig-cell" style="border-left:3px solid var(--neutral)"><div class="sc-lbl">⚖ Pivot Point</div><div class="sc-val" id="pivotVal" style="color:var(--neutral)">${sig.pivot?fP(sig.pivot):'—'}</div><div class="sc-sub">R1: ${sig.r1?fP(sig.r1):'—'}</div></div>
-          <div class="sig-cell" style="border-left:3px solid var(--sell)"><div class="sc-lbl">📕 Resistance</div><div class="sc-val sl" id="resistanceVal">${sig.resistance?fP(sig.resistance):'—'}</div><div class="sc-sub">Kiwango cha Juu</div></div>
-        </div>
-        <div class="conf-wrap">
-          <div class="conf-top">
-            <span class="conf-lbl">Nguvu ya Signal — Ishara za Bull: <strong style="color:var(--buy)">${sig.bull}</strong> | Ishara za Bear: <strong style="color:var(--sell)">${sig.bear}</strong> | Jumla: ${sig.bull+sig.bear}</span>
-            <span class="conf-pct" id="confPct" style="color:${confColor}">${sig.conf}% ${sig.conf>=70?'(Imara)':sig.conf>=55?'(Wastani)':'(Dhaifu)'}</span>
-          </div>
-          <div class="conf-track"><div class="conf-fill" id="confFill" style="width:${sig.conf}%;background:${confColor}"></div></div>
-          ${sig.bull===0&&sig.bear===0?`<div style="font-size:10px;color:var(--sell);margin-top:5px;font-family:var(--mono)">⚠ Hakuna ushahidi wa kutosha — signal hii si ya kuaminiwa. Subiri viashiria zaidi.</div>`:''}
-        </div>
-        <div class="reason-box ${sc}">
-          <div class="r-title">Sababu za Signal (Viashiria vya Kiufundi)</div>
-          <ul class="r-points" id="reasonsList">${sig.reasons.map(r=>`<li><span class="r-arrow">→</span>${r}</li>`).join('')||'<li><span class="r-arrow">→</span>Inakusanya...</li>'}</ul>
-        </div>
-        <div class="ind-row">
-          <div class="ind-cell"><div class="ind-name">RSI (14)</div><div class="ind-val ${sig.inds.rsi||'neut'}">${sig.rsi?sig.rsi.toFixed(1):'—'}</div></div>
-          <div class="ind-cell"><div class="ind-name">SMA (20)</div><div class="ind-val ${sig.inds.sma||'neut'}">${sig.sma20?fP(sig.sma20):'—'}</div></div>
-          <div class="ind-cell"><div class="ind-name">EMA (12/26)</div><div class="ind-val ${sig.inds.ema||'neut'}">${sig.ema12?fP(sig.ema12):'—'}</div></div>
-          <div class="ind-cell"><div class="ind-name">BB Band</div><div class="ind-val ${sig.inds.bb||'neut'}">${sig.bb?fP(sig.bb.mid):'—'}</div></div>
-          <div class="ind-cell"><div class="ind-name">MACD</div><div class="ind-val ${sig.inds.macd||'neut'}">${sig.macd?sig.macd.line.toFixed(4):'—'}</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="forex-panel">
-      <div class="pos-title">💱 Exchange Rates — Forex & Dhahabu (Live)</div>
-      <div class="forex-grid" id="forexGrid">
-        <div class="forex-cell"><div class="forex-pair">XAU/USD (GOLD)</div><div class="forex-rate" id="fx_XAUUSD">—</div><div class="forex-chg" id="fxc_XAUUSD" style="color:var(--muted)">Inapakia...</div></div>
-        <div class="forex-cell"><div class="forex-pair">XAG/USD (SILVER)</div><div class="forex-rate" id="fx_XAGUSD">—</div><div class="forex-chg" id="fxc_XAGUSD" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">EUR/USD</div><div class="forex-rate" id="fx_EURUSD">—</div><div class="forex-chg" id="fxc_EURUSD" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">GBP/USD</div><div class="forex-rate" id="fx_GBPUSD">—</div><div class="forex-chg" id="fxc_GBPUSD" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">USD/JPY</div><div class="forex-rate" id="fx_USDJPY">—</div><div class="forex-chg" id="fxc_USDJPY" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">USD/TZS</div><div class="forex-rate" id="fx_USDTZS">—</div><div class="forex-chg" id="fxc_USDTZS" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">AUD/USD</div><div class="forex-rate" id="fx_AUDUSD">—</div><div class="forex-chg" id="fxc_AUDUSD" style="color:var(--muted)">—</div></div>
-        <div class="forex-cell"><div class="forex-pair">USD/CHF</div><div class="forex-rate" id="fx_USDCHF">—</div><div class="forex-chg" id="fxc_USDCHF" style="color:var(--muted)">—</div></div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="pos-panel">
-        <div class="pos-title">💰 Hesabu ya Trade</div>
-        <div class="pos-grid">
-          <div class="pos-input-wrap"><label class="pos-lbl">Mtaji (USD)</label><input class="pos-input" type="number" id="psCapital" placeholder="mfano: 1000" oninput="calcPositionSize()"></div>
-          <div class="pos-input-wrap"><label class="pos-lbl">Hatari %</label><input class="pos-input" type="number" id="psRisk" value="1" min="0.1" max="10" step="0.1" oninput="calcPositionSize()"></div>
-          <div class="pos-input-wrap"><label class="pos-lbl">SL Distance</label><input class="pos-input" type="text" readonly value="${slPct}%" style="color:var(--sell)"></div>
-        </div>
-        <div class="pos-results">
-          <div class="pos-res-cell"><div class="pos-res-lbl">Hatari (USD)</div><div class="pos-res-val" id="psRiskUSD" style="color:var(--sell)">—</div></div>
-          <div class="pos-res-cell"><div class="pos-res-lbl">Saizi ya Trade</div><div class="pos-res-val" id="psPositionUSD">—</div></div>
-          <div class="pos-res-cell"><div class="pos-res-lbl">Faida Inayotarajiwa</div><div class="pos-res-val" id="psProfit">—</div></div>
-        </div>
-        <div class="pos-warning" id="psWarning">⚠ Saizi kubwa sana (>50% mtaji). Punguza hatari!</div>
-      </div>
-      <div class="sent-panel">
-        <div class="pos-title">📊 Hali ya Soko</div>
-        <div class="sent-row">
-          <div class="sent-block">
-            <div class="sent-title">Fear &amp; Greed Index</div>
-            <div class="fg-arc-wrap">
-              <div class="fg-num" style="color:${fgColor}">${fgScore}</div>
-              <div><div style="font-size:11px;font-weight:700;color:${fgColor}">${fgLabel}</div><div class="fg-label">Hisia za Soko</div></div>
+    <div id="device-frame">
+        <div class="status-bar" id="statusBar">
+            <div class="status-left"><span id="clockTime">12:00</span></div>
+            <div class="status-right">
+                <span class="status-icon" id="wifiIcon">📶</span>
+                <span class="status-icon" id="signalIcon">📡</span>
+                <div class="battery-level">
+                    <div class="battery-icon"><div class="battery-fill" id="batteryFill" style="width: 75%"></div></div>
+                    <span id="batteryText">75%</span>
+                </div>
             </div>
-          </div>
-          <div class="sent-block">
-            <div class="sent-title">Long / Short Ratio</div>
-            <div class="ls-bar-wrap">
-              <div class="ls-bar-track"><div class="ls-bar-fill" id="lsFill" style="width:${longPct}%"></div></div>
-              <div class="ls-labels"><span style="color:var(--buy)" id="lsLongPct">Long ${longPct}%</span><span style="color:var(--sell)" id="lsShortPct">Short ${100-longPct}%</span></div>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="connection-status hidden" id="connectionStatus"></div>
+        <div class="lock-screen" id="lockScreen">
+            <div class="lock-clock">
+                <div class="lock-time" id="lockTime">12:00</div>
+                <div class="lock-date" id="lockDate">Monday, January 1</div>
+            </div>
+            <div class="lock-pin">
+                <div class="pin-dots" id="pinDots">
+                    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                </div>
+                <div class="pin-pad" id="pinPad">
+                    <button class="pin-key" data-key="1">1</button>
+                    <button class="pin-key" data-key="2">2<span>ABC</span></button>
+                    <button class="pin-key" data-key="3">3<span>DEF</span></button>
+                    <button class="pin-key" data-key="4">4<span>GHI</span></button>
+                    <button class="pin-key" data-key="5">5<span>JKL</span></button>
+                    <button class="pin-key" data-key="6">6<span>MNO</span></button>
+                    <button class="pin-key" data-key="7">7<span>PQRS</span></button>
+                    <button class="pin-key" data-key="8">8<span>TUV</span></button>
+                    <button class="pin-key" data-key="9">9<span>WXYZ</span></button>
+                    <button class="pin-key" data-key="clear">⌫</button>
+                    <button class="pin-key" data-key="0">0</button>
+                    <button class="pin-key" data-key="enter">✓</button>
+                </div>
+            </div>
+        </div>
+        <div class="notification-panel" id="notificationPanel">
+            <div class="notification-content">
+                <div class="notification-header">
+                    <span class="notification-title">Notifications</span>
+                    <span class="notification-clear" onclick="clearNotifications()">Clear all</span>
+                </div>
+                <div id="notificationList"></div>
+                <div class="quick-settings">
+                    <div class="qs-tile" id="qsWifi" onclick="toggleQuickSetting('wifi')"><div class="qs-icon">📶</div><span class="qs-label">Wi-Fi</span></div>
+                    <div class="qs-tile" id="qsBluetooth" onclick="toggleQuickSetting('bluetooth')"><div class="qs-icon">🔷</div><span class="qs-label">Bluetooth</span></div>
+                    <div class="qs-tile" id="qsFlashlight" onclick="toggleQuickSetting('flashlight')"><div class="qs-icon">🔦</div><span class="qs-label">Flash</span></div>
+                    <div class="qs-tile" id="qsAirplane" onclick="toggleQuickSetting('airplane')"><div class="qs-icon">✈️</div><span class="qs-label">Airplane</span></div>
+                    <div class="qs-tile" id="qsDark" onclick="toggleQuickSetting('dark')"><div class="qs-icon">🌙</div><span class="qs-label">Dark</span></div>
+                    <div class="qs-tile" id="qsLock" onclick="toggleQuickSetting('lock')"><div class="qs-icon">🔒</div><span class="qs-label">Lock</span></div>
+                    <div class="qs-tile" id="qsDnd" onclick="toggleQuickSetting('dnd')"><div class="qs-icon">🔕</div><span class="qs-label">DND</span></div>
+                    <div class="qs-tile" id="qsSettings" onclick="openApp('settings')"><div class="qs-icon">⚙️</div><span class="qs-label">Settings</span></div>
+                    <div class="qs-slider"><span>🔅</span><input type="range" min="0" max="100" value="70" id="brightnessSlider" onchange="setBrightness(this.value)"><span>🔆</span></div>
+                    <div class="qs-slider"><span>🔊</span><input type="range" min="0" max="100" value="50" id="volumeSlider" onchange="setVolume(this.value)"><span>🔊</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="screens-container" id="screensContainer">
+            <div class="screen home-screen" id="homeScreen">
+                <div class="wallpaper" id="wallpaper"></div>
+                <div class="home-content">
+                    <div class="clock-widget">
+                        <div class="clock-time" id="homeClock">12:00</div>
+                        <div class="clock-date" id="homeDate">Monday, January 1</div>
+                    </div>
+                    <div class="search-bar" onclick="openApp('browser')"><span class="search-icon">🔍</span><span class="search-text">Tafuta kwenye wavuti...</span><span class="search-mic">🎤</span></div>
+                    <div class="app-grid" id="homeApps"></div>
+                </div>
+                <div class="dock" id="dock"></div>
+            </div>
+            <div class="app-drawer" id="appDrawer">
+                <div class="drawer-handle" onclick="closeAppDrawer()"></div>
+                <div class="drawer-search"><input type="text" placeholder="Search apps..." id="appSearch" oninput="searchApps(this.value)"></div>
+                <div class="drawer-apps"><div class="app-grid" id="drawerApps"></div></div>
+            </div>
+            <div class="screen app-screen hidden" id="appScreen">
+                <div class="app-header">
+                    <div class="app-back" onclick="closeApp()">←</div>
+                    <div class="app-title" id="appTitle">App</div>
+                    <div class="app-actions" id="appActions"></div>
+                </div>
+                <div class="app-body" id="appBody"></div>
+            </div>
+        </div>
     </div>
-
-    <div class="chart-panel">
-      <div class="chart-hdr">
-        <span class="chart-title-txt">📈 ${coin.id}/USDT — ${S.tf} Candles (Entry/SL/TP Lines)</span>
-        <span class="chart-meta" id="chartMeta">Inapakia...</span>
-      </div>
-      <canvas id="coinChart" height="170"></canvas>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title" id="modalTitle">Title</div></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-actions" id="modalActions"></div>
+        </div>
     </div>
+    <div class="toast" id="toast"></div>
+<script>
+// ==================== FIREBASE CONFIG ====================
+// BADILI HII NA FIREBASE CONFIG YAKO KWELI
+const firebaseConfig = {
+    apiKey: "BADILISHA-API-KEY-YAKO",
+    authDomain: "BADILISHA-PROJECT-ID.firebaseapp.com",
+    projectId: "BADILISHA-PROJECT-ID",
+    storageBucket: "BADILISHA-PROJECT-ID.appspot.com",
+    messagingSenderId: "BADILISHA-SENDER-ID",
+    appId: "BADILISHA-APP-ID"
+};
 
-    <div class="ai-panel">
-      <div class="ai-panel-hdr">
-        <div class="ai-title">🤖 Uchambuzi wa AI — xAI Grok <span class="ai-badge">GROK LIVE</span></div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Powered by xAI (api.x.ai)</div>
-      </div>
-      <button class="ai-ask-btn" id="aiAskBtn" onclick="askGrokAI()">🤖 Changanua na xAI Grok — ${coin.id}/USDT</button>
-      <div id="aiOutput" class="ai-output loading" style="margin-top:10px">Bonyeza kitufe hapo juu kupata uchambuzi wa kina wa ${coin.id}/USDT kutoka kwa xAI Grok.</div>
-      <div class="ai-fields" id="aiFields" style="display:none">
-        <div class="ai-field-cell"><div class="ai-field-lbl">🎯 AI Entry</div><div class="ai-field-val entry" id="aiEntry">—</div></div>
-        <div class="ai-field-cell"><div class="ai-field-lbl">🛑 AI Stop Loss</div><div class="ai-field-val sl" id="aiSL">—</div></div>
-        <div class="ai-field-cell"><div class="ai-field-lbl">✅ AI Take Profit</div><div class="ai-field-val tp" id="aiTP">—</div></div>
-      </div>
-      <div class="ai-disclaimer">⚠ Si ushauri wa uwekezaji — tumia risk management kila wakati. xAI Grok inatoa maoni ya ziada tu.</div>
-    </div>`;
+let db = null;
+let firebaseInitialized = false;
 
-  drawChart(coin,S.tf);
-  calcPositionSize();
-  startValidityTimer(sig);
-  // Load forex after render
-  updateForexDisplay();
-}
-
-// ═══════════════════════════════════
-//  CHART
-// ═══════════════════════════════════
-function drawChart(coin,interval){
-  if(typeof Chart==='undefined')return;
-  const key=coin.id+'_'+interval;const candles=S.candles[key];
-  if(!candles||candles.length<2)return;
-  const el=document.getElementById('coinChart');if(!el)return;
-  if(S.chartInst){S.chartInst.destroy();S.chartInst=null;}
-  const sig=S.signals[coin.id];
-  const color=!sig?'#4b6cf7':sig.type==='BUY'?'#00b87a':sig.type==='SELL'?'#e8334a':'#4b6cf7';
-  const step=Math.max(1,Math.floor(candles.length/150));
-  const data=candles.filter((_,i)=>i%step===0);
-  const labels=data.map(c=>{
-    const d=new Date(c.t);
-    return interval.endsWith('m')?d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('en',{month:'short',day:'numeric'});
-  });
-  const datasets=[{label:'Bei',data:data.map(c=>c.c),borderColor:color,backgroundColor:color+'15',borderWidth:1.5,pointRadius:0,fill:true,tension:0.2}];
-  if(sig&&sig.entry){
-    datasets.push({label:'Entry ('+fP(sig.entry)+')',data:data.map(()=>sig.entry),borderColor:'#4b6cf7',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false});
-    datasets.push({label:'SL ('+fP(sig.sl)+')',data:data.map(()=>sig.sl),borderColor:'#e8334a',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false});
-    datasets.push({label:'TP ('+fP(sig.tp)+')',data:data.map(()=>sig.tp),borderColor:'#00b87a',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false});
-  }
-  S.chartInst=new Chart(el.getContext('2d'),{
-    type:'line',data:{labels,datasets},
-    options:{
-      responsive:true,animation:false,
-      plugins:{
-        legend:{display:!!sig,position:'top',labels:{color:'#7a8db3',font:{family:'IBM Plex Mono',size:9},boxWidth:20,padding:10}},
-        tooltip:{backgroundColor:'#fff',borderColor:'#dde3ef',borderWidth:1,titleColor:'#1e2d4a',bodyColor:'#7a8db3',callbacks:{label:ctx=>' '+fP(ctx.parsed.y)}}
-      },
-      scales:{
-        x:{ticks:{color:'#7a8db3',font:{family:'IBM Plex Mono',size:9},maxTicksLimit:10},grid:{color:'rgba(221,227,239,0.5)'}},
-        y:{ticks:{color:'#7a8db3',font:{family:'IBM Plex Mono',size:9}},grid:{color:'rgba(221,227,239,0.5)'}}
-      }
+function initFirebase() {
+    try {
+        if (firebaseConfig.apiKey.includes("BADILISHA")) {
+            console.warn("Firebase bado haijasanidiwa!");
+            showConnectionStatus("offline", "Firebase haijasanidiwa - Badili config", 3000);
+            return false;
+        }
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseInitialized = true;
+        showConnectionStatus("online", "Imeunganishwa na Firebase", 2000);
+        listenForMessages();
+        listenForEmails();
+        return true;
+    } catch (e) {
+        console.error("Firebase init error:", e);
+        showConnectionStatus("offline", "Imeshindwa kuunganisha na Firebase", 3000);
+        return false;
     }
-  });
-  const metaEl=document.getElementById('chartMeta');
-  if(metaEl)metaEl.textContent=`${candles.length} candles · ${nowStr()}`;
 }
 
-// ═══════════════════════════════════
-//  xAI GROK — IMEBORESHWA
-// ═══════════════════════════════════
-async function askGrokAI(){
-  const outEl=document.getElementById('aiOutput');
-  const fieldsEl=document.getElementById('aiFields');
-  const btn=document.getElementById('aiAskBtn');
-  if(!outEl||!btn)return;
+function showConnectionStatus(status, message, duration) {
+    const el = document.getElementById('connectionStatus');
+    el.className = 'connection-status ' + status;
+    el.textContent = message;
+    if (duration > 0) {
+        setTimeout(function() { el.classList.add('hidden'); }, duration);
+    }
+}
 
-  const coin=S.selected;const sig=S.signals[coin.id];const d=S.prices[coin.id];
-  if(!sig||!d){outEl.className='ai-output loading';outEl.textContent='⏳ Subiri data ya coin ipakiwe kwanza...';return;}
+// ==================== STATE ====================
+const state = {
+    pin: "1234",
+    pinEntered: "",
+    isLocked: true,
+    theme: "light",
+    notifications: [
+        { id: 1, app: "Messages", icon: "💬", text: "New message from John", time: "2m ago", color: "#34a853" },
+        { id: 2, app: "Phone", icon: "📞", text: "Missed call from +1234567890", time: "15m ago", color: "#1a73e8" },
+        { id: 3, app: "Files", icon: "📁", text: "Download complete: document.pdf", time: "1h ago", color: "#fbbc05" }
+    ],
+    quickSettings: { wifi: true, bluetooth: false, flashlight: false, airplane: false, dark: false, lock: false, dnd: false },
+    contacts: [
+        { id: 1, name: "John Doe", number: "+1 234 567 8901", favorite: true },
+        { id: 2, name: "Jane Smith", number: "+1 234 567 8902", favorite: true },
+        { id: 3, name: "Bob Johnson", number: "+1 234 567 8903", favorite: false },
+        { id: 4, name: "Alice Brown", number: "+1 234 567 8904", favorite: false },
+        { id: 5, name: "Charlie Wilson", number: "+1 234 567 8905", favorite: false }
+    ],
+    messages: [
+        { id: 1, contact: "John Doe", number: "+1 234 567 8901", preview: "Hey, are we still meeting today?", time: "2m ago", unread: true, thread: [
+            { sent: false, text: "Hey, are we still meeting today?", time: "2:30 PM", status: "read" },
+            { sent: true, text: "Yes, see you at 3!", time: "2:31 PM", status: "read" }
+        ]},
+        { id: 2, contact: "Jane Smith", number: "+1 234 567 8902", preview: "Thanks for the help!", time: "1h ago", unread: false, thread: [
+            { sent: false, text: "Thanks for the help!", time: "1:00 PM", status: "read" },
+            { sent: true, text: "No problem!", time: "1:05 PM", status: "read" }
+        ]}
+    ],
+    emails: [
+        { id: 1, from: "john@example.com", to: "me@android.com", subject: "Meeting Reminder", preview: "Do not forget our meeting at 3 PM today...", time: "10m ago", unread: true, body: "Hi there,\n\nDo not forget our meeting at 3 PM today. We will be discussing the new project timeline.\n\nBest,\nJohn" },
+        { id: 2, from: "jane@example.com", to: "me@android.com", subject: "Project Update", preview: "The designs are ready for review...", time: "2h ago", unread: false, body: "Hey,\n\nThe designs are ready for review. Please check them out and let me know your thoughts.\n\nThanks,\nJane" },
+        { id: 3, from: "noreply@amazon.com", to: "me@android.com", subject: "Your order has shipped!", preview: "Your package will arrive on Friday...", time: "5h ago", unread: true, body: "Your order #12345 has shipped!\n\nTracking: AMZN123456\nEstimated delivery: Friday, June 21\n\nThank you for shopping with us!" }
+    ],
+    calls: [
+        { id: 1, name: "John Doe", number: "+1 234 567 8901", type: "missed", time: "15m ago" },
+        { id: 2, name: "Jane Smith", number: "+1 234 567 8902", type: "outgoing", time: "2h ago" },
+        { id: 3, name: "Unknown", number: "+1 999 888 7777", type: "incoming", time: "Yesterday" }
+    ],
+    files: [
+        { id: 1, name: "Documents", type: "folder", size: "", count: 12, color: "#1a73e8" },
+        { id: 2, name: "Photos", type: "folder", size: "", count: 48, color: "#ea4335" },
+        { id: 3, name: "Videos", type: "folder", size: "", count: 6, color: "#34a853" },
+        { id: 4, name: "Music", type: "folder", size: "", count: 23, color: "#fbbc05" },
+        { id: 5, name: "report_2024.pdf", type: "pdf", size: "2.4 MB", count: 0, color: "#ea4335" },
+        { id: 6, name: "budget.xlsx", type: "excel", size: "156 KB", count: 0, color: "#34a853" },
+        { id: 7, name: "notes.txt", type: "text", size: "4 KB", count: 0, color: "#5f6368" },
+        { id: 8, name: "archive.zip", type: "zip", size: "12.8 MB", count: 0, color: "#fbbc05" }
+    ],
+    calculator: { display: "0", history: "", operator: null, operand: null, resetNext: false },
+    settings: { pin: "1234", password: "", fingerprint: false, appLock: false, hiddenVault: false, autoBackup: false, cloudSync: false, language: "en" },
+    apps: [
+        { id: "phone", name: "Phone", icon: "📞", color: "#34a853", badge: 0 },
+        { id: "messages", name: "Messages", icon: "💬", color: "#34a853", badge: 2 },
+        { id: "contacts", name: "Contacts", icon: "👥", color: "#1a73e8", badge: 0 },
+        { id: "calculator", name: "Calculator", icon: "🧮", color: "#5f6368", badge: 0 },
+        { id: "files", name: "Files", icon: "📁", color: "#fbbc05", badge: 0 },
+        { id: "camera", name: "Camera", icon: "📷", color: "#5f6368", badge: 0 },
+        { id: "gallery", name: "Gallery", icon: "🖼️", color: "#ea4335", badge: 0 },
+        { id: "music", name: "Music", icon: "🎵", color: "#ea4335", badge: 0 },
+        { id: "settings", name: "Settings", icon: "⚙️", color: "#5f6368", badge: 0 },
+        { id: "calendar", name: "Calendar", icon: "📅", color: "#1a73e8", badge: 0 },
+        { id: "clock", name: "Clock", icon: "⏰", color: "#5f6368", badge: 0 },
+        { id: "weather", name: "Weather", icon: "🌤️", color: "#fbbc05", badge: 0 },
+        { id: "browser", name: "Browser", icon: "🌐", color: "#1a73e8", badge: 0 },
+        { id: "email", name: "Email", icon: "📧", color: "#ea4335", badge: 3 },
+        { id: "maps", name: "Maps", icon: "🗺️", color: "#34a853", badge: 0 },
+        { id: "notes", name: "Notes", icon: "📝", color: "#fbbc05", badge: 0 }
+    ],
+    dockApps: ["phone", "messages", "browser", "camera"],
+    browser: {
+        tabs: [{ id: 1, title: "Google", url: "https://www.google.com" }],
+        activeTab: 0,
+        history: [],
+        canGoBack: false,
+        canGoForward: false
+    }
+};
 
-  btn.disabled=true;
-  outEl.className='ai-output loading';
-  outEl.textContent='⏳ xAI Grok inachambuza '+coin.id+'/USDT — tafadhali subiri...';
-  if(fieldsEl)fieldsEl.style.display='none';
+// ==================== INIT ====================
+function init() {
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderHomeApps();
+    renderDock();
+    renderDrawerApps();
+    renderNotifications();
+    updateBattery();
+    initFirebase();
 
-  const slPct=((Math.abs(sig.entry-sig.sl)/sig.entry)*100).toFixed(2);
-  const tpPct=((Math.abs(sig.tp-sig.entry)/sig.entry)*100).toFixed(2);
-
-  const prompt=`Wewe ni mtaalam wa crypto trading. Changanua ${coin.id}/USDT kwa kutumia data halisi hii na utoe maamuzi sahihi kwa Kiswahili.
-
-DATA HALISI YA SOKO (Binance Live - ${new Date().toLocaleTimeString('sw-TZ')}):
-- Bei ya Sasa: $${d.price.toFixed(8)}
-- Mabadiliko (24h): ${d.chg24h.toFixed(2)}%
-- Juu (24h): $${(d.high||d.price*1.02).toFixed(6)} | Chini: $${(d.low||d.price*0.98).toFixed(6)}
-- Volume: ${fVol(d.vol||0)}
-- Timeframe: ${S.tf.toUpperCase()}
-
-VIASHIRIA VYA KIUFUNDI:
-- RSI (14): ${sig.rsi?sig.rsi.toFixed(1):'N/A'} ${sig.rsi<30?'[OVERSOLD]':sig.rsi>70?'[OVERBOUGHT]':'[NEUTRAL]'}
-- Stoch RSI: ${sig.stochRSI?sig.stochRSI.toFixed(1):'N/A'}
-- ATR (14): $${sig.atr?sig.atr.toFixed(6):'N/A'}
-- SMA 20: $${sig.sma20?sig.sma20.toFixed(6):'N/A'}
-- EMA 9: $${sig.ema9?sig.ema9.toFixed(6):'N/A'}
-- EMA 12: $${sig.ema12?sig.ema12.toFixed(6):'N/A'} | EMA 26: $${sig.ema26?sig.ema26.toFixed(6):'N/A'}
-- MACD Line: ${sig.macd?sig.macd.line.toFixed(6):'N/A'} | Histogram: ${sig.macd?sig.macd.hist.toFixed(6):'N/A'}
-- BB Upper: $${sig.bb?sig.bb.upper.toFixed(6):'N/A'} | Mid: $${sig.bb?sig.bb.mid.toFixed(6):'N/A'} | Lower: $${sig.bb?sig.bb.lower.toFixed(6):'N/A'}
-- Support: $${sig.support?sig.support.toFixed(6):'N/A'}
-- Resistance: $${sig.resistance?sig.resistance.toFixed(6):'N/A'}
-- Pivot Point: $${sig.pivot?sig.pivot.toFixed(6):'N/A'}
-- Algorithm Signal: ${sig.type} (Bull Score: ${sig.bull}, Bear Score: ${sig.bear}, Confidence: ${sig.conf}%)
-- Algorithm Entry: $${sig.entry?sig.entry.toFixed(6):'N/A'}
-- Algorithm SL: $${sig.sl?sig.sl.toFixed(6):'N/A'} (-${slPct}%)
-- Algorithm TP: $${sig.tp?sig.tp.toFixed(6):'N/A'} (+${tpPct}%)
-- Algorithm R:R: 1:${sig.rr}
-
-Toa uchambuzi wako HASA kwa muundo huu (usibadilishe muundo):
-
-SIGNAL: [BUY / SELL / NEUTRAL]
-SABABU: [Sababu 2-3 za msingi kwa Kiswahili]
-ENTRY: $[bei sahihi ya kuingia - nambari tu, mfano 0.123456]
-STOP_LOSS: $[bei ya stop loss - nambari tu]
-TAKE_PROFIT: $[bei ya take profit - nambari tu]
-HATARI: [CHINI / WASTANI / JUU]
-MUHTASARI: [Sentensi 1-2 kwa Kiswahili inayoelezea hali ya soko na mapendekezo]
-
-MUHIMU: Hesabu Entry, SL, TP kwa kuzingatia ATR=$${sig.atr?sig.atr.toFixed(6):'N/A'} na bei ya sasa=$${d.price.toFixed(6)}. Toa nambari halisi za bei.`;
-
-  try{
-    const resp=await fetch('https://api.x.ai/v1/chat/completions',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+KEYS.xai
-      },
-      body:JSON.stringify({
-        model:'grok-3-fast',
-        max_tokens:800,
-        messages:[
-          {role:'system',content:'Wewe ni mtaalam wa crypto trading. Toa uchambuzi wa kina na ushauri wa kiufundi kwa Kiswahili. Fuata muundo ulioulizwa HASA bila kupotoka.'},
-          {role:'user',content:prompt}
-        ]
-      })
+    var touchStartY = 0;
+    var touchEndY = 0;
+    document.addEventListener('touchstart', function(e) { touchStartY = e.changedTouches[0].screenY; });
+    document.addEventListener('touchend', function(e) {
+        touchEndY = e.changedTouches[0].screenY;
+        var diff = touchStartY - touchEndY;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0 && touchStartY < 100) { openNotificationPanel(); }
+            else if (diff < 0 && touchEndY < 100) { closeNotificationPanel(); }
+            else if (diff < 0 && !state.isLocked) { openAppDrawer(); }
+        }
     });
 
-    if(!resp.ok){
-      const errData=await resp.json().catch(()=>({}));
-      const errMsg=errData.error?.message||'HTTP '+resp.status;
-      throw new Error(errMsg);
+    var pinKeys = document.querySelectorAll('.pin-key');
+    for (var i = 0; i < pinKeys.length; i++) {
+        pinKeys[i].addEventListener('click', function() {
+            handlePinKey(this.dataset.key);
+        });
+    }
+}
+
+// ==================== CLOCK & STATUS ====================
+function updateClock() {
+    var now = new Date();
+    var hours = now.getHours().toString().padStart(2, '0');
+    var minutes = now.getMinutes().toString().padStart(2, '0');
+    var timeStr = hours + ":" + minutes;
+    document.getElementById('clockTime').textContent = timeStr;
+    document.getElementById('homeClock').textContent = timeStr;
+    document.getElementById('lockTime').textContent = timeStr;
+    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var dateStr = days[now.getDay()] + ", " + months[now.getMonth()] + " " + now.getDate();
+    document.getElementById('homeDate').textContent = dateStr;
+    document.getElementById('lockDate').textContent = dateStr;
+}
+
+function updateBattery() {
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(battery) {
+            var level = Math.round(battery.level * 100);
+            document.getElementById('batteryFill').style.width = level + '%';
+            document.getElementById('batteryText').textContent = level + '%';
+        });
+    }
+}
+
+// ==================== PIN LOCK ====================
+function handlePinKey(key) {
+    if (key === "clear") {
+        state.pinEntered = state.pinEntered.slice(0, -1);
+    } else if (key === "enter") {
+        if (state.pinEntered === state.pin) {
+            unlock();
+        } else {
+            showToast("Wrong PIN");
+            state.pinEntered = "";
+        }
+    } else if (state.pinEntered.length < 4) {
+        state.pinEntered += key;
+    }
+    updatePinDots();
+}
+
+function updatePinDots() {
+    var dots = document.querySelectorAll('.pin-dot');
+    for (var i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle('filled', i < state.pinEntered.length);
+    }
+}
+
+function unlock() {
+    state.isLocked = false;
+    document.getElementById('lockScreen').classList.add('hidden');
+    setTimeout(function() {
+        document.getElementById('lockScreen').style.display = 'none';
+    }, 500);
+}
+
+// ==================== HOME SCREEN ====================
+function renderHomeApps() {
+    var homeApps = state.apps.slice(0, 12);
+    var html = '';
+    for (var i = 0; i < homeApps.length; i++) {
+        html += createAppItem(homeApps[i]);
+    }
+    document.getElementById('homeApps').innerHTML = html;
+}
+
+function renderDock() {
+    var dockApps = [];
+    for (var i = 0; i < state.dockApps.length; i++) {
+        var app = state.apps.find(function(a) { return a.id === state.dockApps[i]; });
+        if (app) dockApps.push(app);
+    }
+    var html = '';
+    for (var i = 0; i < dockApps.length; i++) {
+        html += createAppItem(dockApps[i], true);
+    }
+    document.getElementById('dock').innerHTML = html;
+}
+
+function createAppItem(app, isDock) {
+    isDock = isDock || false;
+    var badge = app.badge > 0 ? '<div class="app-badge">' + app.badge + '</div>' : '';
+    return '<div class="app-item" onclick="openApp(\'' + app.id + '\')">' +
+        '<div class="app-icon" style="background: ' + app.color + '">' + app.icon + badge + '</div>' +
+        (isDock ? '' : '<div class="app-name">' + app.name + '</div>') +
+        '</div>';
+}
+
+// ==================== APP DRAWER ====================
+function renderDrawerApps(filter) {
+    filter = filter || '';
+    var apps = state.apps.filter(function(a) {
+        return a.name.toLowerCase().includes(filter.toLowerCase());
+    });
+    var html = '<div style="padding: 8px 0; font-size: 12px; color: var(--on-background); text-transform: uppercase; letter-spacing: 0.5px;">All Apps</div>' +
+        '<div class="app-grid">';
+    for (var i = 0; i < apps.length; i++) {
+        html += createAppItem(apps[i]);
+    }
+    html += '</div>';
+    document.getElementById('drawerApps').innerHTML = html;
+}
+
+function openAppDrawer() { document.getElementById('appDrawer').classList.add('open'); }
+function closeAppDrawer() { document.getElementById('appDrawer').classList.remove('open'); }
+function searchApps(query) { renderDrawerApps(query); }
+
+// ==================== NOTIFICATIONS ====================
+function renderNotifications() {
+    var container = document.getElementById('notificationList');
+    if (state.notifications.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--on-background);">No notifications</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < state.notifications.length; i++) {
+        var n = state.notifications[i];
+        html += '<div class="notification-item">' +
+            '<div class="notification-icon" style="background: ' + n.color + '20; color: ' + n.color + '">' + n.icon + '</div>' +
+            '<div class="notification-body">' +
+                '<div class="notification-app-name">' + n.app + '</div>' +
+                '<div class="notification-text">' + n.text + '</div>' +
+                '<div class="notification-time">' + n.time + '</div>' +
+            '</div>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+
+function openNotificationPanel() { document.getElementById('notificationPanel').classList.add('open'); }
+function closeNotificationPanel() { document.getElementById('notificationPanel').classList.remove('open'); }
+function clearNotifications() { state.notifications = []; renderNotifications(); showToast('Notifications cleared'); }
+
+// ==================== QUICK SETTINGS ====================
+function toggleQuickSetting(name) {
+    state.quickSettings[name] = !state.quickSettings[name];
+    var tile = document.getElementById('qs' + name.charAt(0).toUpperCase() + name.slice(1));
+    tile.classList.toggle('active', state.quickSettings[name]);
+    if (name === 'dark') { toggleTheme(); }
+    else if (name === 'lock') { lockDevice(); }
+    showToast(name + ' ' + (state.quickSettings[name] ? 'on' : 'off'));
+}
+
+function setBrightness(val) { document.getElementById('device-frame').style.filter = 'brightness(' + val + '%)'; }
+function setVolume(val) {}
+function toggleTheme() {
+    state.theme = state.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', state.theme);
+}
+function lockDevice() { location.reload(); }
+
+// ==================== APP LAUNCHER ====================
+function openApp(appId) {
+    var app = state.apps.find(function(a) { return a.id === appId; });
+    if (!app) return;
+    closeAppDrawer();
+    closeNotificationPanel();
+    document.getElementById('appTitle').textContent = app.name;
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('homeScreen').classList.add('slide-left');
+    var body = document.getElementById('appBody');
+    body.innerHTML = '';
+    switch(appId) {
+        case 'phone': renderPhoneApp(body); break;
+        case 'messages': renderMessagesApp(body); break;
+        case 'contacts': renderContactsApp(body); break;
+        case 'calculator': renderCalculatorApp(body); break;
+        case 'files': renderFilesApp(body); break;
+        case 'settings': renderSettingsApp(body); break;
+        case 'browser': renderBrowserApp(body); break;
+        case 'email': renderEmailApp(body); break;
+        default: body.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);"><div style="font-size: 64px; margin-bottom: 16px;">' + app.icon + '</div><h2>' + app.name + '</h2><p>Coming soon</p></div>';
+    }
+}
+
+function closeApp() {
+    document.getElementById('appScreen').classList.add('hidden');
+    document.getElementById('homeScreen').classList.remove('slide-left');
+}
+
+// ==================== PHONE APP ====================
+function renderPhoneApp(container) {
+    var dialKeys = '';
+    var letters = ['', 'ABC', 'DEF', 'GHI', 'JKL', 'MNO', 'PQRS', 'TUV', 'WXYZ'];
+    for (var n = 1; n <= 9; n++) {
+        dialKeys += '<div class="dial-key" onclick="dialKey(\'' + n + '\')">' + n;
+        if (letters[n-1]) {
+            dialKeys += '<span>' + letters[n-1] + '</span>';
+        }
+        dialKeys += '</div>';
+    }
+    container.innerHTML = '<div class="phone-dialer">' +
+        '<div class="dial-display" id="dialDisplay"></div>' +
+        '<div class="dial-pad">' + dialKeys +
+            '<div class="dial-key" onclick="dialKey(\'*\')">*</div>' +
+            '<div class="dial-key" onclick="dialKey(\'0\')">0<span>+</span></div>' +
+            '<div class="dial-key" onclick="dialKey(\'#\')">#</div>' +
+        '</div>' +
+        '<div class="dial-actions">' +
+            '<div class="dial-delete" onclick="dialDelete()">⌫</div>' +
+            '<div class="dial-call" onclick="makeCall()">📞</div>' +
+            '<div class="dial-delete" onclick="showCallHistory()">📋</div>' +
+        '</div>' +
+    '</div>';
+}
+
+var dialNumber = '';
+function dialKey(key) {
+    dialNumber += key;
+    var display = document.getElementById('dialDisplay');
+    if (display) display.textContent = dialNumber;
+}
+function dialDelete() {
+    dialNumber = dialNumber.slice(0, -1);
+    var display = document.getElementById('dialDisplay');
+    if (display) display.textContent = dialNumber;
+}
+function makeCall() {
+    if (!dialNumber) return;
+    showToast('Calling ' + dialNumber + '...');
+    state.calls.unshift({ id: Date.now(), name: dialNumber, number: dialNumber, type: 'outgoing', time: 'Just now' });
+}
+function showCallHistory() {
+    var body = document.getElementById('appBody');
+    var html = '<div class="contact-list">';
+    for (var i = 0; i < state.calls.length; i++) {
+        var c = state.calls[i];
+        var color = c.type === 'missed' ? '#ea4335' : '#34a853';
+        var icon = c.type === 'missed' ? '❌' : c.type === 'outgoing' ? '↗️' : '↙️';
+        html += '<div class="contact-item">' +
+            '<div class="contact-avatar" style="background: ' + color + '">' + icon + '</div>' +
+            '<div class="contact-info"><div class="contact-name">' + c.name + '</div><div class="contact-number">' + c.number + ' • ' + c.time + '</div></div>' +
+            '<div class="contact-actions"><div class="contact-action-btn" onclick="showToast(\'Calling ' + c.number + '\')">📞</div></div>' +
+            '</div>';
+    }
+    html += '</div>';
+    body.innerHTML = html;
+}
+
+// ==================== MESSAGES APP (with Firestore) ====================
+function renderMessagesApp(container) {
+    var html = '<div class="sms-list">';
+    for (var i = 0; i < state.messages.length; i++) {
+        var m = state.messages[i];
+        var unreadClass = m.unread ? 'unread' : '';
+        var unreadDot = m.unread ? '<div style="width: 8px; height: 8px; background: #1a73e8; border-radius: 50%; margin-top: 4px; margin-left: auto;"></div>' : '';
+        html += '<div class="sms-item ' + unreadClass + '" onclick="openThread(' + m.id + ')">' +
+            '<div class="contact-avatar" style="background: #1a73e8">' + m.contact[0] + '</div>' +
+            '<div class="contact-info">' +
+                '<div class="contact-name">' + m.contact + '</div>' +
+                '<div class="sms-preview">' + m.preview + '</div>' +
+            '</div>' +
+            '<div style="text-align: right;">' +
+                '<div class="sms-time">' + m.time + '</div>' + unreadDot +
+            '</div>' +
+        '</div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function openThread(id) {
+    var msg = state.messages.find(function(m) { return m.id === id; });
+    if (!msg) return;
+    msg.unread = false;
+    var body = document.getElementById('appBody');
+    var threadHtml = '<div class="sms-thread">' +
+        '<div class="sms-messages" id="threadMessages">';
+    for (var i = 0; i < msg.thread.length; i++) {
+        var t = msg.thread[i];
+        var statusText = '';
+        if (t.status === 'sent') statusText = '✓';
+        else if (t.status === 'delivered') statusText = '✓✓';
+        else if (t.status === 'read') statusText = '✓✓';
+        var align = t.sent ? 'left' : 'right';
+        threadHtml += '<div class="sms-bubble ' + (t.sent ? 'sent' : 'received') + '">' +
+            t.text +
+            '<div class="msg-status" style="text-align: ' + align + ';">' + t.time + ' ' + statusText + '</div>' +
+        '</div>';
+    }
+    threadHtml += '</div>' +
+        '<div class="sms-input-area">' +
+            '<input type="text" class="sms-input" placeholder="Andika ujumbe..." id="msgInput" onkeypress="if(event.key===\'Enter\')sendMessage(' + id + ')">' +
+            '<div class="sms-send" id="sendBtn" onclick="sendMessage(' + id + ')">➤</div>' +
+        '</div>' +
+    '</div>';
+    body.innerHTML = threadHtml;
+}
+
+function sendMessage(threadId) {
+    var input = document.getElementById('msgInput');
+    var sendBtn = document.getElementById('sendBtn');
+    var text = input.value.trim();
+    if (!text) return;
+
+    var msg = state.messages.find(function(m) { return m.id === threadId; });
+    var now = new Date();
+    var time = now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0');
+
+    msg.thread.push({ sent: true, text: text, time: time, status: 'sending' });
+    msg.preview = text;
+    msg.time = 'Just now';
+    input.value = '';
+    openThread(threadId);
+
+    if (sendBtn) {
+        sendBtn.classList.add('sending');
+        sendBtn.innerHTML = '';
     }
 
-    const data=await resp.json();
-    const text=(data.choices||[])[0]?.message?.content?.trim()||'';
-    if(!text)throw new Error('Jibu tupu kutoka kwa xAI Grok');
+    if (firebaseInitialized && db) {
+        showConnectionStatus('syncing', 'Inatuma ujumbe...');
+        db.collection('messages').add({
+            to: msg.number,
+            from: 'me@android.com',
+            text: text,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'sent',
+            deviceId: 'android-16-launcher'
+        }).then(function() {
+            msg.thread[msg.thread.length - 1].status = 'sent';
+            showConnectionStatus('online', 'Ujumbe umetumwa', 2000);
+            if (sendBtn) {
+                sendBtn.classList.remove('sending');
+                sendBtn.innerHTML = '➤';
+            }
+            openThread(threadId);
+        }).catch(function(e) {
+            console.error('Firestore send error:', e);
+            msg.thread[msg.thread.length - 1].status = 'failed';
+            showConnectionStatus('offline', 'Imeshindwa kutuma - umehifadhiwa', 3000);
+            if (sendBtn) {
+                sendBtn.classList.remove('sending');
+                sendBtn.innerHTML = '➤';
+            }
+            openThread(threadId);
+        });
+    } else {
+        setTimeout(function() {
+            msg.thread[msg.thread.length - 1].status = 'sent';
+            showToast('Ujumbe umetumwa (offline mode)');
+            if (sendBtn) {
+                sendBtn.classList.remove('sending');
+                sendBtn.innerHTML = '➤';
+            }
+            openThread(threadId);
+        }, 1000);
+    }
 
-    outEl.className='ai-output';
-    outEl.textContent=text;
+    setTimeout(function() {
+        msg.thread.push({ sent: false, text: 'Nimepokea! 👍', time: time, status: 'read' });
+        msg.preview = 'Nimepokea! 👍';
+        openThread(threadId);
+    }, 2000);
+}
 
-    // Parse numbers from AI response
-    const getField=label=>{
-      const patterns=[
-        new RegExp(label+'[:\\s]+\\$?([0-9,\\.]+)','i'),
-        new RegExp(label+'[:\\s]*\\n?\\$?([0-9,\\.]+)','i'),
-      ];
-      for(const p of patterns){const m=text.match(p);if(m)return parseFloat(m[1].replace(/,/g,''));}
-      return null;
+function listenForMessages() {
+    if (!db) return;
+    db.collection('messages').where('to', '==', 'me@android.com')
+        .orderBy('timestamp', 'desc')
+        .onSnapshot(function(snapshot) {
+            snapshot.docChanges().forEach(function(change) {
+                if (change.type === 'added') {
+                    var data = change.doc.data();
+                    var existing = state.messages.find(function(m) { return m.number === data.from; });
+                    var timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    if (existing) {
+                        existing.thread.push({ sent: false, text: data.text, time: timeStr, status: 'read' });
+                        existing.preview = data.text;
+                        existing.time = 'Just now';
+                        existing.unread = true;
+                    } else {
+                        state.messages.unshift({
+                            id: Date.now(),
+                            contact: data.from,
+                            number: data.from,
+                            preview: data.text,
+                            time: 'Just now',
+                            unread: true,
+                            thread: [{ sent: false, text: data.text, time: timeStr, status: 'read' }]
+                        });
+                    }
+                    var appTitle = document.getElementById('appTitle').textContent;
+                    if (appTitle === 'Messages') {
+                        renderMessagesApp(document.getElementById('appBody'));
+                    }
+                    showToast('Ujumbe mpya kutoka ' + data.from);
+                }
+            });
+        });
+}
+
+// ==================== CONTACTS APP ====================
+function renderContactsApp(container) {
+    container.innerHTML = '<div style="padding: 0 0 16px;"><input type="text" class="modal-input" placeholder="Search contacts..." oninput="filterContacts(this.value)"></div>' +
+        '<div class="contact-list" id="contactsList">' + renderContactsList() + '</div>';
+}
+
+function renderContactsList(filter) {
+    filter = filter || '';
+    var contacts = state.contacts.filter(function(c) {
+        return c.name.toLowerCase().includes(filter.toLowerCase());
+    }).sort(function(a, b) { return a.name.localeCompare(b.name); });
+    var html = '';
+    for (var i = 0; i < contacts.length; i++) {
+        var c = contacts[i];
+        var initials = c.name.split(' ').map(function(n) { return n[0]; }).join('');
+        html += '<div class="contact-item">' +
+            '<div class="contact-avatar">' + initials + '</div>' +
+            '<div class="contact-info"><div class="contact-name">' + c.name + '</div><div class="contact-number">' + c.number + '</div></div>' +
+            '<div class="contact-actions">' +
+                '<div class="contact-action-btn" onclick="showToast(\'Calling ' + c.number + '\')">📞</div>' +
+                '<div class="contact-action-btn" onclick="showToast(\'Messaging ' + c.number + '\')">💬</div>' +
+            '</div>' +
+        '</div>';
+    }
+    return html;
+}
+function filterContacts(query) {
+    document.getElementById('contactsList').innerHTML = renderContactsList(query);
+}
+
+// ==================== CALCULATOR APP ====================
+function renderCalculatorApp(container) {
+    container.innerHTML = '<div class="calculator">' +
+        '<div class="calc-display"><div class="calc-history" id="calcHistory"></div><div class="calc-result" id="calcResult">0</div></div>' +
+        '<div class="calc-pad">' +
+            '<button class="calc-btn" onclick="calcClear()">AC</button>' +
+            '<button class="calc-btn" onclick="calcOp(\'±\')">±</button>' +
+            '<button class="calc-btn" onclick="calcOp(\'%\')">%</button>' +
+            '<button class="calc-btn operator" onclick="calcOp(\'÷\')">÷</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'7\')">7</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'8\')">8</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'9\')">9</button>' +
+            '<button class="calc-btn operator" onclick="calcOp(\'×\')">×</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'4\')">4</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'5\')">5</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'6\')">6</button>' +
+            '<button class="calc-btn operator" onclick="calcOp(\'-\')">−</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'1\')">1</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'2\')">2</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'3\')">3</button>' +
+            '<button class="calc-btn operator" onclick="calcOp(\'+\')">+</button>' +
+            '<button class="calc-btn zero" onclick="calcNum(\'0\')">0</button>' +
+            '<button class="calc-btn" onclick="calcNum(\'.\')">.</button>' +
+            '<button class="calc-btn equals" onclick="calcEquals()">=</button>' +
+        '</div>' +
+    '</div>';
+}
+
+function calcNum(n) {
+    if (state.calculator.resetNext) { state.calculator.display = '0'; state.calculator.resetNext = false; }
+    if (state.calculator.display === '0' && n !== '.') { state.calculator.display = n; }
+    else { state.calculator.display += n; }
+    updateCalc();
+}
+function calcOp(op) {
+    state.calculator.operand = parseFloat(state.calculator.display);
+    state.calculator.operator = op;
+    state.calculator.history = state.calculator.display + ' ' + op;
+    state.calculator.resetNext = true;
+    updateCalc();
+}
+function calcEquals() {
+    if (!state.calculator.operator) return;
+    var current = parseFloat(state.calculator.display);
+    var result = 0;
+    switch(state.calculator.operator) {
+        case '+': result = state.calculator.operand + current; break;
+        case '-': result = state.calculator.operand - current; break;
+        case '×': result = state.calculator.operand * current; break;
+        case '÷': result = state.calculator.operand / current; break;
+        case '%': result = state.calculator.operand % current; break;
+    }
+    state.calculator.history = '';
+    state.calculator.display = result.toString();
+    state.calculator.operator = null;
+    state.calculator.operand = null;
+    state.calculator.resetNext = true;
+    updateCalc();
+}
+function calcClear() {
+    state.calculator = { display: '0', history: '', operator: null, operand: null, resetNext: false };
+    updateCalc();
+}
+function updateCalc() {
+    var resultEl = document.getElementById('calcResult');
+    var historyEl = document.getElementById('calcHistory');
+    if (resultEl) resultEl.textContent = state.calculator.display;
+    if (historyEl) historyEl.textContent = state.calculator.history;
+}
+
+// ==================== BROWSER APP (Real Web Search) ====================
+function renderBrowserApp(container) {
+    container.innerHTML = '<div class="browser-app">' +
+        '<div class="browser-tabs" id="browserTabs"></div>' +
+        '<div class="browser-toolbar">' +
+            '<button class="browser-nav-btn" id="btnBack" onclick="browserGoBack()" disabled>←</button>' +
+            '<button class="browser-nav-btn" id="btnForward" onclick="browserGoForward()" disabled>→</button>' +
+            '<button class="browser-nav-btn" onclick="browserReload()">↻</button>' +
+            '<div class="browser-address-bar">' +
+                '<span>🔍</span>' +
+                '<input type="text" id="browserUrl" placeholder="Tafuta au andika URL..." value="" onkeypress="if(event.key===\'Enter\')browserNavigate()">' +
+            '</div>' +
+            '<button class="browser-nav-btn" onclick="browserNewTab()">+</button>' +
+        '</div>' +
+        '<div class="browser-content" id="browserContent">' +
+            '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);">' +
+                '<div style="font-size: 64px; margin-bottom: 16px;">🌐</div>' +
+                '<h2>Browser</h2>' +
+                '<p style="margin-top: 8px;">Andika neno la kutafuta au URL</p>' +
+                '<div style="margin-top: 24px; display: flex; flex-direction: column; gap: 8px; max-width: 280px; margin-left: auto; margin-right: auto;">' +
+                    '<button onclick="quickSearch(\'google\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">🔍 Google</button>' +
+                    '<button onclick="quickSearch(\'youtube\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">▶️ YouTube</button>' +
+                    '<button onclick="quickSearch(\'wikipedia\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">📚 Wikipedia</button>' +
+                    '<button onclick="quickSearch(\'news\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">📰 Habari</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+    '</div>';
+    renderBrowserTabs();
+}
+
+function renderBrowserTabs() {
+    var tabsContainer = document.getElementById('browserTabs');
+    if (!tabsContainer) return;
+    var html = '';
+    for (var i = 0; i < state.browser.tabs.length; i++) {
+        var tab = state.browser.tabs[i];
+        var active = i === state.browser.activeTab ? 'active' : '';
+        html += '<div class="browser-tab ' + active + '" onclick="switchTab(' + i + ')">' +
+            '<span>' + tab.title + '</span>' +
+            '<span class="browser-tab-close" onclick="event.stopPropagation(); closeTab(' + i + ')">×</span>' +
+        '</div>';
+    }
+    tabsContainer.innerHTML = html;
+}
+
+function switchTab(index) {
+    state.browser.activeTab = index;
+    renderBrowserTabs();
+    var tab = state.browser.tabs[index];
+    var urlInput = document.getElementById('browserUrl');
+    if (urlInput) urlInput.value = tab.url || '';
+}
+
+function closeTab(index) {
+    state.browser.tabs.splice(index, 1);
+    if (state.browser.tabs.length === 0) {
+        browserNewTab();
+    } else {
+        state.browser.activeTab = Math.min(state.browser.activeTab, state.browser.tabs.length - 1);
+        renderBrowserTabs();
+    }
+}
+
+function browserNewTab() {
+    state.browser.tabs.push({ id: Date.now(), title: 'New Tab', url: '' });
+    state.browser.activeTab = state.browser.tabs.length - 1;
+    renderBrowserTabs();
+    var content = document.getElementById('browserContent');
+    if (content) {
+        content.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);">' +
+            '<div style="font-size: 64px; margin-bottom: 16px;">🌐</div>' +
+            '<h2>Browser</h2>' +
+            '<p style="margin-top: 8px;">Andika neno la kutafuta au URL</p>' +
+        '</div>';
+    }
+    var urlInput = document.getElementById('browserUrl');
+    if (urlInput) urlInput.value = '';
+}
+
+function browserNavigate() {
+    var urlInput = document.getElementById('browserUrl');
+    var query = urlInput.value.trim();
+    if (!query) return;
+    var content = document.getElementById('browserContent');
+
+    if (query.indexOf('http://') === 0 || query.indexOf('https://') === 0 || query.indexOf('.') > 0) {
+        var url = query;
+        if (url.indexOf('http') !== 0) url = 'https://' + url;
+        state.browser.tabs[state.browser.activeTab].url = url;
+        state.browser.tabs[state.browser.activeTab].title = url.replace(/^https?:\/\//, '').substring(0, 20) + '...';
+        renderBrowserTabs();
+        content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+        return;
+    }
+    performWebSearch(query);
+}
+
+function performWebSearch(query) {
+    var content = document.getElementById('browserContent');
+    content.innerHTML = '<div class="search-loading">' +
+        '<div class="search-loading-spinner"></div>' +
+        '<p>Inatafuta: "' + query + '"...</p>' +
+    '</div>';
+
+    state.browser.tabs[state.browser.activeTab].title = query.substring(0, 15) + '...';
+    renderBrowserTabs();
+
+    // Use Wikipedia API as primary search
+    var wikiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query.replace(/\s+/g, '_'));
+
+    fetch(wikiUrl).then(function(response) {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Wiki not found');
+    }).then(function(wikiData) {
+        var results = [];
+        if (wikiData.extract) {
+            var wikiPageUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(query.replace(/\s+/g, '_'));
+            results.push({
+                title: wikiData.title || query,
+                url: wikiPageUrl,
+                description: wikiData.extract
+            });
+        }
+        results.push({
+            title: 'Tafuta "' + query + '" kwenye Google',
+            url: 'https://www.google.com/search?q=' + encodeURIComponent(query),
+            description: 'Bofya hapa kufungua ukurasa wa matokeo ya Google kwa "' + query + '"'
+        });
+        results.push({
+            title: 'Tafuta "' + query + '" kwenye DuckDuckGo',
+            url: 'https://duckduckgo.com/?q=' + encodeURIComponent(query),
+            description: 'Fungua DuckDuckGo Search kwa ajili ya "' + query + '"'
+        });
+        displaySearchResults(query, results);
+    }).catch(function(error) {
+        console.error('Search error:', error);
+        displaySearchResults(query, [
+            {
+                title: 'Tafuta "' + query + '" kwenye Google',
+                url: 'https://www.google.com/search?q=' + encodeURIComponent(query),
+                description: 'Fungua Google Search kwa ajili ya "' + query + '"'
+            },
+            {
+                title: 'Tafuta "' + query + '" kwenye DuckDuckGo',
+                url: 'https://duckduckgo.com/?q=' + encodeURIComponent(query),
+                description: 'Fungua DuckDuckGo Search kwa ajili ya "' + query + '"'
+            },
+            {
+                title: 'Tafuta "' + query + '" kwenye Wikipedia',
+                url: 'https://en.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(query),
+                description: 'Tafuta "' + query + '" kwenye Wikipedia'
+            }
+        ]);
+    });
+}
+
+function displaySearchResults(query, results) {
+    var content = document.getElementById('browserContent');
+    var html = '<div class="search-results">' +
+        '<div style="padding: 12px 0; font-size: 14px; color: var(--on-background); border-bottom: 1px solid var(--background); margin-bottom: 12px;">' +
+            '<strong>' + results.length + '</strong> matokeo ya "' + query + '"' +
+        '</div>';
+    for (var i = 0; i < results.length; i++) {
+        var r = results[i];
+        html += '<div class="search-result-item animate-slideUp" style="animation-delay: ' + (i * 0.05) + 's" onclick="openSearchResult(\'' + r.url + '\')">' +
+            '<div class="search-result-title">' + r.title + '</div>' +
+            '<div class="search-result-url">' + r.url + '</div>' +
+            '<div class="search-result-desc">' + (r.description || '') + '</div>' +
+        '</div>';
+    }
+    html += '</div>';
+    content.innerHTML = html;
+}
+
+function openSearchResult(url) {
+    state.browser.tabs[state.browser.activeTab].url = url;
+    var content = document.getElementById('browserContent');
+    content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+    state.browser.tabs[state.browser.activeTab].title = url.replace(/^https?:\/\//, '').substring(0, 20) + '...';
+    renderBrowserTabs();
+    var urlInput = document.getElementById('browserUrl');
+    if (urlInput) urlInput.value = url;
+}
+
+function quickSearch(site) {
+    var queries = {
+        google: 'https://www.google.com',
+        youtube: 'https://www.youtube.com',
+        wikipedia: 'https://www.wikipedia.org',
+        news: 'https://news.google.com'
     };
-    const entryAI=getField('ENTRY');
-    const slAI=getField('STOP_LOSS');
-    const tpAI=getField('TAKE_PROFIT');
-
-    if(fieldsEl&&(entryAI||slAI||tpAI)){
-      fieldsEl.style.display='grid';
-      const eEl=document.getElementById('aiEntry');const sEl=document.getElementById('aiSL');const tEl=document.getElementById('aiTP');
-      if(eEl&&entryAI)eEl.textContent=fP(entryAI);
-      if(sEl&&slAI)sEl.textContent=fP(slAI);
-      if(tEl&&tpAI)tEl.textContent=fP(tpAI);
-    }
-
-    toast('✅ xAI Grok amekamilisha uchambuzi wa '+coin.id);
-  }catch(e){
-    outEl.className='ai-output error';
-    // Jaribu fallback kwa Claude AI kama xAI imefeli
-    outEl.textContent='⚠ xAI Grok: '+e.message+'\n\n⏳ Inajaribu Claude AI kama backup...';
-    await askClaudeAIFallback(coin,sig,d,outEl,fieldsEl);
-  }finally{
-    btn.disabled=false;
-  }
+    var url = queries[site];
+    state.browser.tabs[state.browser.activeTab].url = url;
+    state.browser.tabs[state.browser.activeTab].title = site.charAt(0).toUpperCase() + site.slice(1);
+    renderBrowserTabs();
+    var content = document.getElementById('browserContent');
+    content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+    var urlInput = document.getElementById('browserUrl');
+    if (urlInput) urlInput.value = url;
 }
 
-// Claude AI kama backup kama xAI imefeli
-async function askClaudeAIFallback(coin,sig,d,outEl,fieldsEl){
-  try{
-    const prompt=`Wewe ni mtaalam wa crypto trading. Changanua ${coin.id}/USDT haraka.
-Bei: $${d.price.toFixed(6)}, RSI: ${sig.rsi?sig.rsi.toFixed(1):'N/A'}, ATR: $${sig.atr?sig.atr.toFixed(6):'N/A'}
-Signal ya Algorithm: ${sig.type}, Entry: $${sig.entry?sig.entry.toFixed(6):'N/A'}, SL: $${sig.sl?sig.sl.toFixed(6):'N/A'}, TP: $${sig.tp?sig.tp.toFixed(6):'N/A'}
+function browserGoBack() {}
+function browserGoForward() {}
+function browserReload() {
+    var tab = state.browser.tabs[state.browser.activeTab];
+    if (tab.url) {
+        var content = document.getElementById('browserContent');
+        content.innerHTML = '<iframe class="web-frame" src="' + tab.url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+    }
+}
 
-Jibu kwa muundo huu:
-SIGNAL: [BUY/SELL/NEUTRAL]
-SABABU: [sababu 2 za Kiswahili]
-ENTRY: $[nambari]
-STOP_LOSS: $[nambari]
-TAKE_PROFIT: $[nambari]
-HATARI: [CHINI/WASTANI/JUU]
-MUHTASARI: [sentensi moja]`;
+// ==================== EMAIL APP (with Firestore) ====================
+function renderEmailApp(container) {
+    var html = '<div class="email-list" id="emailList">';
+    for (var i = 0; i < state.emails.length; i++) {
+        var e = state.emails[i];
+        var unreadClass = e.unread ? 'unread' : '';
+        html += '<div class="email-item ' + unreadClass + '" onclick="readEmail(' + e.id + ')">' +
+            '<div class="email-avatar">' + e.from[0].toUpperCase() + '</div>' +
+            '<div class="email-info">' +
+                '<div class="email-sender">' + e.from + '</div>' +
+                '<div class="email-subject">' + e.subject + '</div>' +
+                '<div class="email-preview">' + e.preview + '</div>' +
+            '</div>' +
+            '<div class="email-meta">' +
+                '<div class="email-time">' + e.time + '</div>' +
+            '</div>' +
+        '</div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+    var actions = document.getElementById('appActions');
+    if (actions) actions.innerHTML = '<div class="app-action" onclick="composeEmail()">✏️</div>';
+}
 
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,messages:[{role:'user',content:prompt}]})
+function readEmail(id) {
+    var email = state.emails.find(function(e) { return e.id === id; });
+    if (!email) return;
+    email.unread = false;
+    var body = document.getElementById('appBody');
+    body.innerHTML = '<div class="email-read">' +
+        '<div class="email-read-header">' +
+            '<div class="email-read-subject">' + email.subject + '</div>' +
+            '<div class="email-read-sender-row">' +
+                '<div class="email-avatar">' + email.from[0].toUpperCase() + '</div>' +
+                '<div>' +
+                    '<div style="font-weight: 600; color: var(--on-surface);">' + email.from + '</div>' +
+                    '<div style="font-size: 13px; color: var(--on-background);">To: ' + email.to + '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="email-read-body">' + email.body.replace(/\n/g, '<br>') + '</div>' +
+    '</div>';
+    var actions = document.getElementById('appActions');
+    if (actions) actions.innerHTML = '<div class="app-action" onclick="replyEmail(' + id + ')">↩️</div><div class="app-action" onclick="deleteEmail(' + id + ')">🗑️</div>';
+}
+
+function composeEmail() {
+    var body = document.getElementById('appBody');
+    body.innerHTML = '<div class="email-compose">' +
+        '<div class="email-compose-fields">' +
+            '<div class="email-field">' +
+                '<span class="email-field-label">To:</span>' +
+                '<input type="email" id="emailTo" placeholder="recipient@example.com">' +
+            '</div>' +
+            '<div class="email-field">' +
+                '<span class="email-field-label">Subject:</span>' +
+                '<input type="text" id="emailSubject" placeholder="Email subject">' +
+            '</div>' +
+        '</div>' +
+        '<div class="email-compose-body">' +
+            '<textarea id="emailBody" placeholder="Andika barua pepe hapa..."></textarea>' +
+        '</div>' +
+        '<div class="email-compose-actions">' +
+            '<span style="font-size: 12px; color: var(--on-background);">Kutumia Firestore</span>' +
+            '<button class="email-send-btn" id="emailSendBtn" onclick="sendEmail()">' +
+                '<span>📤</span> Tuma' +
+            '</button>' +
+        '</div>' +
+    '</div>';
+    var actions = document.getElementById('appActions');
+    if (actions) actions.innerHTML = '';
+}
+
+function sendEmail() {
+    var to = document.getElementById('emailTo').value.trim();
+    var subject = document.getElementById('emailSubject').value.trim();
+    var bodyText = document.getElementById('emailBody').value.trim();
+    var sendBtn = document.getElementById('emailSendBtn');
+
+    if (!to || !subject || !bodyText) {
+        showToast('Jaza sehemu zote zilizo haja');
+        return;
+    }
+
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.classList.add('sending');
+        sendBtn.innerHTML = '<span>⏳</span> Inatuma...';
+    }
+
+    if (firebaseInitialized && db) {
+        showConnectionStatus('syncing', 'Inatuma barua pepe...');
+        db.collection('emails').add({
+            to: to,
+            from: 'me@android.com',
+            subject: subject,
+            body: bodyText,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'sent',
+            deviceId: 'android-16-launcher'
+        }).then(function() {
+            showConnectionStatus('online', 'Barua pepe umetumwa', 2000);
+            showToast('Barua pepe umetumwa kupitia Firestore!');
+        }).catch(function(e) {
+            console.error('Email send error:', e);
+            showConnectionStatus('offline', 'Imeshindwa kutuma - umehifadhiwa', 3000);
+            showToast('Imeshindwa kutuma kwenye Firestore');
+        });
+    } else {
+        showToast('Barua pepe umetumwa (offline mode)');
+    }
+
+    state.emails.unshift({
+        id: Date.now(),
+        from: 'me@android.com',
+        to: to,
+        subject: subject,
+        preview: bodyText.substring(0, 50) + '...',
+        time: 'Just now',
+        unread: false,
+        body: bodyText
     });
-    if(!resp.ok)throw new Error('Claude HTTP '+resp.status);
-    const data=await resp.json();
-    const text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
-    if(!text)throw new Error('Jibu tupu');
-    outEl.className='ai-output';
-    outEl.textContent='[Claude AI Backup]\n\n'+text;
-    toast('✅ Claude AI (backup) amekamilisha uchambuzi wa '+coin.id);
-  }catch(e2){
-    outEl.className='ai-output error';
-    outEl.textContent='❌ AI zote zimefeli. Jaribu tena baadaye.\n\nxAI: API key lazima iwe na ruhusa ya grok-3-fast\nClaude: Inahitaji claude.ai app';
-  }
+
+    renderEmailApp(document.getElementById('appBody'));
+    var actions = document.getElementById('appActions');
+    if (actions) actions.innerHTML = '<div class="app-action" onclick="composeEmail()">✏️</div>';
 }
 
-// ═══════════════════════════════════
-//  FOREX + GOLD DATA
-// ═══════════════════════════════════
-const forexCache={};
-
-async function fetchAllForex(){
-  // Njia 1: Twelve Data (EUR/USD, GBP/USD, nk.)
-  await fetchTwelveDataForex();
-  // Njia 2: Finnhub (Gold/Silver)
-  await fetchFinnhubGold();
-  // Njia 3: Alpha Vantage kwa TZS
-  await fetchAlphaVantageTZS();
-  updateForexDisplay();
+function replyEmail(id) {
+    var email = state.emails.find(function(e) { return e.id === id; });
+    if (!email) return;
+    composeEmail();
+    document.getElementById('emailTo').value = email.from;
+    document.getElementById('emailSubject').value = 'Re: ' + email.subject;
 }
 
-async function fetchTwelveDataForex(){
-  const pairs=['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/TZS'];
-  const symbols=pairs.join(',');
-  try{
-    const r=await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(symbols)}&apikey=${KEYS.twelvedata}`,{signal:AbortSignal.timeout(8000)});
-    if(!r.ok)return;
-    const data=await r.json();
-    pairs.forEach(pair=>{
-      const key=pair.replace('/','');
-      const d=data[pair]||data[key];
-      if(d&&d.price){
-        forexCache[key]={rate:parseFloat(d.price),chg:null,source:'12Data'};
-      }
-    });
-    // Pia pata XAUUSD kutoka Twelve Data
-    await fetchTwelveDataGold();
-  }catch(e){}
-}
-
-async function fetchTwelveDataGold(){
-  try{
-    const r=await fetch(`https://api.twelvedata.com/price?symbol=XAU/USD,XAG/USD&apikey=${KEYS.twelvedata}`,{signal:AbortSignal.timeout(8000)});
-    if(!r.ok)return;
-    const data=await r.json();
-    if(data['XAU/USD']?.price){
-      forexCache['XAUUSD']={rate:parseFloat(data['XAU/USD'].price),chg:null,source:'12Data'};
-      // Update sidebar
-      const el=document.getElementById('metal_XAU');if(el)el.textContent='$'+parseFloat(data['XAU/USD'].price).toFixed(2);
+function deleteEmail(id) {
+    var idx = state.emails.findIndex(function(e) { return e.id === id; });
+    if (idx > -1) {
+        state.emails.splice(idx, 1);
+        renderEmailApp(document.getElementById('appBody'));
+        showToast('Barua pepe imefutwa');
     }
-    if(data['XAG/USD']?.price){
-      forexCache['XAGUSD']={rate:parseFloat(data['XAG/USD'].price),chg:null,source:'12Data'};
-      const el=document.getElementById('metal_XAG');if(el)el.textContent='$'+parseFloat(data['XAG/USD'].price).toFixed(2);
+}
+
+function listenForEmails() {
+    if (!db) return;
+    db.collection('emails').where('to', '==', 'me@android.com')
+        .orderBy('timestamp', 'desc')
+        .onSnapshot(function(snapshot) {
+            snapshot.docChanges().forEach(function(change) {
+                if (change.type === 'added') {
+                    var data = change.doc.data();
+                    state.emails.unshift({
+                        id: Date.now() + Math.random(),
+                        from: data.from,
+                        to: data.to,
+                        subject: data.subject,
+                        preview: data.body.substring(0, 50) + '...',
+                        time: 'Just now',
+                        unread: true,
+                        body: data.body
+                    });
+                    var appTitle = document.getElementById('appTitle').textContent;
+                    if (appTitle === 'Email') {
+                        renderEmailApp(document.getElementById('appBody'));
+                    }
+                    showToast('Barua pepe mpya kutoka ' + data.from);
+                }
+            });
+        });
+}
+
+// ==================== FILES APP ====================
+function renderFilesApp(container) {
+    container.innerHTML = '<div class="file-toolbar">' +
+        '<button class="file-tool" onclick="createFolder()">📁 New Folder</button>' +
+        '<button class="file-tool" onclick="createNote()">📝 New Note</button>' +
+        '<button class="file-tool" onclick="showToast(\'Upload coming soon\')">📤 Upload</button>' +
+        '<button class="file-tool" onclick="showRecycleBin()">🗑️ Recycle</button>' +
+    '</div>' +
+    '<div class="file-categories">' +
+        '<div class="file-category" onclick="filterFiles(\'all\')">' +
+            '<div class="file-category-icon" style="background: #1a73e820; color: #1a73e8">📁</div>' +
+            '<div class="file-category-info"><div class="file-category-name">All Files</div><div class="file-category-count">' + state.files.length + ' items</div></div>' +
+        '</div>' +
+        '<div class="file-category" onclick="filterFiles(\'image\')">' +
+            '<div class="file-category-icon" style="background: #ea433520; color: #ea4335">🖼️</div>' +
+            '<div class="file-category-info"><div class="file-category-name">Images</div><div class="file-category-count">Photos & Videos</div></div>' +
+        '</div>' +
+        '<div class="file-category" onclick="filterFiles(\'document\')">' +
+            '<div class="file-category-icon" style="background: #34a85320; color: #34a853">📄</div>' +
+            '<div class="file-category-info"><div class="file-category-name">Documents</div><div class="file-category-count">PDF, Word, Excel</div></div>' +
+        '</div>' +
+        '<div class="file-category" onclick="filterFiles(\'archive\')">' +
+            '<div class="file-category-icon" style="background: #fbbc0520; color: #fbbc05">📦</div>' +
+            '<div class="file-category-info"><div class="file-category-name">Archives</div><div class="file-category-count">ZIP & Others</div></div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="file-list" id="fileList">' + renderFileList() + '</div>';
+}
+
+function renderFileList(filter) {
+    filter = filter || 'all';
+    var files = state.files;
+    if (filter === 'image') files = files.filter(function(f) { return ['jpg','png','gif','mp4'].indexOf(f.type) > -1; });
+    if (filter === 'document') files = files.filter(function(f) { return ['pdf','word','excel','text'].indexOf(f.type) > -1; });
+    if (filter === 'archive') files = files.filter(function(f) { return f.type === 'zip'; });
+    var html = '';
+    for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        var icon = '📎';
+        if (f.type === 'folder') icon = '📁';
+        else if (f.type === 'pdf') icon = '📕';
+        else if (f.type === 'excel') icon = '📗';
+        else if (f.type === 'word') icon = '📘';
+        else if (f.type === 'zip') icon = '📦';
+        else if (f.type === 'text') icon = '📄';
+        var meta = f.type === 'folder' ? f.count + ' items' : f.size;
+        html += '<div class="file-item" onclick="openFile(' + f.id + ')">' +
+            '<div class="file-icon" style="background: ' + f.color + '20; color: ' + f.color + '">' + icon + '</div>' +
+            '<div class="file-info"><div class="file-name">' + f.name + '</div><div class="file-meta">' + meta + '</div></div>' +
+            '<div class="file-menu" onclick="event.stopPropagation(); showFileMenu(' + f.id + ')">⋮</div>' +
+        '</div>';
     }
-  }catch(e){}
+    return html;
+}
+function filterFiles(type) { document.getElementById('fileList').innerHTML = renderFileList(type); }
+function openFile(id) { var file = state.files.find(function(f) { return f.id === id; }); showToast('Opening ' + file.name + '...'); }
+function showFileMenu(id) {
+    var file = state.files.find(function(f) { return f.id === id; });
+    showModal('File Options', '<div style="display: flex; flex-direction: column; gap: 12px;">' +
+        '<button class="file-tool" style="width: 100%;" onclick="renameFile(' + id + ')">✏️ Rename</button>' +
+        '<button class="file-tool" style="width: 100%;" onclick="copyFile(' + id + ')">📋 Copy</button>' +
+        '<button class="file-tool" style="width: 100%;" onclick="moveFile(' + id + ')">📤 Move</button>' +
+        '<button class="file-tool" style="width: 100%;" onclick="deleteFile(' + id + ')">🗑️ Delete</button>' +
+    '</div>', []);
+}
+function createFolder() {
+    showModal('New Folder', '<input type="text" class="modal-input" id="folderName" placeholder="Folder name">', [
+        { text: 'Cancel', action: closeModal },
+        { text: 'Create', action: function() {
+            var name = document.getElementById('folderName').value;
+            if (name) { state.files.unshift({ id: Date.now(), name: name, type: 'folder', size: '', count: 0, color: '#1a73e8' }); closeModal(); renderFilesApp(document.getElementById('appBody')); showToast('Folder created'); }
+        }, primary: true }
+    ]);
+}
+function createNote() {
+    showModal('New Note', '<input type="text" class="modal-input" id="noteName" placeholder="Note name" style="margin-bottom: 8px;"><textarea class="modal-input" id="noteContent" placeholder="Write your note here..." style="height: 120px; resize: none;"></textarea>', [
+        { text: 'Cancel', action: closeModal },
+        { text: 'Save', action: function() {
+            var name = document.getElementById('noteName').value || 'Untitled Note';
+            var content = document.getElementById('noteContent').value;
+            if (content) { state.files.unshift({ id: Date.now(), name: name + '.txt', type: 'text', size: content.length + ' B', count: 0, color: '#5f6368' }); closeModal(); renderFilesApp(document.getElementById('appBody')); showToast('Note saved'); }
+        }, primary: true }
+    ]);
+}
+function renameFile(id) {
+    var file = state.files.find(function(f) { return f.id === id; });
+    showModal('Rename', '<input type="text" class="modal-input" id="renameInput" value="' + file.name + '">', [
+        { text: 'Cancel', action: closeModal },
+        { text: 'Rename', action: function() { file.name = document.getElementById('renameInput').value; closeModal(); renderFilesApp(document.getElementById('appBody')); }, primary: true }
+    ]);
+}
+function copyFile(id) { showToast('File copied to clipboard'); closeModal(); }
+function moveFile(id) { showToast('Select destination folder'); closeModal(); }
+function deleteFile(id) {
+    var idx = state.files.findIndex(function(f) { return f.id === id; });
+    if (idx > -1) { state.files.splice(idx, 1); renderFilesApp(document.getElementById('appBody')); showToast('File moved to recycle bin'); }
+    closeModal();
+}
+function showRecycleBin() {
+    showModal('Recycle Bin', '<div style="text-align: center; padding: 40px; color: var(--on-background);"><div style="font-size: 48px; margin-bottom: 16px;">🗑️</div><p>Recycle bin is empty</p><p style="font-size: 12px; margin-top: 8px;">Deleted files will appear here</p></div>', [{ text: 'Close', action: closeModal }]);
 }
 
-async function fetchFinnhubGold(){
-  // Finnhub: forex rates
-  const pairs=[{sym:'OANDA:XAU_USD',key:'XAUUSD'},{sym:'OANDA:EUR_USD',key:'EURUSD'},{sym:'OANDA:GBP_USD',key:'GBPUSD'},{sym:'OANDA:USD_JPY',key:'USDJPY'}];
-  for(const pair of pairs){
-    if(forexCache[pair.key]?.rate)continue; // tayari ipo
-    try{
-      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${pair.sym}&token=${KEYS.finnhub}`,{signal:AbortSignal.timeout(6000)});
-      if(!r.ok)continue;
-      const data=await r.json();
-      if(data.c&&data.c>0){
-        const chg=data.pc>0?((data.c-data.pc)/data.pc*100):null;
-        forexCache[pair.key]={rate:data.c,chg,high:data.h,low:data.l,source:'Finnhub'};
-        if(pair.key==='XAUUSD'){const el=document.getElementById('metal_XAU');if(el)el.textContent='$'+data.c.toFixed(2);}
-      }
-    }catch(e){}
-  }
+// ==================== SETTINGS APP ====================
+function renderSettingsApp(container) {
+    var cloudStatus = firebaseInitialized ? 'On' : 'Off';
+    var themeActive = state.theme === 'dark' ? 'active' : '';
+    container.innerHTML = '<div class="settings-list">' +
+        '<div class="settings-section">' +
+            '<div class="settings-section-title">Network & Internet</div>' +
+            '<div class="settings-item" onclick="showToast(\'Wi-Fi settings\')"><div class="settings-icon">📶</div><div class="settings-info"><div class="settings-label">Wi-Fi</div><div class="settings-desc">Connected to HomeNetwork</div></div><div class="settings-toggle active"></div></div>' +
+            '<div class="settings-item" onclick="showToast(\'Bluetooth settings\')"><div class="settings-icon">🔷</div><div class="settings-info"><div class="settings-label">Bluetooth</div><div class="settings-desc">Off</div></div><div class="settings-toggle"></div></div>' +
+            '<div class="settings-item" onclick="showToast(\'Mobile data settings\')"><div class="settings-icon">📡</div><div class="settings-info"><div class="settings-label">Mobile Data</div><div class="settings-desc">5G - 2.4 GB used</div></div><div class="settings-toggle active"></div></div>' +
+        '</div>' +
+        '<div class="settings-section">' +
+            '<div class="settings-section-title">Personalization</div>' +
+            '<div class="settings-item" onclick="changeWallpaper()"><div class="settings-icon">🖼️</div><div class="settings-info"><div class="settings-label">Wallpaper</div><div class="settings-desc">Change home screen background</div></div><div style="color: var(--on-background);">›</div></div>' +
+            '<div class="settings-item" onclick="toggleThemeSetting()"><div class="settings-icon">🌙</div><div class="settings-info"><div class="settings-label">Dark Mode</div><div class="settings-desc">Use dark theme</div></div><div class="settings-toggle ' + themeActive + '" id="themeToggle"></div></div>' +
+        '</div>' +
+        '<div class="settings-section">' +
+            '<div class="settings-section-title">Security</div>' +
+            '<div class="settings-item" onclick="changePin()"><div class="settings-icon">🔢</div><div class="settings-info"><div class="settings-label">Screen Lock</div><div class="settings-desc">PIN: ****</div></div><div style="color: var(--on-background);">›</div></div>' +
+            '<div class="settings-item" onclick="showToast(\'Fingerprint setup\')"><div class="settings-icon">👆</div><div class="settings-info"><div class="settings-label">Fingerprint</div><div class="settings-desc">Not set up</div></div><div class="settings-toggle"></div></div>' +
+            '<div class="settings-item" onclick="showToast(\'App lock settings\')"><div class="settings-icon">🔐</div><div class="settings-info"><div class="settings-label">App Lock</div><div class="settings-desc">Lock individual apps</div></div><div class="settings-toggle"></div></div>' +
+            '<div class="settings-item" onclick="showToast(\'Hidden vault\')"><div class="settings-icon">🕵️</div><div class="settings-info"><div class="settings-label">Hidden Vault</div><div class="settings-desc">Hide private files</div></div><div class="settings-toggle"></div></div>' +
+        '</div>' +
+        '<div class="settings-section">' +
+            '<div class="settings-section-title">Backup & Storage</div>' +
+            '<div class="settings-item" onclick="showToast(\'Cloud sync settings\')"><div class="settings-icon">☁️</div><div class="settings-info"><div class="settings-label">Cloud Backup</div><div class="settings-desc">Firebase sync: ' + cloudStatus + '</div></div><div class="settings-toggle ' + (firebaseInitialized ? 'active' : '') + '"></div></div>' +
+            '<div class="settings-item" onclick="showToast(\'Auto backup settings\')"><div class="settings-icon">🔄</div><div class="settings-info"><div class="settings-label">Auto Backup</div><div class="settings-desc">Daily at 2:00 AM</div></div><div class="settings-toggle"></div></div>' +
+            '<div class="settings-item" onclick="showStorageInfo()"><div class="settings-icon">💾</div><div class="settings-info"><div class="settings-label">Storage</div><div class="settings-desc">64 GB used of 128 GB</div></div><div style="color: var(--on-background);">›</div></div>' +
+        '</div>' +
+        '<div class="settings-section">' +
+            '<div class="settings-section-title">System</div>' +
+            '<div class="settings-item" onclick="showToast(\'Language settings\')"><div class="settings-icon">🌐</div><div class="settings-info"><div class="settings-label">Language</div><div class="settings-desc">English (US)</div></div><div style="color: var(--on-background);">›</div></div>' +
+            '<div class="settings-item" onclick="showAboutPhone()"><div class="settings-icon">📱</div><div class="settings-info"><div class="settings-label">About Phone</div><div class="settings-desc">Android 16 - Build 2026.06</div></div><div style="color: var(--on-background);">›</div></div>' +
+        '</div>' +
+    '</div>';
 }
 
-async function fetchAlphaVantageTZS(){
-  // TZS kwa Alpha Vantage
-  try{
-    if(forexCache['USDTZS']?.rate)return;
-    const r=await fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=TZS&apikey=${KEYS.alphavantage}`,{signal:AbortSignal.timeout(8000)});
-    if(!r.ok)return;
-    const data=await r.json();
-    const rate=parseFloat(data['Realtime Currency Exchange Rate']?.['5. Exchange Rate']);
-    if(rate>0)forexCache['USDTZS']={rate,chg:null,source:'AlphaVantage'};
-  }catch(e){}
+function toggleThemeSetting() {
+    toggleTheme();
+    document.getElementById('themeToggle').classList.toggle('active', state.theme === 'dark');
 }
 
-function updateForexDisplay(){
-  const pairs=[
-    {key:'XAUUSD',id:'fx_XAUUSD',chgId:'fxc_XAUUSD',decimals:2,prefix:'$'},
-    {key:'XAGUSD',id:'fx_XAGUSD',chgId:'fxc_XAGUSD',decimals:2,prefix:'$'},
-    {key:'EURUSD',id:'fx_EURUSD',chgId:'fxc_EURUSD',decimals:5,prefix:''},
-    {key:'GBPUSD',id:'fx_GBPUSD',chgId:'fxc_GBPUSD',decimals:5,prefix:''},
-    {key:'USDJPY',id:'fx_USDJPY',chgId:'fxc_USDJPY',decimals:3,prefix:''},
-    {key:'USDTZS',id:'fx_USDTZS',chgId:'fxc_USDTZS',decimals:0,prefix:''},
-    {key:'AUDUSD',id:'fx_AUDUSD',chgId:'fxc_AUDUSD',decimals:5,prefix:''},
-    {key:'USDCHF',id:'fx_USDCHF',chgId:'fxc_USDCHF',decimals:5,prefix:''},
-  ];
-  pairs.forEach(p=>{
-    const el=document.getElementById(p.id);const chgEl=document.getElementById(p.chgId);
-    const cache=forexCache[p.key];
-    if(el&&cache?.rate){
-      el.textContent=p.prefix+cache.rate.toFixed(p.decimals);
-      if(chgEl){
-        if(cache.chg!==null&&cache.chg!==undefined){
-          const pct=(cache.chg>=0?'+':'')+cache.chg.toFixed(2)+'%';
-          chgEl.textContent=pct+' | '+cache.source;
-          chgEl.style.color=cache.chg>=0?'var(--buy)':'var(--sell)';
-        }else{chgEl.textContent=cache.source;chgEl.style.color='var(--muted)';}
-      }
+function changeWallpaper() {
+    var wallpapers = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)'
+    ];
+    var html = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">';
+    for (var i = 0; i < wallpapers.length; i++) {
+        html += '<div style="height: 80px; border-radius: 12px; background: ' + wallpapers[i] + '; cursor: pointer;" onclick="setWallpaper(\'' + wallpapers[i] + '\')"></div>';
     }
-    // Sidebar update
-    const sbMap={EURUSD:'forex_EURUSD',GBPUSD:'forex_GBPUSD',USDJPY:'forex_USDJPY'};
-    if(sbMap[p.key]&&cache?.rate){
-      const sbEl=document.getElementById(sbMap[p.key]);
-      if(sbEl)sbEl.textContent=cache.rate.toFixed(p.decimals);
+    html += '</div>';
+    showModal('Choose Wallpaper', html, [{ text: 'Cancel', action: closeModal }]);
+}
+
+function setWallpaper(wallpaper) {
+    document.getElementById('wallpaper').style.background = wallpaper;
+    closeModal();
+    showToast('Wallpaper changed');
+}
+
+function changePin() {
+    showModal('Change PIN', '<input type="password" class="modal-input" id="oldPin" placeholder="Current PIN" maxlength="4"><input type="password" class="modal-input" id="newPin" placeholder="New PIN" maxlength="4" style="margin-top: 8px;"><input type="password" class="modal-input" id="confirmPin" placeholder="Confirm PIN" maxlength="4" style="margin-top: 8px;">', [
+        { text: 'Cancel', action: closeModal },
+        { text: 'Change', action: function() {
+            var oldPin = document.getElementById('oldPin').value;
+            var newPin = document.getElementById('newPin').value;
+            var confirmPin = document.getElementById('confirmPin').value;
+            if (oldPin !== state.pin) { showToast('Wrong current PIN'); return; }
+            if (newPin.length !== 4) { showToast('PIN must be 4 digits'); return; }
+            if (newPin !== confirmPin) { showToast('PINs do not match'); return; }
+            state.pin = newPin;
+            closeModal();
+            showToast('PIN changed successfully');
+        }, primary: true }
+    ]);
+}
+
+function showStorageInfo() {
+    showModal('Storage', '<div style="padding: 16px 0;"><div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>Used</span><span>64 GB</span></div><div style="height: 8px; background: var(--background); border-radius: 4px; overflow: hidden;"><div style="width: 50%; height: 100%; background: var(--primary); border-radius: 4px;"></div></div><div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--on-background);"><span>Free: 64 GB</span><span>Total: 128 GB</span></div><div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;"><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📱 System</span><span>12 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📁 Apps</span><span>28 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>🖼️ Media</span><span>18 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📄 Files</span><span>6 GB</span></div></div></div>', [{ text: 'Close', action: closeModal }]);
+}
+
+function showAboutPhone() {
+    showModal('About Phone', '<div style="text-align: center; padding: 16px;"><div style="font-size: 64px; margin-bottom: 16px;">📱</div><h2 style="margin-bottom: 8px; color: var(--on-surface);">Android 16</h2><p style="color: var(--on-background); margin-bottom: 24px;">Build 2026.06.21</p><div style="display: flex; flex-direction: column; gap: 12px; text-align: left;"><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Device Name</span><span style="color: var(--on-surface);">Pixel 9 Pro</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Android Version</span><span style="color: var(--on-surface);">16</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Security Patch</span><span style="color: var(--on-surface);">June 2026</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Kernel Version</span><span style="color: var(--on-surface);">6.2.0</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>RAM</span><span style="color: var(--on-surface);">12 GB</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Storage</span><span style="color: var(--on-surface);">128 GB</span></div></div></div>', [{ text: 'Close', action: closeModal }]);
+}
+
+// ==================== MODAL & TOAST ====================
+function showModal(title, body, actions) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = body;
+    var actionsContainer = document.getElementById('modalActions');
+    if (actions && actions.length > 0) {
+        var html = '';
+        for (var i = 0; i < actions.length; i++) {
+            var a = actions[i];
+            html += '<button class="modal-btn ' + (a.primary ? 'primary' : '') + '" onclick="modalAction' + i + '()">' + a.text + '</button>';
+        }
+        actionsContainer.innerHTML = html;
+        // Store actions for execution
+        for (var i = 0; i < actions.length; i++) {
+            window['modalAction' + i] = actions[i].action;
+        }
+    } else {
+        actionsContainer.innerHTML = '<button class="modal-btn" onclick="closeModal()">OK</button>';
     }
-  });
+    document.getElementById('modalOverlay').classList.add('open');
 }
 
-// ═══════════════════════════════════
-//  METAL PRICES (backup/supplement)
-// ═══════════════════════════════════
-async function fetchMetalPrices(){
-  try{
-    const r=await fetch(`https://api.metalpriceapi.com/v1/latest?api_key=${KEYS.metal}&base=USD&currencies=XAU,XAG`,{signal:AbortSignal.timeout(8000)});
-    if(!r.ok)return;
-    const data=await r.json();
-    if(!data.success)return;
-    const rates=data.rates;
-    if(rates['USDXAU']&&!forexCache['XAUUSD']?.rate){
-      const gold=1/rates['USDXAU'];
-      forexCache['XAUUSD']={rate:gold,chg:null,source:'MetalAPI'};
-      const el=document.getElementById('metal_XAU');if(el){el.textContent='$'+gold.toFixed(2);el.style.color='var(--warn)';}
-      updateForexDisplay();
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function showToast(message) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+// ==================== LOCAL STORAGE ====================
+function saveData() {
+    var data = { contacts: state.contacts, messages: state.messages, calls: state.calls, files: state.files, settings: state.settings, theme: state.theme, emails: state.emails };
+    localStorage.setItem('androidLauncherData', JSON.stringify(data));
+    showToast('Data saved locally');
+}
+
+function loadData() {
+    var saved = localStorage.getItem('androidLauncherData');
+    if (saved) {
+        try {
+            var data = JSON.parse(saved);
+            state.contacts = data.contacts || state.contacts;
+            state.messages = data.messages || state.messages;
+            state.calls = data.calls || state.calls;
+            state.files = data.files || state.files;
+            state.settings = data.settings || state.settings;
+            state.emails = data.emails || state.emails;
+            if (data.theme) { state.theme = data.theme; document.documentElement.setAttribute('data-theme', state.theme); }
+        } catch(e) { console.log('Error loading data'); }
     }
-    if(rates['USDXAG']&&!forexCache['XAGUSD']?.rate){
-      const silver=1/rates['USDXAG'];
-      forexCache['XAGUSD']={rate:silver,chg:null,source:'MetalAPI'};
-      const el=document.getElementById('metal_XAG');if(el){el.textContent='$'+silver.toFixed(2);el.style.color='var(--muted)';}
-      updateForexDisplay();
-    }
-  }catch(e){}
 }
 
-// ═══════════════════════════════════
-//  SIDEBAR
-// ═══════════════════════════════════
-function buildSidebar(){
-  const list=document.getElementById('coinList');if(!list)return;
-  const frag=document.createDocumentFragment();
-  COINS.forEach(coin=>{
-    const d=S.prices[coin.id],sig=S.signals[coin.id];
-    const dotColor=sig?(sig.type==='BUY'?'var(--buy)':sig.type==='SELL'?'var(--sell)':'var(--warn)'):'var(--dim)';
-    const pClass=d?(d.chg24h>=0?'up':'dn'):'';
-    const btn=document.createElement('button');
-    btn.className='coin-btn'+(S.selected.id===coin.id?' active':'');
-    btn.onclick=()=>selectCoin(coin.id);
-    btn.innerHTML=`<span style="font-size:14px">${coin.em}</span><span class="coin-sym">${coin.id}</span><span class="coin-price-sb ${pClass}" id="sbp_${coin.id}">${d?fP(d.price):'—'}</span><span class="sig-dot" style="background:${dotColor}"></span>`;
-    frag.appendChild(btn);
-  });
-  list.replaceChildren(frag);
-  // Update TF buttons
-  document.querySelectorAll('.tf-btn').forEach(b=>{b.classList.toggle('active',b.textContent===S.tf);});
-}
+// ==================== INIT APP ====================
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    init();
+    setInterval(saveData, 30000);
+    document.addEventListener('visibilitychange', function() { if (document.hidden) saveData(); });
+});
 
-function flashSidebarPrice(sym){
-  const el=document.getElementById('sbp_'+sym);if(!el)return;
-  const d=S.prices[sym];if(!d)return;
-  el.textContent=fP(d.price);el.className='coin-price-sb '+(d.chg24h>=0?'up':'dn');
-}
-
-// ═══════════════════════════════════
-//  OVERVIEW TABLE
-// ═══════════════════════════════════
-function showAll(){
-  S.view='all';
-  const rows=COINS.map(coin=>{
-    const d=S.prices[coin.id],sig=S.signals[coin.id];
-    if(!d||!sig)return '';
-    const p=d.chg24h>=0?'up-txt':'dn-txt';
-    const sc=sig.type==='BUY'?'td-buy':sig.type==='SELL'?'td-sell':'td-neut';
-    const oc=sig.type==='BUY'?'ord-buy':sig.type==='SELL'?'ord-sell':'ord-neut';
-    const cc=sig.conf>=70?'var(--buy)':sig.conf<=50?'var(--sell)':'var(--warn)';
-    const arrow=sig.type==='BUY'?'▲':sig.type==='SELL'?'▼':'→';
-    return `<tr onclick="selectCoin('${coin.id}')"><td><div class="ov-coin"><span class="ov-em">${coin.em}</span><div><div class="ov-sym2">${coin.id}</div><div class="ov-full2">${coin.name}</div></div></div></td><td id="ovp_${coin.id}">${fP(d.price)}</td><td class="${p}">${fPct(d.chg24h)}</td><td class="${sc}">${arrow} ${sig.type}</td><td><span class="ord-tag ${oc}">${sig.orderType}</span></td><td>${fP(sig.entry)}</td><td style="color:var(--sell)">${fP(sig.sl)}</td><td style="color:var(--buy)">${fP(sig.tp)}</td><td>1:${sig.rr}</td><td style="color:${cc}">${sig.conf}%</td><td class="${sig.trend==='BULLISH'?'up-txt':sig.trend==='BEARISH'?'dn-txt':''}">${sig.trend}</td></tr>`;
-  }).join('');
-  document.getElementById('mainArea').innerHTML=`
-    <div class="disclaimer"><strong>⚠ Tahadhari:</strong> Signals zinatokana na data halisi za Binance. Si ushauri wa uwekezaji.</div>
-    <div class="ov-panel">
-      <div class="ov-hdr"><span class="ov-title">📊 Muhtasari — Coins Zote (${COINS.length}) · Binance Live</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Bonyeza coin kuona details</span></div>
-      <div style="overflow-x:auto"><table class="ov-table">
-        <thead><tr><th>Coin</th><th>Bei</th><th>24h%</th><th>Signal</th><th>Order</th><th>Entry</th><th>SL</th><th>TP</th><th>R:R</th><th>Uhakika</th><th>Trend</th></tr></thead>
-        <tbody id="ovBody">${rows||'<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">Inapakia...</td></tr>'}</tbody>
-      </table></div>
-    </div>`;
-  const ovTimer=setInterval(()=>{
-    if(S.view!=='all'){clearInterval(ovTimer);return;}
-    COINS.forEach(c=>{const el=document.getElementById('ovp_'+c.id);if(el&&S.prices[c.id])el.textContent=fP(S.prices[c.id].price);});
-  },1000);
-}
-
-function selectCoin(id){
-  const coin=COINS.find(c=>c.id===id);if(!coin)return;
-  S.selected=coin;S.view='single';
-  localStorage.setItem('st_selected',id); // PERSIST
-  buildSidebar();renderSingle(coin);fetchKlines(coin,S.tf);connectKlineWS(coin,S.tf);
-}
-
-function setTF(btn,tf){
-  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  S.tf=tf;
-  localStorage.setItem('st_tf',tf); // PERSIST
-  fetchKlines(S.selected,tf);connectKlineWS(S.selected,tf);
-}
-
-// ═══════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════
-function toast(msg,isErr=false){
-  const tc=document.getElementById('toasts');if(!tc)return;
-  const el=document.createElement('div');el.className='toast';
-  if(isErr)el.style.borderColor='rgba(232,51,74,0.4)';
-  el.textContent=msg;tc.appendChild(el);
-  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.3s';setTimeout(()=>el.remove(),300);},4000);
-}
-
-// ═══════════════════════════════════
-//  INIT
-// ═══════════════════════════════════
-// 1. Sidebar mara moja
-buildSidebar();
-
-// 2. Pata bei
-preloadPricesREST();
-
-// 3. Backup Binance WS
-setTimeout(openBinanceWSIfNeeded,6000);
-
-// 4. Forex + Gold
-setTimeout(()=>{
-  fetchAllForex();
-  fetchMetalPrices();
-  setInterval(fetchAllForex,3*60*1000); // Sasisisha kila dakika 3
-  setInterval(fetchMetalPrices,5*60*1000);
-},1500);
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 </script>
 </body>
 </html>
