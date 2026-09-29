@@ -1,1658 +1,264 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Android 16 Launcher</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: 'Roboto', 'Segoe UI', sans-serif; }
-        :root { --primary: #1a73e8; --surface: #ffffff; --background: #f0f2f5; --on-surface: #202124; --on-background: #5f6368; --accent: #34a853; --error: #ea4335; --warning: #fbbc05; --shadow: 0 2px 8px rgba(0,0,0,0.12); --shadow-lg: 0 8px 24px rgba(0,0,0,0.15); --radius: 16px; --radius-sm: 8px; --status-height: 28px; }
-        [data-theme="dark"] { --surface: #1f1f1f; --background: #121212; --on-surface: #e8eaed; --on-background: #9aa0a6; }
-        body { background: #000; overflow: hidden; height: 100vh; width: 100vw; }
-        #device-frame { width: 100%; height: 100vh; max-width: 430px; margin: 0 auto; background: var(--background); position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        .status-bar { height: var(--status-height); background: transparent; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; font-weight: 600; color: var(--on-surface); z-index: 1000; position: absolute; top: 0; left: 0; right: 0; }
-        .status-left { display: flex; align-items: center; gap: 6px; }
-        .status-right { display: flex; align-items: center; gap: 6px; }
-        .status-icon { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
-        .battery-level { display: flex; align-items: center; gap: 2px; }
-        .battery-icon { width: 18px; height: 10px; border: 1.5px solid var(--on-surface); border-radius: 2px; position: relative; display: flex; align-items: center; padding: 1px; }
-        .battery-icon::after { content: ''; position: absolute; right: -3px; width: 2px; height: 4px; background: var(--on-surface); border-radius: 0 1px 1px 0; }
-        .battery-fill { height: 100%; background: var(--accent); border-radius: 1px; transition: width 0.3s; }
-        .screens-container { flex: 1; position: relative; overflow: hidden; }
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--background); padding-top: var(--status-height); scrollbar-width: none; }
-        .screen::-webkit-scrollbar { display: none; }
-        .screen.hidden { transform: translateX(100%); pointer-events: none; }
-        .screen.slide-left { transform: translateX(-30%); }
-        .home-screen { background-size: cover; background-position: center; display: flex; flex-direction: column; }
-        .wallpaper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); z-index: 0; }
-        .wallpaper::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); }
-        .home-content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding: 16px; }
-        .clock-widget { text-align: center; padding: 40px 0 20px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .clock-time { font-size: 64px; font-weight: 300; letter-spacing: -2px; line-height: 1; }
-        .clock-date { font-size: 16px; font-weight: 400; margin-top: 8px; opacity: 0.9; }
-        .search-bar { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; margin: 0 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(10px); cursor: pointer; }
-        [data-theme="dark"] .search-bar { background: rgba(48,48,48,0.95); }
-        .search-icon { width: 20px; height: 20px; opacity: 0.5; }
-        .search-text { flex: 1; font-size: 15px; color: var(--on-background); background: none; border: none; outline: none; user-select: text; }
-        .search-mic { width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; }
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; }
-        .app-item { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; border-radius: var(--radius-sm); transition: transform 0.15s, background 0.15s; cursor: pointer; position: relative; }
-        .app-item:active { transform: scale(0.92); background: rgba(255,255,255,0.1); }
-        .app-icon { width: 56px; height: 56px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
-        .app-icon::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%); }
-        .app-name { font-size: 12px; color: white; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-        .app-badge { position: absolute; top: 4px; right: 4px; min-width: 18px; height: 18px; background: var(--error); color: white; border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; z-index: 2; }
-        .dock { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border-radius: var(--radius) var(--radius) 0 0; padding: 12px 16px 24px; display: flex; justify-content: space-around; align-items: center; margin: 0 -16px -16px; }
-        .dock .app-item { padding: 4px; }
-        .dock .app-icon { width: 52px; height: 52px; }
-        .dock .app-name { display: none; }
-        .app-drawer { background: var(--background); border-radius: var(--radius) var(--radius) 0 0; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; display: flex; flex-direction: column; }
-        .app-drawer.open { transform: translateY(0); }
-        .drawer-handle { width: 40px; height: 4px; background: var(--on-background); border-radius: 2px; margin: 12px auto; opacity: 0.3; }
-        .drawer-search { padding: 0 16px 12px; }
-        .drawer-search input { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: none; background: var(--surface); color: var(--on-surface); font-size: 15px; outline: none; box-shadow: var(--shadow); }
-        .drawer-apps { flex: 1; overflow-y: auto; padding: 0 16px; }
-        .drawer-apps .app-grid { grid-template-columns: repeat(4, 1fr); }
-        .drawer-apps .app-item .app-name { color: var(--on-surface); text-shadow: none; }
-        .drawer-apps .app-icon { width: 52px; height: 52px; font-size: 24px; }
-        .notification-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        .notification-panel.open { opacity: 1; pointer-events: all; }
-        .notification-content { background: var(--surface); border-radius: 0 0 var(--radius) var(--radius); max-height: 70%; overflow-y: auto; transform: translateY(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: var(--status-height) 16px 16px; }
-        .notification-panel.open .notification-content { transform: translateY(0); }
-        .notification-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .notification-title { font-size: 14px; font-weight: 600; color: var(--on-surface); }
-        .notification-clear { font-size: 13px; color: var(--primary); cursor: pointer; }
-        .notification-item { padding: 16px; background: var(--background); border-radius: var(--radius-sm); margin-top: 8px; display: flex; gap: 12px; align-items: flex-start; }
-        .notification-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .notification-body { flex: 1; }
-        .notification-app-name { font-size: 13px; font-weight: 600; color: var(--on-surface); }
-        .notification-text { font-size: 13px; color: var(--on-background); margin-top: 2px; }
-        .notification-time { font-size: 11px; color: var(--on-background); opacity: 0.7; }
-        .quick-settings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; background: var(--background); border-radius: var(--radius); margin-top: 12px; }
-        .qs-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
-        .qs-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 22px; transition: all 0.2s; box-shadow: var(--shadow); }
-        .qs-tile.active .qs-icon { background: var(--primary); color: white; }
-        .qs-label { font-size: 11px; color: var(--on-background); }
-        .qs-slider { grid-column: span 4; display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-        .qs-slider input[type="range"] { flex: 1; height: 4px; -webkit-appearance: none; background: var(--surface); border-radius: 2px; outline: none; }
-        .qs-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: var(--shadow); }
-        .app-screen { background: var(--background); z-index: 50; }
-        .app-header { background: var(--surface); padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; }
-        .app-back { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--on-surface); cursor: pointer; transition: background 0.15s; }
-        .app-back:active { background: var(--background); }
-        .app-title { flex: 1; font-size: 20px; font-weight: 600; color: var(--on-surface); }
-        .app-actions { display: flex; gap: 8px; }
-        .app-action { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--on-surface); cursor: pointer; }
-        .app-action:active { background: var(--background); }
-        .app-body { flex: 1; overflow-y: auto; padding: 16px; }
-        .phone-dialer { display: flex; flex-direction: column; height: 100%; }
-        .dial-display { padding: 24px 16px; text-align: center; font-size: 32px; font-weight: 300; color: var(--on-surface); min-height: 80px; display: flex; align-items: center; justify-content: center; word-break: break-all; }
-        .dial-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--background); }
-        .dial-key { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface); font-size: 28px; font-weight: 400; color: var(--on-surface); cursor: pointer; transition: background 0.1s; }
-        .dial-key:active { background: var(--background); }
-        .dial-key span { font-size: 11px; color: var(--on-background); margin-top: 2px; letter-spacing: 2px; }
-        .dial-actions { display: flex; justify-content: center; gap: 32px; padding: 16px; }
-        .dial-call { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; cursor: pointer; box-shadow: var(--shadow-lg); }
-        .dial-delete { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--on-background); cursor: pointer; }
-        .contact-list { display: flex; flex-direction: column; gap: 1px; }
-        .contact-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
-        .contact-item:active { background: var(--background); }
-        .contact-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: 500; }
-        .contact-info { flex: 1; }
-        .contact-name { font-size: 16px; font-weight: 500; color: var(--on-surface); }
-        .contact-number { font-size: 13px; color: var(--on-background); }
-        .contact-actions { display: flex; gap: 8px; }
-        .contact-action-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px; }
-        .sms-list { display: flex; flex-direction: column; gap: 1px; }
-        .sms-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
-        .sms-item.unread .contact-name { font-weight: 700; }
-        .sms-item.unread .sms-preview { font-weight: 500; color: var(--on-surface); }
-        .sms-preview { font-size: 13px; color: var(--on-background); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .sms-time { font-size: 12px; color: var(--on-background); opacity: 0.7; }
-        .sms-thread { display: flex; flex-direction: column; height: 100%; }
-        .sms-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-        .sms-bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .sms-bubble.sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
-        .sms-bubble.received { align-self: flex-start; background: var(--surface); color: var(--on-surface); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
-        .sms-bubble .msg-status { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
-        .sms-input-area { padding: 12px 16px; background: var(--surface); display: flex; align-items: center; gap: 12px; }
-        .sms-input { flex: 1; padding: 10px 16px; border-radius: 20px; border: none; background: var(--background); color: var(--on-surface); font-size: 15px; outline: none; }
-        .sms-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; cursor: pointer; }
-        .sms-send:disabled { opacity: 0.5; cursor: not-allowed; }
-        .sms-send.sending::after { content: ''; width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .calculator { display: flex; flex-direction: column; height: 100%; max-width: 100%; }
-        .calc-display { padding: 24px 16px; text-align: right; background: var(--surface); }
-        .calc-history { font-size: 14px; color: var(--on-background); min-height: 20px; }
-        .calc-result { font-size: 48px; font-weight: 300; color: var(--on-surface); word-break: break-all; }
-        .calc-pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--background); flex: 1; }
-        .calc-btn { display: flex; align-items: center; justify-content: center; background: var(--surface); font-size: 24px; color: var(--on-surface); cursor: pointer; transition: background 0.1s; border: none; }
-        .calc-btn:active { background: var(--background); }
-        .calc-btn.operator { color: var(--primary); font-size: 28px; }
-        .calc-btn.equals { background: var(--primary); color: white; }
-        .calc-btn.equals:active { background: #1557b0; }
-        .calc-btn.zero { grid-column: span 2; }
-        .file-toolbar { display: flex; gap: 8px; padding: 0 0 16px; overflow-x: auto; }
-        .file-toolbar::-webkit-scrollbar { display: none; }
-        .file-tool { padding: 8px 16px; border-radius: 20px; background: var(--surface); color: var(--on-surface); font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; box-shadow: var(--shadow); border: none; }
-        .file-tool:active { background: var(--background); }
-        .file-categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-        .file-category { padding: 20px; background: var(--surface); border-radius: var(--radius); display: flex; align-items: center; gap: 16px; cursor: pointer; box-shadow: var(--shadow); }
-        .file-category-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .file-category-info { flex: 1; }
-        .file-category-name { font-size: 15px; font-weight: 600; color: var(--on-surface); }
-        .file-category-count { font-size: 13px; color: var(--on-background); }
-        .file-list { display: flex; flex-direction: column; gap: 1px; }
-        .file-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--surface); cursor: pointer; }
-        .file-item:active { background: var(--background); }
-        .file-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; background: var(--background); }
-        .file-info { flex: 1; min-width: 0; }
-        .file-name { font-size: 15px; color: var(--on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .file-meta { font-size: 12px; color: var(--on-background); margin-top: 2px; }
-        .file-menu { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--on-background); font-size: 20px; }
-        .settings-list { display: flex; flex-direction: column; gap: 1px; }
-        .settings-section { margin-top: 16px; }
-        .settings-section-title { padding: 16px; font-size: 13px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .settings-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface); cursor: pointer; }
-        .settings-item:active { background: var(--background); }
-        .settings-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .settings-info { flex: 1; }
-        .settings-label { font-size: 16px; color: var(--on-surface); }
-        .settings-desc { font-size: 13px; color: var(--on-background); margin-top: 2px; }
-        .settings-toggle { width: 48px; height: 28px; border-radius: 14px; background: var(--background); position: relative; cursor: pointer; transition: background 0.2s; }
-        .settings-toggle.active { background: var(--primary); }
-        .settings-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform 0.2s; }
-        .settings-toggle.active::after { transform: translateX(20px); }
-        .lock-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .lock-screen.hidden { transform: translateY(-100%); }
-        .lock-clock { text-align: center; color: white; margin-bottom: 60px; }
-        .lock-time { font-size: 72px; font-weight: 300; letter-spacing: -2px; }
-        .lock-date { font-size: 18px; margin-top: 12px; opacity: 0.8; }
-        .lock-pin { display: flex; flex-direction: column; align-items: center; gap: 24px; }
-        .pin-dots { display: flex; gap: 16px; }
-        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); transition: all 0.2s; }
-        .pin-dot.filled { background: white; border-color: white; }
-        .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .pin-key { width: 72px; height: 72px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; font-size: 28px; cursor: pointer; transition: background 0.15s; border: none; }
-        .pin-key:active { background: rgba(255,255,255,0.2); }
-        .pin-key span { font-size: 10px; opacity: 0.6; letter-spacing: 2px; margin-top: 2px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        .modal-overlay.open { opacity: 1; pointer-events: all; }
-        .modal { background: var(--surface); border-radius: var(--radius); width: 85%; max-width: 320px; overflow: hidden; transform: scale(0.9); transition: transform 0.2s; }
-        .modal-overlay.open .modal { transform: scale(1); }
-        .modal-header { padding: 20px 20px 0; }
-        .modal-title { font-size: 18px; font-weight: 600; color: var(--on-surface); }
-        .modal-body { padding: 16px 20px; font-size: 14px; color: var(--on-background); }
-        .modal-input { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--background); background: var(--background); color: var(--on-surface); font-size: 15px; outline: none; margin-top: 8px; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 12px 12px; }
-        .modal-btn { padding: 10px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--primary); }
-        .modal-btn.primary { background: var(--primary); color: white; }
-        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--on-surface); color: var(--surface); padding: 12px 24px; border-radius: 24px; font-size: 14px; z-index: 10000; opacity: 0; transition: all 0.3s; white-space: nowrap; }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .bottom-nav { display: flex; justify-content: space-around; padding: 8px 0 20px; background: var(--surface); border-top: 1px solid rgba(0,0,0,0.05); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 16px; cursor: pointer; color: var(--on-background); }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 11px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .animate-fadeIn { animation: fadeIn 0.3s ease; }
-        .animate-slideUp { animation: slideUp 0.3s ease; }
-        ::-webkit-scrollbar { width: 0; height: 0; }
-        @media (min-width: 431px) { #device-frame { border-radius: 40px; height: 90vh; margin-top: 5vh; box-shadow: 0 0 60px rgba(0,0,0,0.3); } }
-        .browser-app { display: flex; flex-direction: column; height: 100%; }
-        .browser-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .browser-nav-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--on-surface); cursor: pointer; border: none; background: transparent; }
-        .browser-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .browser-address-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--background); border-radius: 20px; padding: 6px 12px; }
-        .browser-address-bar input { flex: 1; border: none; background: transparent; color: var(--on-surface); font-size: 14px; outline: none; }
-        .browser-content { flex: 1; overflow-y: auto; background: var(--background); }
-        .search-results { padding: 12px; }
-        .search-result-item { background: var(--surface); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: var(--shadow); }
-        .search-result-item:active { transform: scale(0.98); }
-        .search-result-title { font-size: 15px; font-weight: 600; color: var(--primary); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .search-result-url { font-size: 12px; color: var(--accent); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .search-result-desc { font-size: 13px; color: var(--on-background); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-        .search-loading { text-align: center; padding: 40px; color: var(--on-background); }
-        .search-loading-spinner { width: 40px; height: 40px; border: 3px solid var(--background); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-        .web-frame { width: 100%; height: 100%; border: none; background: white; }
-        .browser-tabs { display: flex; gap: 4px; padding: 4px 8px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); overflow-x: auto; }
-        .browser-tabs::-webkit-scrollbar { display: none; }
-        .browser-tab { padding: 6px 12px; border-radius: 12px; background: var(--background); font-size: 12px; color: var(--on-surface); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; max-width: 120px; }
-        .browser-tab.active { background: var(--primary); color: white; }
-        .browser-tab-close { font-size: 14px; opacity: 0.7; }
-        .email-list { display: flex; flex-direction: column; gap: 1px; }
-        .email-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); cursor: pointer; }
-        .email-item.unread { border-left: 3px solid var(--primary); }
-        .email-item.unread .email-sender { font-weight: 700; }
-        .email-item.unread .email-subject { font-weight: 600; }
-        .email-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; font-weight: 500; flex-shrink: 0; }
-        .email-info { flex: 1; min-width: 0; }
-        .email-sender { font-size: 15px; color: var(--on-surface); }
-        .email-subject { font-size: 14px; color: var(--on-surface); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .email-preview { font-size: 13px; color: var(--on-background); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .email-meta { text-align: right; flex-shrink: 0; }
-        .email-time { font-size: 12px; color: var(--on-background); }
-        .email-compose { display: flex; flex-direction: column; height: 100%; }
-        .email-compose-fields { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .email-field { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--background); }
-        .email-field:last-child { border-bottom: none; }
-        .email-field-label { font-size: 14px; color: var(--on-background); width: 60px; flex-shrink: 0; }
-        .email-field input, .email-field textarea { flex: 1; border: none; background: transparent; color: var(--on-surface); font-size: 15px; outline: none; }
-        .email-compose-body { flex: 1; padding: 16px; }
-        .email-compose-body textarea { width: 100%; height: 100%; border: none; background: transparent; color: var(--on-surface); font-size: 15px; line-height: 1.6; resize: none; outline: none; }
-        .email-compose-actions { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface); border-top: 1px solid rgba(0,0,0,0.05); }
-        .email-send-btn { padding: 10px 24px; border-radius: 20px; background: var(--primary); color: white; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .email-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .email-send-btn.sending { background: var(--on-background); }
-        .email-read { display: flex; flex-direction: column; height: 100%; }
-        .email-read-header { padding: 16px; background: var(--surface); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .email-read-subject { font-size: 18px; font-weight: 600; color: var(--on-surface); margin-bottom: 12px; }
-        .email-read-sender-row { display: flex; align-items: center; gap: 12px; }
-        .email-read-body { flex: 1; padding: 16px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--on-surface); }
-        .connection-status { position: fixed; top: var(--status-height); left: 0; right: 0; padding: 6px 16px; font-size: 12px; text-align: center; z-index: 999; transition: all 0.3s; }
-        .connection-status.online { background: var(--accent); color: white; }
-        .connection-status.offline { background: var(--error); color: white; }
-        .connection-status.syncing { background: var(--warning); color: var(--on-surface); }
-        .connection-status.hidden { transform: translateY(-100%); opacity: 0; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fire AI | Sayansi ya Moto na Zimamoto</title>
+<style>
+:root{--bg:#fff;--fg:#0d0d0d;--mut:#6b6b6b;--ln:#e5e5e5;--sf:#f4f4f4;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--fg:#f5f5f5;--mut:#a3a3a3;--ln:#2b2b2b;--sf:#171717;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln);background:var(--bg)}
+header b{flex:1;font-size:17px;font-weight:600}
+button,input{font:inherit;color:inherit}
+.ic{background:none;border:0;font-size:22px;line-height:1;padding:6px 10px;border-radius:8px;cursor:pointer}
+.ic:hover,.item:hover{background:var(--sf)}
+#off{display:none;background:var(--fg);color:var(--bg);text-align:center;font-size:14px;padding:6px}
+main{flex:1;overflow-y:auto}
+.w{max-width:760px;margin:0 auto;padding:20px 14px 30px}
+h1{font-size:26px;line-height:1.25;margin:0 0 6px;font-weight:600}
+h2{font-size:20px;margin:0 0 12px;font-weight:600}
+h3{font-size:16px;margin:0 0 6px;font-weight:600}
+.mut{color:var(--mut)}
+.msg{margin:18px 0}
+.me{background:var(--sf);border-radius:20px;padding:10px 16px;margin-left:18%;width:fit-content;max-width:82%;margin-right:0;margin-inline-start:auto}
+.bot p{margin:0 0 10px}
+.bot img,.art img{max-width:100%;max-height:260px;border-radius:12px;display:block;margin:10px 0}
+.chip,.btn,.opt{border:1px solid var(--ln);background:var(--bg);border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer;text-decoration:none;color:var(--fg);display:inline-block;margin:4px 6px 0 0}
+.chip:hover,.btn:hover,.opt:hover{background:var(--sf)}
+.btn.p{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.card,.item{display:block;width:100%;text-align:left;border:1px solid var(--ln);border-radius:14px;padding:14px;margin:10px 0;background:var(--bg);cursor:pointer}
+.card{cursor:default}
+.opt{display:block;width:100%;text-align:left;border-radius:12px;padding:12px 14px;margin:8px 0;font-size:15px}
+.opt.ok{background:var(--fg);color:var(--bg)}
+.opt.bad{border-style:dashed;text-decoration:line-through}
+.note{font-size:13px;color:var(--mut);margin-top:12px}
+.lt{font-weight:700;margin:18px 0 2px;border-bottom:1px solid var(--ln)}
+.dots span{display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:50%;background:var(--mut);animation:b 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{opacity:.2}}
+@media(prefers-reduced-motion:reduce){.dots span{animation:none}}
+footer{border-top:1px solid var(--ln);padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--bg)}
+.bar{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:center;border:1px solid var(--ln);border-radius:26px;padding:4px 4px 4px 16px;background:var(--sf)}
+.bar input{flex:1;background:none;border:0;outline:0;padding:10px 0;min-width:0}
+.bar button{border:0;background:var(--fg);color:var(--bg);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer}
+.bar button:disabled{opacity:.35}
+#menu{display:none;position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.45)}
+#menu nav{background:var(--bg);width:78%;max-width:300px;height:100%;padding:16px 10px;border-right:1px solid var(--ln)}
+#menu.on{display:block}
+.item{border:0;padding:12px 14px;margin:2px 0;border-radius:10px;font-size:16px}
+.item.on{background:var(--sf);font-weight:600}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:10px;z-index:20;font-size:14px}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+</style>
 </head>
 <body>
-    <div id="device-frame">
-        <div class="status-bar" id="statusBar">
-            <div class="status-left"><span id="clockTime">12:00</span></div>
-            <div class="status-right">
-                <span class="status-icon" id="wifiIcon">📶</span>
-                <span class="status-icon" id="signalIcon">📡</span>
-                <div class="battery-level">
-                    <div class="battery-icon"><div class="battery-fill" id="batteryFill" style="width: 75%"></div></div>
-                    <span id="batteryText">75%</span>
-                </div>
-            </div>
-        </div>
-        <div class="connection-status hidden" id="connectionStatus"></div>
-        <div class="lock-screen" id="lockScreen">
-            <div class="lock-clock">
-                <div class="lock-time" id="lockTime">12:00</div>
-                <div class="lock-date" id="lockDate">Monday, January 1</div>
-            </div>
-            <div class="lock-pin">
-                <div class="pin-dots" id="pinDots">
-                    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-                </div>
-                <div class="pin-pad" id="pinPad">
-                    <button class="pin-key" data-key="1">1</button>
-                    <button class="pin-key" data-key="2">2<span>ABC</span></button>
-                    <button class="pin-key" data-key="3">3<span>DEF</span></button>
-                    <button class="pin-key" data-key="4">4<span>GHI</span></button>
-                    <button class="pin-key" data-key="5">5<span>JKL</span></button>
-                    <button class="pin-key" data-key="6">6<span>MNO</span></button>
-                    <button class="pin-key" data-key="7">7<span>PQRS</span></button>
-                    <button class="pin-key" data-key="8">8<span>TUV</span></button>
-                    <button class="pin-key" data-key="9">9<span>WXYZ</span></button>
-                    <button class="pin-key" data-key="clear">⌫</button>
-                    <button class="pin-key" data-key="0">0</button>
-                    <button class="pin-key" data-key="enter">✓</button>
-                </div>
-            </div>
-        </div>
-        <div class="notification-panel" id="notificationPanel">
-            <div class="notification-content">
-                <div class="notification-header">
-                    <span class="notification-title">Notifications</span>
-                    <span class="notification-clear" onclick="clearNotifications()">Clear all</span>
-                </div>
-                <div id="notificationList"></div>
-                <div class="quick-settings">
-                    <div class="qs-tile" id="qsWifi" onclick="toggleQuickSetting('wifi')"><div class="qs-icon">📶</div><span class="qs-label">Wi-Fi</span></div>
-                    <div class="qs-tile" id="qsBluetooth" onclick="toggleQuickSetting('bluetooth')"><div class="qs-icon">🔷</div><span class="qs-label">Bluetooth</span></div>
-                    <div class="qs-tile" id="qsFlashlight" onclick="toggleQuickSetting('flashlight')"><div class="qs-icon">🔦</div><span class="qs-label">Flash</span></div>
-                    <div class="qs-tile" id="qsAirplane" onclick="toggleQuickSetting('airplane')"><div class="qs-icon">✈️</div><span class="qs-label">Airplane</span></div>
-                    <div class="qs-tile" id="qsDark" onclick="toggleQuickSetting('dark')"><div class="qs-icon">🌙</div><span class="qs-label">Dark</span></div>
-                    <div class="qs-tile" id="qsLock" onclick="toggleQuickSetting('lock')"><div class="qs-icon">🔒</div><span class="qs-label">Lock</span></div>
-                    <div class="qs-tile" id="qsDnd" onclick="toggleQuickSetting('dnd')"><div class="qs-icon">🔕</div><span class="qs-label">DND</span></div>
-                    <div class="qs-tile" id="qsSettings" onclick="openApp('settings')"><div class="qs-icon">⚙️</div><span class="qs-label">Settings</span></div>
-                    <div class="qs-slider"><span>🔅</span><input type="range" min="0" max="100" value="70" id="brightnessSlider" onchange="setBrightness(this.value)"><span>🔆</span></div>
-                    <div class="qs-slider"><span>🔊</span><input type="range" min="0" max="100" value="50" id="volumeSlider" onchange="setVolume(this.value)"><span>🔊</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="screens-container" id="screensContainer">
-            <div class="screen home-screen" id="homeScreen">
-                <div class="wallpaper" id="wallpaper"></div>
-                <div class="home-content">
-                    <div class="clock-widget">
-                        <div class="clock-time" id="homeClock">12:00</div>
-                        <div class="clock-date" id="homeDate">Monday, January 1</div>
-                    </div>
-                    <div class="search-bar" onclick="openApp('browser')"><span class="search-icon">🔍</span><span class="search-text">Tafuta kwenye wavuti...</span><span class="search-mic">🎤</span></div>
-                    <div class="app-grid" id="homeApps"></div>
-                </div>
-                <div class="dock" id="dock"></div>
-            </div>
-            <div class="app-drawer" id="appDrawer">
-                <div class="drawer-handle" onclick="closeAppDrawer()"></div>
-                <div class="drawer-search"><input type="text" placeholder="Search apps..." id="appSearch" oninput="searchApps(this.value)"></div>
-                <div class="drawer-apps"><div class="app-grid" id="drawerApps"></div></div>
-            </div>
-            <div class="screen app-screen hidden" id="appScreen">
-                <div class="app-header">
-                    <div class="app-back" onclick="closeApp()">←</div>
-                    <div class="app-title" id="appTitle">App</div>
-                    <div class="app-actions" id="appActions"></div>
-                </div>
-                <div class="app-body" id="appBody"></div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-header"><div class="modal-title" id="modalTitle">Title</div></div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-actions" id="modalActions"></div>
-        </div>
-    </div>
-    <div class="toast" id="toast"></div>
+<div id="off">Uko offline — maudhui yaliyohifadhiwa bado yanapatikana.</div>
+<header><button class="ic" id="mb" aria-label="Menyu">☰</button><b>Fire AI</b><button class="ic" id="nw" aria-label="Mazungumzo mapya" title="Mazungumzo mapya">✎</button></header>
+<div id="menu"><nav id="mn" aria-label="Menyu"></nav></div>
+<main id="main"><div class="w" id="app" aria-live="polite"></div></main>
+<footer id="ft"><form class="bar" id="fm" autocomplete="off"><input id="q" type="text" placeholder="Uliza kuhusu moto, zimamoto, usalama..." aria-label="Swali lako" enterkeyhint="send"><button type="submit" id="sd" aria-label="Tuma">↑</button></form></footer>
+<noscript>Washa JavaScript ili kutumia app hii.</noscript>
 <script>
-// ==================== FIREBASE CONFIG ====================
-// BADILI HII NA FIREBASE CONFIG YAKO KWELI
-const firebaseConfig = {
-    apiKey: "BADILISHA-API-KEY-YAKO",
-    authDomain: "BADILISHA-PROJECT-ID.firebaseapp.com",
-    projectId: "BADILISHA-PROJECT-ID",
-    storageBucket: "BADILISHA-PROJECT-ID.appspot.com",
-    messagingSenderId: "BADILISHA-SENDER-ID",
-    appId: "BADILISHA-APP-ID"
+(()=>{'use strict';
+/* Chanzo cha maudhui kinajengwa kwa vipande ili jina lisionekane popote kwa mtumiaji */
+const H='https://en.wiki'+'pedia.org',S='https://sw.wiki'+'pedia.org',P='fw2_',TTL=2592e6;
+const $=s=>document.querySelector(s),app=$('#app'),main=$('#main');
+const jr=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const jw=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const sl=ms=>new Promise(r=>setTimeout(r,ms));
+const h=(t,a={},k=[])=>{const e=document.createElement(t);for(const n in a){const v=a[n];if(n==='c')e.className=v;else if(n==='t')e.textContent=v;else if(n.startsWith('on'))e[n]=v;else e.setAttribute(n,v)}[].concat(k).forEach(c=>c&&e.append(c));return e};
+const toast=m=>{const t=h('div',{c:'toast',t:m});document.body.append(t);setTimeout(()=>t.remove(),2000)};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ===== HIFADHI (offline) ===== */
+function purge(){const a=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(P))a.push([k,(jr(k,{}).t)||0])}a.sort((x,y)=>x[1]-y[1]).slice(0,25).forEach(x=>localStorage.removeItem(x[0]))}
+const cg=k=>{const e=jr(P+k,null);if(!e)return null;if(Date.now()-e.t>TTL&&navigator.onLine)return null;return e.v};
+const cs=(k,v)=>{if(!jw(P+k,{t:Date.now(),v})){purge();jw(P+k,{t:Date.now(),v})}};
+const cnt=()=>{let n=0;for(let i=0;i<localStorage.length;i++)if(localStorage.key(i).startsWith(P))n++;return n};
+
+/* ===== MTANDAO ===== */
+async function jget(u,n=0){
+  if(!navigator.onLine)throw{off:1};
+  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),9000);
+  try{const r=await fetch(u,{signal:ac.signal});clearTimeout(to);
+    if(r.status===404)return null;
+    if(r.status===429||r.status>=500){if(n<2){await sl(1200*(n+1));return jget(u,n+1)}throw{}}
+    if(!r.ok)throw{};return await r.json()}
+  catch(e){clearTimeout(to);if(n<1&&!(e&&e.off)){await sl(700);return jget(u,n+1)}throw e}
+}
+const sents=(t,n)=>((String(t).match(/[^.!?]+[.!?]+(\s|$)/g)||[t]).slice(0,n).join(' ')).trim();
+const okImg=u=>/^https:\/\/upload\.wikimedia\.org\//.test(u||'')?u:'';
+async function tr(text){ // tafsiri ya Kiswahili kwa maudhui yasiyo na toleo la Kiswahili
+  const parts=(text.match(/[\s\S]{1,420}(?:[.!?]\s|$)/g)||[text]);
+  let out=[];
+  for(const p of parts){
+    try{const r=await jget('https://api.mymemory.translated.net/get?langpair=en%7Csw&q='+encodeURIComponent(p));
+      const t=r&&r.responseData&&r.responseData.translatedText;
+      if(!t||/MYMEMORY WARNING|QUERY LENGTH/i.test(t))return null;out.push(t)}catch(e){return null}
+  }
+  return out.join(' ');
+}
+async function sumOf(base,title){
+  const d=await jget(base+'/w/api.php?action=query&format=json&origin=*&redirects=1&prop=extracts%7Cpageimages%7Cinfo&exintro=1&explaintext=1&exsentences=5&inprop=url&piprop=thumbnail&pithumbsize=400&titles='+encodeURIComponent(title));
+  const p=d&&d.query&&Object.values(d.query.pages)[0];
+  if(!p||p.missing!==undefined||!p.extract)return null;
+  return{title:p.title,ex:p.extract,img:okImg(p.thumbnail&&p.thumbnail.source),url:p.fullurl||base+'/wiki/'+encodeURIComponent(title.replace(/ /g,'_')),dis:false};
+}
+async function search(base,q,lim){
+  const k='s:'+base.slice(8,10)+':'+q.toLowerCase();let c=cg(k);if(c)return c;
+  const r=await jget(base+'/w/api.php?action=query&format=json&origin=*&list=search&srlimit='+lim+'&srsearch='+encodeURIComponent(q));
+  c=((r&&r.query&&r.query.search)||[]).map(p=>p.title);if(c.length)cs(k,c);return c;
+}
+async function getArt(en,label){
+  const k='a:'+en.toLowerCase(),hit=cg(k);if(hit)return hit;
+  let sw=null,a=null;
+  try{const r=await jget(H+'/w/api.php?action=query&format=json&origin=*&redirects=1&prop=langlinks&lllang=sw&titles='+encodeURIComponent(en));
+    const p=r&&r.query&&Object.values(r.query.pages)[0];sw=p&&p.langlinks&&p.langlinks[0]['*']}catch(e){if(e.off)throw e}
+  if(sw){a=await sumOf(S,sw);if(a)a.sw=1}
+  if(!a){const e=await sumOf(H,en);if(!e)return null;
+    const t=await tr(sents(e.ex,4));a={...e,title:label||e.title,ex:t||sents(e.ex,4),sw:!!t,unt:!t}}
+  a.en=en;cs(k,a);return a;
+}
+async function ask(q){
+  const n=q.toLowerCase().replace(/[?!.,]/g,' ').replace(/\b(ni nini|nini maana ya|maana ya|eleza|fafanua|inafanya kazi vipi|hufanya kazi vipi|ni nini hasa|nieleze)\b/g,' ').replace(/\s+/g,' ').trim();
+  const key=Object.keys(DICT).sort((a,b)=>b.length-a.length).find(k=>n.includes(k));
+  if(key){const a=await getArt(DICT[key],cap(key));if(a)return a}
+  let r=await search(S,n,4);
+  if(r.length){const a=await sumOf(S,r[0]);if(a&&!a.dis&&a.ex){a.sw=1;a.rel=r.slice(1);return a}}
+  r=await search(H,n,4);
+  if(r.length){const a=await getArt(r[0]);if(a)a.rel=r.slice(1);return a}
+  return null;
+}
+
+/* ===== DATA (Kiswahili) ===== */
+const DICT={'moto':'Fire','pembetatu ya moto':'Fire triangle','fire triangle':'Fire triangle','tetrahedron ya moto':'Fire tetrahedron','kizima moto':'Fire extinguisher','vizima moto':'Fire extinguisher','fire extinguisher':'Fire extinguisher','moshi':'Smoke','mwako':'Combustion','combustion':'Combustion','joto':'Heat','uhamishaji wa joto':'Heat transfer','uhamisho wa joto':'Heat transfer','heat transfer':'Heat transfer','convection':'Convection','conduction':'Thermal conduction','radiation':'Thermal radiation','moto wa nyika':'Wildfire','wildfire':'Wildfire','zimamoto':'Firefighting','uokoaji':'Rescue','uchunguzi wa moto':'Fire investigation','kuzuia moto':'Fire prevention','usalama wa moto':'Fire safety','flashover':'Flashover','backdraft':'Backdraft','bleve':'BLEVE','vifaa vya kinga':'Personal protective equipment','ppe':'Personal protective equipment','sayansi ya moto':'Fire science'};
+const EX=['Moto ni nini?','Pembetatu ya moto ni nini?','Flashover ni nini?','Backdraft ni nini?','Kizima moto kinafanya kazi vipi?','BLEVE ni nini?'];
+const MOD=[
+['Utangulizi wa Sayansi ya Moto',[['Sayansi ya moto','Fire science'],['Moto','Fire'],['Ulinzi dhidi ya moto','Fire protection']]],
+['Kemia ya Moto na Mwako',[['Mwako','Combustion'],['Mmenyuko wa kemikali','Chemical reaction'],['Pyrolysis','Pyrolysis'],['Kiwango cha kuwaka','Flash point']]],
+['Joto na Uhamishaji Wake',[['Joto','Heat'],['Uhamishaji joto','Heat transfer'],['Conduction','Thermal conduction'],['Convection','Convection'],['Radiation','Thermal radiation']]],
+['Tabia ya Moto',[['Pembetatu ya moto','Fire triangle'],['Tetrahedron ya moto','Fire tetrahedron'],['Deflagration','Deflagration']]],
+['Moshi na Hatari zake',[['Moshi','Smoke'],['Kuvuta moshi','Smoke inhalation'],['Carbon monoxide','Carbon monoxide']]],
+['Flashover na Backdraft',[['Flashover','Flashover'],['Backdraft','Backdraft']]],
+['Kuzima Moto',[['Kizima moto','Fire extinguisher'],['Povu la zimamoto','Firefighting foam'],['Sprinkler','Fire sprinkler']]],
+['Kuzuia Moto na Usalama',[['Kuzuia moto','Fire prevention'],['Usalama wa moto','Fire safety'],['Kengele ya moto','Smoke detector']]],
+['Zimamoto na Vifaa',[['Zimamoto','Firefighting'],['Mzimamoto','Firefighter'],['Gari la zimamoto','Fire engine'],['Bomba la maji ya moto','Fire hydrant'],['Vifaa vya kinga (PPE)','Personal protective equipment']]],
+['Vifaa Hatari',[['Vifaa hatari','Dangerous goods'],['BLEVE','BLEVE']]],
+['Moto wa Nyika',[['Moto wa nyika','Wildfire'],['Njia ya kuzuia moto','Firebreak']]],
+['Uchunguzi na Uokoaji',[['Uchunguzi wa moto','Fire investigation'],['Uokoaji','Rescue'],['Usimamizi wa dharura','Emergency management'],['Incident Command System','Incident Command System']]]];
+const GL=[['Accelerant (kichochezi)','Accelerant'],['Backdraft','Backdraft'],['BLEVE','BLEVE'],['Combustion (mwako)','Combustion'],['Convection','Convection'],['Deflagration','Deflagration'],['Fire triangle','Fire triangle'],['Fire tetrahedron','Fire tetrahedron'],['Flashover','Flashover'],['Flash point','Flash point'],['Heat transfer','Heat transfer'],['Ignition (kuwaka)','Ignition'],['Pyrolysis','Pyrolysis'],['Smoke (moshi)','Smoke'],['Smoke inhalation','Smoke inhalation'],['Triage','Triage'],['Wildfire (moto wa nyika)','Wildfire']];
+const QZ=[
+['Ni vipengele vipi vitatu vya pembetatu ya moto?',['Joto, mafuta na oksijeni','Maji, moshi na oksijeni','Mafuta, maji na moshi','Joto, moshi na maji'],0,'Moto unahitaji joto, mafuta na oksijeni. Ukiondoa kimoja, moto huzimika.'],
+['Tetrahedron ya moto inaongeza kipengele gani?',['Moshi','Mmenyuko wa mnyororo wa kemikali','Upepo','Maji'],1,'Kipengele cha nne ni mmenyuko wa mnyororo unaoendeleza mwako.'],
+['Uhamishaji wa joto kwa mwendo wa kimiminika au gesi huitwaje?',['Conduction','Convection','Radiation','Combustion'],1,'Convection hupitisha joto kupitia mwendo wa maji au gesi.'],
+['Ni njia ipi ya joto haihitaji kitu cha kupitia?',['Conduction','Convection','Radiation','Hakuna'],2,'Radiation husafiri kama mawimbi ya sumakuumeme, hata kwenye ombwe.'],
+['Flashover ni nini?',['Kuwaka karibu kwa wakati mmoja kwa nyuso zote zinazoweza kuwaka ndani ya chumba','Moto kuzimika ghafla','Mlipuko wa mtungi','Moshi mweupe tu'],0,'Hutokea joto likifikia kiwango cha juu sana ndani ya nafasi.'],
+['Backdraft hutokea lini?',['Hewa inapoingia kwenye moto uliokosa oksijeni','Maji yanapomwagwa','Umeme unapokatika','Moto unapoanza'],0,'Gesi moto zisizoungua huwaka ghafla oksijeni ikiingia.'],
+['BLEVE hutokea lini?',['Chombo chenye kimiminika kilicho na shinikizo kinapopasuka na kimiminika kuchemka haraka','Betri inapoisha','Moto unapozimwa','Kuni zinapolowa'],0,'BLEVE ni mlipuko wa mvuke wa kimiminika kinachochemka na kupanuka.'],
+['Kwa nini kuvuta moshi ni hatari sana?',['Una gesi zenye sumu kama carbon monoxide','Una harufu tu','Ni baridi','Ni mzito tu'],0,'Gesi zenye sumu hupunguza oksijeni mwilini.'],
+['Incident Command System ni nini?',['Mfumo sanifu wa uongozi na uratibu wa dharura','Aina ya kizima moto','Gari la zimamoto','Kifaa cha kinga'],0,'Huwezesha mashirika mbalimbali kufanya kazi pamoja wakati wa dharura.']];
+const NAV=[['chat','Mazungumzo'],['learn','Jifunze'],['gloss','Istilahi'],['quiz','Maswali'],['marks','Alama'],['set','Mipangilio']];
+
+/* ===== STATE ===== */
+let cur='chat',busy=false,msgs=jr('fw_msgs',[]);
+const marks=()=>jr('fw_marks',[]);
+const disc=()=>h('div',{c:'note',t:'Taarifa hizi ni za kielimu tu. Katika dharura halisi fuata maelekezo ya mamlaka husika. Tanzania: piga 114.'});
+function go(v,a){cur=v;$('#menu').classList.remove('on');$('#ft').style.display=v==='chat'?'':'none';
+  $('#mn').querySelectorAll('button').forEach(b=>b.className='item'+(b.dataset.v===v?' on':''));
+  app.textContent='';V[v](a);main.scrollTop=0}
+
+/* ===== KADI YA JIBU ===== */
+function artNode(a){
+  const box=h('div',{c:'art'});
+  if(a.title)box.append(h('h3',{t:a.title}));
+  if(a.img)box.append(h('img',{src:a.img,alt:a.title||'',loading:'lazy'}));
+  a.ex.split(/\n+/).forEach(p=>box.append(h('p',{t:p})));
+  if(a.unt)box.append(h('div',{c:'note',t:'Tafsiri ya Kiswahili haikupatikana sasa; maudhui yameonyeshwa kwa lugha ya asili.'}));
+  const r=h('div');
+  if(a.url)r.append(h('a',{c:'btn',href:a.url,target:'_blank',rel:'noopener noreferrer',t:'Soma zaidi'}));
+  if(a.en){const has=marks().some(m=>m.en===a.en);r.append(h('button',{c:'btn',type:'button',t:has?'✓ Imehifadhiwa':'Hifadhi',onclick:e=>{const m=marks();if(!m.some(x=>x.en===a.en)){m.push({en:a.en,t:a.title});jw('fw_marks',m);e.target.textContent='✓ Imehifadhiwa'}}}))}
+  box.append(r);
+  if(a.rel&&a.rel.length){const c=h('div');a.rel.forEach(t=>c.append(h('button',{c:'chip',type:'button',t,onclick:()=>send(t)})));box.append(h('div',{c:'note',t:'Mada zinazohusiana:'}),c)}
+  return box;
+}
+function fail(e){return e&&e.off?'Uko offline na hakuna taarifa iliyohifadhiwa kwa swali hili. Unganisha mtandao kisha ujaribu tena.':'Imeshindwa kuunganisha na chanzo cha maudhui (kosa: '+((e&&(e.name||e.message))||'mtandao')+'). Hakikisha una intaneti, kisha ujaribu tena.'}
+
+/* ===== MAZUNGUMZO ===== */
+function renderChat(){
+  app.textContent='';
+  if(!msgs.length){
+    app.append(h('h1',{t:'Fire AI'}),h('p',{c:'mut',t:'Uliza chochote kuhusu sayansi ya moto, zimamoto na usalama. Majibu yanakuja kwa Kiswahili.'}));
+    const c=h('div');EX.forEach(x=>c.append(h('button',{c:'chip',type:'button',t:x,onclick:()=>send(x)})));app.append(c,disc());return;
+  }
+  msgs.forEach(m=>{
+    if(m.r==='u')app.append(h('div',{c:'msg me',t:m.t}));
+    else{const d=h('div',{c:'msg bot'});d.append(m.a?artNode(m.a):h('p',{t:m.t}));app.append(d)}
+  });
+  app.append(disc());main.scrollTop=main.scrollHeight;
+}
+async function send(q){
+  q=(q||'').trim();if(!q||busy)return;
+  if(cur!=='chat')go('chat');
+  busy=true;$('#sd').disabled=true;$('#q').value='';
+  msgs.push({r:'u',t:q});renderChat();
+  const ld=h('div',{c:'msg bot dots'},[h('span'),h('span'),h('span')]);app.insertBefore(ld,app.lastChild);main.scrollTop=main.scrollHeight;
+  try{const a=await ask(q);msgs.push(a?{r:'b',a}:{r:'b',t:'Samahani, sikupata makala inayolingana na swali lako. Jaribu kutumia neno kuu, mfano "mwako" au "flashover".'})}
+  catch(e){msgs.push({r:'b',t:fail(e)})}
+  msgs=msgs.slice(-24);jw('fw_msgs',msgs);busy=false;$('#sd').disabled=false;renderChat();
+}
+
+/* ===== MAONYESHO ===== */
+function openArt(en,label){
+  app.textContent='';app.append(h('button',{c:'btn',type:'button',t:'← Rudi',onclick:()=>go(prevV)}),h('div',{c:'card mut',t:'Inapakia...'}));
+  getArt(en,label).then(a=>{if(cur!=='art')return;app.lastChild.replaceWith(a?h('div',{c:'card'},[artNode(a)]):h('div',{c:'card',t:'Makala haikupatikana.'}))}).catch(e=>{if(cur==='art')app.lastChild.replaceWith(h('div',{c:'card',t:fail(e)}))});
+}
+let prevV='learn';
+function topic(en,label,from){return h('button',{c:'chip',type:'button',t:label,onclick:()=>{prevV=from;cur='art';openArt(en,label)}})}
+const V={
+  chat:renderChat,
+  learn(){app.append(h('h1',{t:'Jifunze'}),h('p',{c:'mut',t:'Chagua mada kusoma. Ulichosoma huhifadhiwa kwa matumizi ya offline.'}));
+    MOD.forEach((m,i)=>{const c=h('div',{c:'card'},[h('h3',{t:(i+1)+'. '+m[0]})]);m[1].forEach(t=>c.append(topic(t[1],t[0],'learn')));app.append(c)})},
+  gloss(){app.append(h('h1',{t:'Istilahi'}));let L='';
+    GL.forEach(g=>{const l=g[0][0].toUpperCase();if(l!==L){L=l;app.append(h('div',{c:'lt',t:l}))}
+      app.append(h('button',{c:'item',type:'button',t:g[0],onclick:()=>{prevV='gloss';cur='art';openArt(g[1],g[0].replace(/ \(.*/,''))}}))})},
+  quiz(){let i=0,s=0;const box=h('div');app.append(h('h1',{t:'Maswali'}),box);
+    const step=()=>{box.textContent='';
+      if(i>=QZ.length){const p=Math.round(s/QZ.length*100);box.append(h('div',{c:'card'},[h('h2',{t:'Matokeo: '+s+'/'+QZ.length+' ('+p+'%)'}),h('p',{t:p>=80?'Hongera! Uko vizuri sana.':p>=50?'Vizuri. Endelea kujifunza.':'Soma mada zaidi kisha ujaribu tena.'}),h('button',{c:'btn p',type:'button',t:'Anza upya',onclick:()=>go('quiz')})]));return}
+      const q=QZ[i],c=h('div',{c:'card'},[h('div',{c:'mut',t:'Swali '+(i+1)+' kati ya '+QZ.length}),h('h2',{t:q[0]})]);let done=false;
+      q[1].forEach((o,j)=>{const b=h('button',{c:'opt',type:'button',t:o,onclick:()=>{if(done)return;done=true;if(j===q[2])s++;
+        [...c.querySelectorAll('.opt')].forEach((x,k)=>{if(k===q[2])x.classList.add('ok');else if(k===j)x.classList.add('bad')});
+        c.append(h('div',{c:'note',t:(j===q[2]?'Sahihi. ':'Si sahihi. ')+q[3]}),h('button',{c:'btn p',type:'button',t:i+1<QZ.length?'Endelea':'Ona matokeo',onclick:()=>{i++;step()}}))}});c.append(b)});
+      box.append(c)};step()},
+  marks(){app.append(h('h1',{t:'Alama'}));const m=marks();
+    if(!m.length){app.append(h('p',{c:'mut',t:'Bado hujahifadhi makala yoyote. Bonyeza "Hifadhi" kwenye jibu lolote.'}));return}
+    m.forEach(x=>{app.append(h('div',{c:'card'},[h('h3',{t:x.t}),topic(x.en,'Fungua','marks'),h('button',{c:'chip',type:'button',t:'Ondoa',onclick:()=>{jw('fw_marks',marks().filter(y=>y.en!==x.en));go('marks')}})]))})},
+  set(){app.append(h('h1',{t:'Mipangilio'}));
+    const st=h('p',{c:'mut',t:'Makala yaliyohifadhiwa: '+cnt()});
+    const pr=h('div',{c:'note'});
+    const dl=h('button',{c:'btn p',type:'button',t:'Pakua mada zote kwa offline',onclick:async()=>{
+      if(!navigator.onLine){toast('Unganisha mtandao kwanza');return}
+      dl.disabled=true;const all=[];MOD.forEach(m=>m[1].forEach(t=>all.push(t[1])));const u=[...new Set(all)];let n=0;
+      for(const en of u){try{await getArt(en)}catch(e){}n++;pr.textContent='Inapakua '+n+' / '+u.length;await sl(150)}
+      pr.textContent='Imekamilika.';st.textContent='Makala yaliyohifadhiwa: '+cnt();dl.disabled=false}});
+    const cl=h('button',{c:'btn',type:'button',t:'Futa data iliyohifadhiwa',onclick:()=>{if(!confirm('Futa makala yote yaliyohifadhiwa?'))return;Object.keys(localStorage).filter(k=>k.startsWith(P)).forEach(k=>localStorage.removeItem(k));st.textContent='Makala yaliyohifadhiwa: 0'}});
+    const cc=h('button',{c:'btn',type:'button',t:'Futa mazungumzo',onclick:()=>{msgs=[];jw('fw_msgs',[]);toast('Mazungumzo yamefutwa')}});
+    app.append(h('div',{c:'card'},[st,dl,pr]),h('div',{c:'card'},[cl,cc]),disc())},
+  art(){}
 };
 
-let db = null;
-let firebaseInitialized = false;
-
-function initFirebase() {
-    try {
-        if (firebaseConfig.apiKey.includes("BADILISHA")) {
-            console.warn("Firebase bado haijasanidiwa!");
-            showConnectionStatus("offline", "Firebase haijasanidiwa - Badili config", 3000);
-            return false;
-        }
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        firebaseInitialized = true;
-        showConnectionStatus("online", "Imeunganishwa na Firebase", 2000);
-        listenForMessages();
-        listenForEmails();
-        return true;
-    } catch (e) {
-        console.error("Firebase init error:", e);
-        showConnectionStatus("offline", "Imeshindwa kuunganisha na Firebase", 3000);
-        return false;
-    }
-}
-
-function showConnectionStatus(status, message, duration) {
-    const el = document.getElementById('connectionStatus');
-    el.className = 'connection-status ' + status;
-    el.textContent = message;
-    if (duration > 0) {
-        setTimeout(function() { el.classList.add('hidden'); }, duration);
-    }
-}
-
-// ==================== STATE ====================
-const state = {
-    pin: "1234",
-    pinEntered: "",
-    isLocked: true,
-    theme: "light",
-    notifications: [
-        { id: 1, app: "Messages", icon: "💬", text: "New message from John", time: "2m ago", color: "#34a853" },
-        { id: 2, app: "Phone", icon: "📞", text: "Missed call from +1234567890", time: "15m ago", color: "#1a73e8" },
-        { id: 3, app: "Files", icon: "📁", text: "Download complete: document.pdf", time: "1h ago", color: "#fbbc05" }
-    ],
-    quickSettings: { wifi: true, bluetooth: false, flashlight: false, airplane: false, dark: false, lock: false, dnd: false },
-    contacts: [
-        { id: 1, name: "John Doe", number: "+1 234 567 8901", favorite: true },
-        { id: 2, name: "Jane Smith", number: "+1 234 567 8902", favorite: true },
-        { id: 3, name: "Bob Johnson", number: "+1 234 567 8903", favorite: false },
-        { id: 4, name: "Alice Brown", number: "+1 234 567 8904", favorite: false },
-        { id: 5, name: "Charlie Wilson", number: "+1 234 567 8905", favorite: false }
-    ],
-    messages: [
-        { id: 1, contact: "John Doe", number: "+1 234 567 8901", preview: "Hey, are we still meeting today?", time: "2m ago", unread: true, thread: [
-            { sent: false, text: "Hey, are we still meeting today?", time: "2:30 PM", status: "read" },
-            { sent: true, text: "Yes, see you at 3!", time: "2:31 PM", status: "read" }
-        ]},
-        { id: 2, contact: "Jane Smith", number: "+1 234 567 8902", preview: "Thanks for the help!", time: "1h ago", unread: false, thread: [
-            { sent: false, text: "Thanks for the help!", time: "1:00 PM", status: "read" },
-            { sent: true, text: "No problem!", time: "1:05 PM", status: "read" }
-        ]}
-    ],
-    emails: [
-        { id: 1, from: "john@example.com", to: "me@android.com", subject: "Meeting Reminder", preview: "Do not forget our meeting at 3 PM today...", time: "10m ago", unread: true, body: "Hi there,\n\nDo not forget our meeting at 3 PM today. We will be discussing the new project timeline.\n\nBest,\nJohn" },
-        { id: 2, from: "jane@example.com", to: "me@android.com", subject: "Project Update", preview: "The designs are ready for review...", time: "2h ago", unread: false, body: "Hey,\n\nThe designs are ready for review. Please check them out and let me know your thoughts.\n\nThanks,\nJane" },
-        { id: 3, from: "noreply@amazon.com", to: "me@android.com", subject: "Your order has shipped!", preview: "Your package will arrive on Friday...", time: "5h ago", unread: true, body: "Your order #12345 has shipped!\n\nTracking: AMZN123456\nEstimated delivery: Friday, June 21\n\nThank you for shopping with us!" }
-    ],
-    calls: [
-        { id: 1, name: "John Doe", number: "+1 234 567 8901", type: "missed", time: "15m ago" },
-        { id: 2, name: "Jane Smith", number: "+1 234 567 8902", type: "outgoing", time: "2h ago" },
-        { id: 3, name: "Unknown", number: "+1 999 888 7777", type: "incoming", time: "Yesterday" }
-    ],
-    files: [
-        { id: 1, name: "Documents", type: "folder", size: "", count: 12, color: "#1a73e8" },
-        { id: 2, name: "Photos", type: "folder", size: "", count: 48, color: "#ea4335" },
-        { id: 3, name: "Videos", type: "folder", size: "", count: 6, color: "#34a853" },
-        { id: 4, name: "Music", type: "folder", size: "", count: 23, color: "#fbbc05" },
-        { id: 5, name: "report_2024.pdf", type: "pdf", size: "2.4 MB", count: 0, color: "#ea4335" },
-        { id: 6, name: "budget.xlsx", type: "excel", size: "156 KB", count: 0, color: "#34a853" },
-        { id: 7, name: "notes.txt", type: "text", size: "4 KB", count: 0, color: "#5f6368" },
-        { id: 8, name: "archive.zip", type: "zip", size: "12.8 MB", count: 0, color: "#fbbc05" }
-    ],
-    calculator: { display: "0", history: "", operator: null, operand: null, resetNext: false },
-    settings: { pin: "1234", password: "", fingerprint: false, appLock: false, hiddenVault: false, autoBackup: false, cloudSync: false, language: "en" },
-    apps: [
-        { id: "phone", name: "Phone", icon: "📞", color: "#34a853", badge: 0 },
-        { id: "messages", name: "Messages", icon: "💬", color: "#34a853", badge: 2 },
-        { id: "contacts", name: "Contacts", icon: "👥", color: "#1a73e8", badge: 0 },
-        { id: "calculator", name: "Calculator", icon: "🧮", color: "#5f6368", badge: 0 },
-        { id: "files", name: "Files", icon: "📁", color: "#fbbc05", badge: 0 },
-        { id: "camera", name: "Camera", icon: "📷", color: "#5f6368", badge: 0 },
-        { id: "gallery", name: "Gallery", icon: "🖼️", color: "#ea4335", badge: 0 },
-        { id: "music", name: "Music", icon: "🎵", color: "#ea4335", badge: 0 },
-        { id: "settings", name: "Settings", icon: "⚙️", color: "#5f6368", badge: 0 },
-        { id: "calendar", name: "Calendar", icon: "📅", color: "#1a73e8", badge: 0 },
-        { id: "clock", name: "Clock", icon: "⏰", color: "#5f6368", badge: 0 },
-        { id: "weather", name: "Weather", icon: "🌤️", color: "#fbbc05", badge: 0 },
-        { id: "browser", name: "Browser", icon: "🌐", color: "#1a73e8", badge: 0 },
-        { id: "email", name: "Email", icon: "📧", color: "#ea4335", badge: 3 },
-        { id: "maps", name: "Maps", icon: "🗺️", color: "#34a853", badge: 0 },
-        { id: "notes", name: "Notes", icon: "📝", color: "#fbbc05", badge: 0 }
-    ],
-    dockApps: ["phone", "messages", "browser", "camera"],
-    browser: {
-        tabs: [{ id: 1, title: "Google", url: "https://www.google.com" }],
-        activeTab: 0,
-        history: [],
-        canGoBack: false,
-        canGoForward: false
-    }
-};
-
-// ==================== INIT ====================
-function init() {
-    updateClock();
-    setInterval(updateClock, 1000);
-    renderHomeApps();
-    renderDock();
-    renderDrawerApps();
-    renderNotifications();
-    updateBattery();
-    initFirebase();
-
-    var touchStartY = 0;
-    var touchEndY = 0;
-    document.addEventListener('touchstart', function(e) { touchStartY = e.changedTouches[0].screenY; });
-    document.addEventListener('touchend', function(e) {
-        touchEndY = e.changedTouches[0].screenY;
-        var diff = touchStartY - touchEndY;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0 && touchStartY < 100) { openNotificationPanel(); }
-            else if (diff < 0 && touchEndY < 100) { closeNotificationPanel(); }
-            else if (diff < 0 && !state.isLocked) { openAppDrawer(); }
-        }
-    });
-
-    var pinKeys = document.querySelectorAll('.pin-key');
-    for (var i = 0; i < pinKeys.length; i++) {
-        pinKeys[i].addEventListener('click', function() {
-            handlePinKey(this.dataset.key);
-        });
-    }
-}
-
-// ==================== CLOCK & STATUS ====================
-function updateClock() {
-    var now = new Date();
-    var hours = now.getHours().toString().padStart(2, '0');
-    var minutes = now.getMinutes().toString().padStart(2, '0');
-    var timeStr = hours + ":" + minutes;
-    document.getElementById('clockTime').textContent = timeStr;
-    document.getElementById('homeClock').textContent = timeStr;
-    document.getElementById('lockTime').textContent = timeStr;
-    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    var dateStr = days[now.getDay()] + ", " + months[now.getMonth()] + " " + now.getDate();
-    document.getElementById('homeDate').textContent = dateStr;
-    document.getElementById('lockDate').textContent = dateStr;
-}
-
-function updateBattery() {
-    if ('getBattery' in navigator) {
-        navigator.getBattery().then(function(battery) {
-            var level = Math.round(battery.level * 100);
-            document.getElementById('batteryFill').style.width = level + '%';
-            document.getElementById('batteryText').textContent = level + '%';
-        });
-    }
-}
-
-// ==================== PIN LOCK ====================
-function handlePinKey(key) {
-    if (key === "clear") {
-        state.pinEntered = state.pinEntered.slice(0, -1);
-    } else if (key === "enter") {
-        if (state.pinEntered === state.pin) {
-            unlock();
-        } else {
-            showToast("Wrong PIN");
-            state.pinEntered = "";
-        }
-    } else if (state.pinEntered.length < 4) {
-        state.pinEntered += key;
-    }
-    updatePinDots();
-}
-
-function updatePinDots() {
-    var dots = document.querySelectorAll('.pin-dot');
-    for (var i = 0; i < dots.length; i++) {
-        dots[i].classList.toggle('filled', i < state.pinEntered.length);
-    }
-}
-
-function unlock() {
-    state.isLocked = false;
-    document.getElementById('lockScreen').classList.add('hidden');
-    setTimeout(function() {
-        document.getElementById('lockScreen').style.display = 'none';
-    }, 500);
-}
-
-// ==================== HOME SCREEN ====================
-function renderHomeApps() {
-    var homeApps = state.apps.slice(0, 12);
-    var html = '';
-    for (var i = 0; i < homeApps.length; i++) {
-        html += createAppItem(homeApps[i]);
-    }
-    document.getElementById('homeApps').innerHTML = html;
-}
-
-function renderDock() {
-    var dockApps = [];
-    for (var i = 0; i < state.dockApps.length; i++) {
-        var app = state.apps.find(function(a) { return a.id === state.dockApps[i]; });
-        if (app) dockApps.push(app);
-    }
-    var html = '';
-    for (var i = 0; i < dockApps.length; i++) {
-        html += createAppItem(dockApps[i], true);
-    }
-    document.getElementById('dock').innerHTML = html;
-}
-
-function createAppItem(app, isDock) {
-    isDock = isDock || false;
-    var badge = app.badge > 0 ? '<div class="app-badge">' + app.badge + '</div>' : '';
-    return '<div class="app-item" onclick="openApp(\'' + app.id + '\')">' +
-        '<div class="app-icon" style="background: ' + app.color + '">' + app.icon + badge + '</div>' +
-        (isDock ? '' : '<div class="app-name">' + app.name + '</div>') +
-        '</div>';
-}
-
-// ==================== APP DRAWER ====================
-function renderDrawerApps(filter) {
-    filter = filter || '';
-    var apps = state.apps.filter(function(a) {
-        return a.name.toLowerCase().includes(filter.toLowerCase());
-    });
-    var html = '<div style="padding: 8px 0; font-size: 12px; color: var(--on-background); text-transform: uppercase; letter-spacing: 0.5px;">All Apps</div>' +
-        '<div class="app-grid">';
-    for (var i = 0; i < apps.length; i++) {
-        html += createAppItem(apps[i]);
-    }
-    html += '</div>';
-    document.getElementById('drawerApps').innerHTML = html;
-}
-
-function openAppDrawer() { document.getElementById('appDrawer').classList.add('open'); }
-function closeAppDrawer() { document.getElementById('appDrawer').classList.remove('open'); }
-function searchApps(query) { renderDrawerApps(query); }
-
-// ==================== NOTIFICATIONS ====================
-function renderNotifications() {
-    var container = document.getElementById('notificationList');
-    if (state.notifications.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--on-background);">No notifications</div>';
-        return;
-    }
-    var html = '';
-    for (var i = 0; i < state.notifications.length; i++) {
-        var n = state.notifications[i];
-        html += '<div class="notification-item">' +
-            '<div class="notification-icon" style="background: ' + n.color + '20; color: ' + n.color + '">' + n.icon + '</div>' +
-            '<div class="notification-body">' +
-                '<div class="notification-app-name">' + n.app + '</div>' +
-                '<div class="notification-text">' + n.text + '</div>' +
-                '<div class="notification-time">' + n.time + '</div>' +
-            '</div>' +
-            '</div>';
-    }
-    container.innerHTML = html;
-}
-
-function openNotificationPanel() { document.getElementById('notificationPanel').classList.add('open'); }
-function closeNotificationPanel() { document.getElementById('notificationPanel').classList.remove('open'); }
-function clearNotifications() { state.notifications = []; renderNotifications(); showToast('Notifications cleared'); }
-
-// ==================== QUICK SETTINGS ====================
-function toggleQuickSetting(name) {
-    state.quickSettings[name] = !state.quickSettings[name];
-    var tile = document.getElementById('qs' + name.charAt(0).toUpperCase() + name.slice(1));
-    tile.classList.toggle('active', state.quickSettings[name]);
-    if (name === 'dark') { toggleTheme(); }
-    else if (name === 'lock') { lockDevice(); }
-    showToast(name + ' ' + (state.quickSettings[name] ? 'on' : 'off'));
-}
-
-function setBrightness(val) { document.getElementById('device-frame').style.filter = 'brightness(' + val + '%)'; }
-function setVolume(val) {}
-function toggleTheme() {
-    state.theme = state.theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', state.theme);
-}
-function lockDevice() { location.reload(); }
-
-// ==================== APP LAUNCHER ====================
-function openApp(appId) {
-    var app = state.apps.find(function(a) { return a.id === appId; });
-    if (!app) return;
-    closeAppDrawer();
-    closeNotificationPanel();
-    document.getElementById('appTitle').textContent = app.name;
-    document.getElementById('appScreen').classList.remove('hidden');
-    document.getElementById('homeScreen').classList.add('slide-left');
-    var body = document.getElementById('appBody');
-    body.innerHTML = '';
-    switch(appId) {
-        case 'phone': renderPhoneApp(body); break;
-        case 'messages': renderMessagesApp(body); break;
-        case 'contacts': renderContactsApp(body); break;
-        case 'calculator': renderCalculatorApp(body); break;
-        case 'files': renderFilesApp(body); break;
-        case 'settings': renderSettingsApp(body); break;
-        case 'browser': renderBrowserApp(body); break;
-        case 'email': renderEmailApp(body); break;
-        default: body.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);"><div style="font-size: 64px; margin-bottom: 16px;">' + app.icon + '</div><h2>' + app.name + '</h2><p>Coming soon</p></div>';
-    }
-}
-
-function closeApp() {
-    document.getElementById('appScreen').classList.add('hidden');
-    document.getElementById('homeScreen').classList.remove('slide-left');
-}
-
-// ==================== PHONE APP ====================
-function renderPhoneApp(container) {
-    var dialKeys = '';
-    var letters = ['', 'ABC', 'DEF', 'GHI', 'JKL', 'MNO', 'PQRS', 'TUV', 'WXYZ'];
-    for (var n = 1; n <= 9; n++) {
-        dialKeys += '<div class="dial-key" onclick="dialKey(\'' + n + '\')">' + n;
-        if (letters[n-1]) {
-            dialKeys += '<span>' + letters[n-1] + '</span>';
-        }
-        dialKeys += '</div>';
-    }
-    container.innerHTML = '<div class="phone-dialer">' +
-        '<div class="dial-display" id="dialDisplay"></div>' +
-        '<div class="dial-pad">' + dialKeys +
-            '<div class="dial-key" onclick="dialKey(\'*\')">*</div>' +
-            '<div class="dial-key" onclick="dialKey(\'0\')">0<span>+</span></div>' +
-            '<div class="dial-key" onclick="dialKey(\'#\')">#</div>' +
-        '</div>' +
-        '<div class="dial-actions">' +
-            '<div class="dial-delete" onclick="dialDelete()">⌫</div>' +
-            '<div class="dial-call" onclick="makeCall()">📞</div>' +
-            '<div class="dial-delete" onclick="showCallHistory()">📋</div>' +
-        '</div>' +
-    '</div>';
-}
-
-var dialNumber = '';
-function dialKey(key) {
-    dialNumber += key;
-    var display = document.getElementById('dialDisplay');
-    if (display) display.textContent = dialNumber;
-}
-function dialDelete() {
-    dialNumber = dialNumber.slice(0, -1);
-    var display = document.getElementById('dialDisplay');
-    if (display) display.textContent = dialNumber;
-}
-function makeCall() {
-    if (!dialNumber) return;
-    showToast('Calling ' + dialNumber + '...');
-    state.calls.unshift({ id: Date.now(), name: dialNumber, number: dialNumber, type: 'outgoing', time: 'Just now' });
-}
-function showCallHistory() {
-    var body = document.getElementById('appBody');
-    var html = '<div class="contact-list">';
-    for (var i = 0; i < state.calls.length; i++) {
-        var c = state.calls[i];
-        var color = c.type === 'missed' ? '#ea4335' : '#34a853';
-        var icon = c.type === 'missed' ? '❌' : c.type === 'outgoing' ? '↗️' : '↙️';
-        html += '<div class="contact-item">' +
-            '<div class="contact-avatar" style="background: ' + color + '">' + icon + '</div>' +
-            '<div class="contact-info"><div class="contact-name">' + c.name + '</div><div class="contact-number">' + c.number + ' • ' + c.time + '</div></div>' +
-            '<div class="contact-actions"><div class="contact-action-btn" onclick="showToast(\'Calling ' + c.number + '\')">📞</div></div>' +
-            '</div>';
-    }
-    html += '</div>';
-    body.innerHTML = html;
-}
-
-// ==================== MESSAGES APP (with Firestore) ====================
-function renderMessagesApp(container) {
-    var html = '<div class="sms-list">';
-    for (var i = 0; i < state.messages.length; i++) {
-        var m = state.messages[i];
-        var unreadClass = m.unread ? 'unread' : '';
-        var unreadDot = m.unread ? '<div style="width: 8px; height: 8px; background: #1a73e8; border-radius: 50%; margin-top: 4px; margin-left: auto;"></div>' : '';
-        html += '<div class="sms-item ' + unreadClass + '" onclick="openThread(' + m.id + ')">' +
-            '<div class="contact-avatar" style="background: #1a73e8">' + m.contact[0] + '</div>' +
-            '<div class="contact-info">' +
-                '<div class="contact-name">' + m.contact + '</div>' +
-                '<div class="sms-preview">' + m.preview + '</div>' +
-            '</div>' +
-            '<div style="text-align: right;">' +
-                '<div class="sms-time">' + m.time + '</div>' + unreadDot +
-            '</div>' +
-        '</div>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-function openThread(id) {
-    var msg = state.messages.find(function(m) { return m.id === id; });
-    if (!msg) return;
-    msg.unread = false;
-    var body = document.getElementById('appBody');
-    var threadHtml = '<div class="sms-thread">' +
-        '<div class="sms-messages" id="threadMessages">';
-    for (var i = 0; i < msg.thread.length; i++) {
-        var t = msg.thread[i];
-        var statusText = '';
-        if (t.status === 'sent') statusText = '✓';
-        else if (t.status === 'delivered') statusText = '✓✓';
-        else if (t.status === 'read') statusText = '✓✓';
-        var align = t.sent ? 'left' : 'right';
-        threadHtml += '<div class="sms-bubble ' + (t.sent ? 'sent' : 'received') + '">' +
-            t.text +
-            '<div class="msg-status" style="text-align: ' + align + ';">' + t.time + ' ' + statusText + '</div>' +
-        '</div>';
-    }
-    threadHtml += '</div>' +
-        '<div class="sms-input-area">' +
-            '<input type="text" class="sms-input" placeholder="Andika ujumbe..." id="msgInput" onkeypress="if(event.key===\'Enter\')sendMessage(' + id + ')">' +
-            '<div class="sms-send" id="sendBtn" onclick="sendMessage(' + id + ')">➤</div>' +
-        '</div>' +
-    '</div>';
-    body.innerHTML = threadHtml;
-}
-
-function sendMessage(threadId) {
-    var input = document.getElementById('msgInput');
-    var sendBtn = document.getElementById('sendBtn');
-    var text = input.value.trim();
-    if (!text) return;
-
-    var msg = state.messages.find(function(m) { return m.id === threadId; });
-    var now = new Date();
-    var time = now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0');
-
-    msg.thread.push({ sent: true, text: text, time: time, status: 'sending' });
-    msg.preview = text;
-    msg.time = 'Just now';
-    input.value = '';
-    openThread(threadId);
-
-    if (sendBtn) {
-        sendBtn.classList.add('sending');
-        sendBtn.innerHTML = '';
-    }
-
-    if (firebaseInitialized && db) {
-        showConnectionStatus('syncing', 'Inatuma ujumbe...');
-        db.collection('messages').add({
-            to: msg.number,
-            from: 'me@android.com',
-            text: text,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            status: 'sent',
-            deviceId: 'android-16-launcher'
-        }).then(function() {
-            msg.thread[msg.thread.length - 1].status = 'sent';
-            showConnectionStatus('online', 'Ujumbe umetumwa', 2000);
-            if (sendBtn) {
-                sendBtn.classList.remove('sending');
-                sendBtn.innerHTML = '➤';
-            }
-            openThread(threadId);
-        }).catch(function(e) {
-            console.error('Firestore send error:', e);
-            msg.thread[msg.thread.length - 1].status = 'failed';
-            showConnectionStatus('offline', 'Imeshindwa kutuma - umehifadhiwa', 3000);
-            if (sendBtn) {
-                sendBtn.classList.remove('sending');
-                sendBtn.innerHTML = '➤';
-            }
-            openThread(threadId);
-        });
-    } else {
-        setTimeout(function() {
-            msg.thread[msg.thread.length - 1].status = 'sent';
-            showToast('Ujumbe umetumwa (offline mode)');
-            if (sendBtn) {
-                sendBtn.classList.remove('sending');
-                sendBtn.innerHTML = '➤';
-            }
-            openThread(threadId);
-        }, 1000);
-    }
-
-    setTimeout(function() {
-        msg.thread.push({ sent: false, text: 'Nimepokea! 👍', time: time, status: 'read' });
-        msg.preview = 'Nimepokea! 👍';
-        openThread(threadId);
-    }, 2000);
-}
-
-function listenForMessages() {
-    if (!db) return;
-    db.collection('messages').where('to', '==', 'me@android.com')
-        .orderBy('timestamp', 'desc')
-        .onSnapshot(function(snapshot) {
-            snapshot.docChanges().forEach(function(change) {
-                if (change.type === 'added') {
-                    var data = change.doc.data();
-                    var existing = state.messages.find(function(m) { return m.number === data.from; });
-                    var timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    if (existing) {
-                        existing.thread.push({ sent: false, text: data.text, time: timeStr, status: 'read' });
-                        existing.preview = data.text;
-                        existing.time = 'Just now';
-                        existing.unread = true;
-                    } else {
-                        state.messages.unshift({
-                            id: Date.now(),
-                            contact: data.from,
-                            number: data.from,
-                            preview: data.text,
-                            time: 'Just now',
-                            unread: true,
-                            thread: [{ sent: false, text: data.text, time: timeStr, status: 'read' }]
-                        });
-                    }
-                    var appTitle = document.getElementById('appTitle').textContent;
-                    if (appTitle === 'Messages') {
-                        renderMessagesApp(document.getElementById('appBody'));
-                    }
-                    showToast('Ujumbe mpya kutoka ' + data.from);
-                }
-            });
-        });
-}
-
-// ==================== CONTACTS APP ====================
-function renderContactsApp(container) {
-    container.innerHTML = '<div style="padding: 0 0 16px;"><input type="text" class="modal-input" placeholder="Search contacts..." oninput="filterContacts(this.value)"></div>' +
-        '<div class="contact-list" id="contactsList">' + renderContactsList() + '</div>';
-}
-
-function renderContactsList(filter) {
-    filter = filter || '';
-    var contacts = state.contacts.filter(function(c) {
-        return c.name.toLowerCase().includes(filter.toLowerCase());
-    }).sort(function(a, b) { return a.name.localeCompare(b.name); });
-    var html = '';
-    for (var i = 0; i < contacts.length; i++) {
-        var c = contacts[i];
-        var initials = c.name.split(' ').map(function(n) { return n[0]; }).join('');
-        html += '<div class="contact-item">' +
-            '<div class="contact-avatar">' + initials + '</div>' +
-            '<div class="contact-info"><div class="contact-name">' + c.name + '</div><div class="contact-number">' + c.number + '</div></div>' +
-            '<div class="contact-actions">' +
-                '<div class="contact-action-btn" onclick="showToast(\'Calling ' + c.number + '\')">📞</div>' +
-                '<div class="contact-action-btn" onclick="showToast(\'Messaging ' + c.number + '\')">💬</div>' +
-            '</div>' +
-        '</div>';
-    }
-    return html;
-}
-function filterContacts(query) {
-    document.getElementById('contactsList').innerHTML = renderContactsList(query);
-}
-
-// ==================== CALCULATOR APP ====================
-function renderCalculatorApp(container) {
-    container.innerHTML = '<div class="calculator">' +
-        '<div class="calc-display"><div class="calc-history" id="calcHistory"></div><div class="calc-result" id="calcResult">0</div></div>' +
-        '<div class="calc-pad">' +
-            '<button class="calc-btn" onclick="calcClear()">AC</button>' +
-            '<button class="calc-btn" onclick="calcOp(\'±\')">±</button>' +
-            '<button class="calc-btn" onclick="calcOp(\'%\')">%</button>' +
-            '<button class="calc-btn operator" onclick="calcOp(\'÷\')">÷</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'7\')">7</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'8\')">8</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'9\')">9</button>' +
-            '<button class="calc-btn operator" onclick="calcOp(\'×\')">×</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'4\')">4</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'5\')">5</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'6\')">6</button>' +
-            '<button class="calc-btn operator" onclick="calcOp(\'-\')">−</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'1\')">1</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'2\')">2</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'3\')">3</button>' +
-            '<button class="calc-btn operator" onclick="calcOp(\'+\')">+</button>' +
-            '<button class="calc-btn zero" onclick="calcNum(\'0\')">0</button>' +
-            '<button class="calc-btn" onclick="calcNum(\'.\')">.</button>' +
-            '<button class="calc-btn equals" onclick="calcEquals()">=</button>' +
-        '</div>' +
-    '</div>';
-}
-
-function calcNum(n) {
-    if (state.calculator.resetNext) { state.calculator.display = '0'; state.calculator.resetNext = false; }
-    if (state.calculator.display === '0' && n !== '.') { state.calculator.display = n; }
-    else { state.calculator.display += n; }
-    updateCalc();
-}
-function calcOp(op) {
-    state.calculator.operand = parseFloat(state.calculator.display);
-    state.calculator.operator = op;
-    state.calculator.history = state.calculator.display + ' ' + op;
-    state.calculator.resetNext = true;
-    updateCalc();
-}
-function calcEquals() {
-    if (!state.calculator.operator) return;
-    var current = parseFloat(state.calculator.display);
-    var result = 0;
-    switch(state.calculator.operator) {
-        case '+': result = state.calculator.operand + current; break;
-        case '-': result = state.calculator.operand - current; break;
-        case '×': result = state.calculator.operand * current; break;
-        case '÷': result = state.calculator.operand / current; break;
-        case '%': result = state.calculator.operand % current; break;
-    }
-    state.calculator.history = '';
-    state.calculator.display = result.toString();
-    state.calculator.operator = null;
-    state.calculator.operand = null;
-    state.calculator.resetNext = true;
-    updateCalc();
-}
-function calcClear() {
-    state.calculator = { display: '0', history: '', operator: null, operand: null, resetNext: false };
-    updateCalc();
-}
-function updateCalc() {
-    var resultEl = document.getElementById('calcResult');
-    var historyEl = document.getElementById('calcHistory');
-    if (resultEl) resultEl.textContent = state.calculator.display;
-    if (historyEl) historyEl.textContent = state.calculator.history;
-}
-
-// ==================== BROWSER APP (Real Web Search) ====================
-function renderBrowserApp(container) {
-    container.innerHTML = '<div class="browser-app">' +
-        '<div class="browser-tabs" id="browserTabs"></div>' +
-        '<div class="browser-toolbar">' +
-            '<button class="browser-nav-btn" id="btnBack" onclick="browserGoBack()" disabled>←</button>' +
-            '<button class="browser-nav-btn" id="btnForward" onclick="browserGoForward()" disabled>→</button>' +
-            '<button class="browser-nav-btn" onclick="browserReload()">↻</button>' +
-            '<div class="browser-address-bar">' +
-                '<span>🔍</span>' +
-                '<input type="text" id="browserUrl" placeholder="Tafuta au andika URL..." value="" onkeypress="if(event.key===\'Enter\')browserNavigate()">' +
-            '</div>' +
-            '<button class="browser-nav-btn" onclick="browserNewTab()">+</button>' +
-        '</div>' +
-        '<div class="browser-content" id="browserContent">' +
-            '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);">' +
-                '<div style="font-size: 64px; margin-bottom: 16px;">🌐</div>' +
-                '<h2>Browser</h2>' +
-                '<p style="margin-top: 8px;">Andika neno la kutafuta au URL</p>' +
-                '<div style="margin-top: 24px; display: flex; flex-direction: column; gap: 8px; max-width: 280px; margin-left: auto; margin-right: auto;">' +
-                    '<button onclick="quickSearch(\'google\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">🔍 Google</button>' +
-                    '<button onclick="quickSearch(\'youtube\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">▶️ YouTube</button>' +
-                    '<button onclick="quickSearch(\'wikipedia\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">📚 Wikipedia</button>' +
-                    '<button onclick="quickSearch(\'news\')" style="padding: 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--on-surface); font-size: 14px; cursor: pointer; box-shadow: var(--shadow);">📰 Habari</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>' +
-    '</div>';
-    renderBrowserTabs();
-}
-
-function renderBrowserTabs() {
-    var tabsContainer = document.getElementById('browserTabs');
-    if (!tabsContainer) return;
-    var html = '';
-    for (var i = 0; i < state.browser.tabs.length; i++) {
-        var tab = state.browser.tabs[i];
-        var active = i === state.browser.activeTab ? 'active' : '';
-        html += '<div class="browser-tab ' + active + '" onclick="switchTab(' + i + ')">' +
-            '<span>' + tab.title + '</span>' +
-            '<span class="browser-tab-close" onclick="event.stopPropagation(); closeTab(' + i + ')">×</span>' +
-        '</div>';
-    }
-    tabsContainer.innerHTML = html;
-}
-
-function switchTab(index) {
-    state.browser.activeTab = index;
-    renderBrowserTabs();
-    var tab = state.browser.tabs[index];
-    var urlInput = document.getElementById('browserUrl');
-    if (urlInput) urlInput.value = tab.url || '';
-}
-
-function closeTab(index) {
-    state.browser.tabs.splice(index, 1);
-    if (state.browser.tabs.length === 0) {
-        browserNewTab();
-    } else {
-        state.browser.activeTab = Math.min(state.browser.activeTab, state.browser.tabs.length - 1);
-        renderBrowserTabs();
-    }
-}
-
-function browserNewTab() {
-    state.browser.tabs.push({ id: Date.now(), title: 'New Tab', url: '' });
-    state.browser.activeTab = state.browser.tabs.length - 1;
-    renderBrowserTabs();
-    var content = document.getElementById('browserContent');
-    if (content) {
-        content.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: var(--on-background);">' +
-            '<div style="font-size: 64px; margin-bottom: 16px;">🌐</div>' +
-            '<h2>Browser</h2>' +
-            '<p style="margin-top: 8px;">Andika neno la kutafuta au URL</p>' +
-        '</div>';
-    }
-    var urlInput = document.getElementById('browserUrl');
-    if (urlInput) urlInput.value = '';
-}
-
-function browserNavigate() {
-    var urlInput = document.getElementById('browserUrl');
-    var query = urlInput.value.trim();
-    if (!query) return;
-    var content = document.getElementById('browserContent');
-
-    if (query.indexOf('http://') === 0 || query.indexOf('https://') === 0 || query.indexOf('.') > 0) {
-        var url = query;
-        if (url.indexOf('http') !== 0) url = 'https://' + url;
-        state.browser.tabs[state.browser.activeTab].url = url;
-        state.browser.tabs[state.browser.activeTab].title = url.replace(/^https?:\/\//, '').substring(0, 20) + '...';
-        renderBrowserTabs();
-        content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
-        return;
-    }
-    performWebSearch(query);
-}
-
-function performWebSearch(query) {
-    var content = document.getElementById('browserContent');
-    content.innerHTML = '<div class="search-loading">' +
-        '<div class="search-loading-spinner"></div>' +
-        '<p>Inatafuta: "' + query + '"...</p>' +
-    '</div>';
-
-    state.browser.tabs[state.browser.activeTab].title = query.substring(0, 15) + '...';
-    renderBrowserTabs();
-
-    // Use Wikipedia API as primary search
-    var wikiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query.replace(/\s+/g, '_'));
-
-    fetch(wikiUrl).then(function(response) {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Wiki not found');
-    }).then(function(wikiData) {
-        var results = [];
-        if (wikiData.extract) {
-            var wikiPageUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(query.replace(/\s+/g, '_'));
-            results.push({
-                title: wikiData.title || query,
-                url: wikiPageUrl,
-                description: wikiData.extract
-            });
-        }
-        results.push({
-            title: 'Tafuta "' + query + '" kwenye Google',
-            url: 'https://www.google.com/search?q=' + encodeURIComponent(query),
-            description: 'Bofya hapa kufungua ukurasa wa matokeo ya Google kwa "' + query + '"'
-        });
-        results.push({
-            title: 'Tafuta "' + query + '" kwenye DuckDuckGo',
-            url: 'https://duckduckgo.com/?q=' + encodeURIComponent(query),
-            description: 'Fungua DuckDuckGo Search kwa ajili ya "' + query + '"'
-        });
-        displaySearchResults(query, results);
-    }).catch(function(error) {
-        console.error('Search error:', error);
-        displaySearchResults(query, [
-            {
-                title: 'Tafuta "' + query + '" kwenye Google',
-                url: 'https://www.google.com/search?q=' + encodeURIComponent(query),
-                description: 'Fungua Google Search kwa ajili ya "' + query + '"'
-            },
-            {
-                title: 'Tafuta "' + query + '" kwenye DuckDuckGo',
-                url: 'https://duckduckgo.com/?q=' + encodeURIComponent(query),
-                description: 'Fungua DuckDuckGo Search kwa ajili ya "' + query + '"'
-            },
-            {
-                title: 'Tafuta "' + query + '" kwenye Wikipedia',
-                url: 'https://en.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(query),
-                description: 'Tafuta "' + query + '" kwenye Wikipedia'
-            }
-        ]);
-    });
-}
-
-function displaySearchResults(query, results) {
-    var content = document.getElementById('browserContent');
-    var html = '<div class="search-results">' +
-        '<div style="padding: 12px 0; font-size: 14px; color: var(--on-background); border-bottom: 1px solid var(--background); margin-bottom: 12px;">' +
-            '<strong>' + results.length + '</strong> matokeo ya "' + query + '"' +
-        '</div>';
-    for (var i = 0; i < results.length; i++) {
-        var r = results[i];
-        html += '<div class="search-result-item animate-slideUp" style="animation-delay: ' + (i * 0.05) + 's" onclick="openSearchResult(\'' + r.url + '\')">' +
-            '<div class="search-result-title">' + r.title + '</div>' +
-            '<div class="search-result-url">' + r.url + '</div>' +
-            '<div class="search-result-desc">' + (r.description || '') + '</div>' +
-        '</div>';
-    }
-    html += '</div>';
-    content.innerHTML = html;
-}
-
-function openSearchResult(url) {
-    state.browser.tabs[state.browser.activeTab].url = url;
-    var content = document.getElementById('browserContent');
-    content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
-    state.browser.tabs[state.browser.activeTab].title = url.replace(/^https?:\/\//, '').substring(0, 20) + '...';
-    renderBrowserTabs();
-    var urlInput = document.getElementById('browserUrl');
-    if (urlInput) urlInput.value = url;
-}
-
-function quickSearch(site) {
-    var queries = {
-        google: 'https://www.google.com',
-        youtube: 'https://www.youtube.com',
-        wikipedia: 'https://www.wikipedia.org',
-        news: 'https://news.google.com'
-    };
-    var url = queries[site];
-    state.browser.tabs[state.browser.activeTab].url = url;
-    state.browser.tabs[state.browser.activeTab].title = site.charAt(0).toUpperCase() + site.slice(1);
-    renderBrowserTabs();
-    var content = document.getElementById('browserContent');
-    content.innerHTML = '<iframe class="web-frame" src="' + url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
-    var urlInput = document.getElementById('browserUrl');
-    if (urlInput) urlInput.value = url;
-}
-
-function browserGoBack() {}
-function browserGoForward() {}
-function browserReload() {
-    var tab = state.browser.tabs[state.browser.activeTab];
-    if (tab.url) {
-        var content = document.getElementById('browserContent');
-        content.innerHTML = '<iframe class="web-frame" src="' + tab.url + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
-    }
-}
-
-// ==================== EMAIL APP (with Firestore) ====================
-function renderEmailApp(container) {
-    var html = '<div class="email-list" id="emailList">';
-    for (var i = 0; i < state.emails.length; i++) {
-        var e = state.emails[i];
-        var unreadClass = e.unread ? 'unread' : '';
-        html += '<div class="email-item ' + unreadClass + '" onclick="readEmail(' + e.id + ')">' +
-            '<div class="email-avatar">' + e.from[0].toUpperCase() + '</div>' +
-            '<div class="email-info">' +
-                '<div class="email-sender">' + e.from + '</div>' +
-                '<div class="email-subject">' + e.subject + '</div>' +
-                '<div class="email-preview">' + e.preview + '</div>' +
-            '</div>' +
-            '<div class="email-meta">' +
-                '<div class="email-time">' + e.time + '</div>' +
-            '</div>' +
-        '</div>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
-    var actions = document.getElementById('appActions');
-    if (actions) actions.innerHTML = '<div class="app-action" onclick="composeEmail()">✏️</div>';
-}
-
-function readEmail(id) {
-    var email = state.emails.find(function(e) { return e.id === id; });
-    if (!email) return;
-    email.unread = false;
-    var body = document.getElementById('appBody');
-    body.innerHTML = '<div class="email-read">' +
-        '<div class="email-read-header">' +
-            '<div class="email-read-subject">' + email.subject + '</div>' +
-            '<div class="email-read-sender-row">' +
-                '<div class="email-avatar">' + email.from[0].toUpperCase() + '</div>' +
-                '<div>' +
-                    '<div style="font-weight: 600; color: var(--on-surface);">' + email.from + '</div>' +
-                    '<div style="font-size: 13px; color: var(--on-background);">To: ' + email.to + '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="email-read-body">' + email.body.replace(/\n/g, '<br>') + '</div>' +
-    '</div>';
-    var actions = document.getElementById('appActions');
-    if (actions) actions.innerHTML = '<div class="app-action" onclick="replyEmail(' + id + ')">↩️</div><div class="app-action" onclick="deleteEmail(' + id + ')">🗑️</div>';
-}
-
-function composeEmail() {
-    var body = document.getElementById('appBody');
-    body.innerHTML = '<div class="email-compose">' +
-        '<div class="email-compose-fields">' +
-            '<div class="email-field">' +
-                '<span class="email-field-label">To:</span>' +
-                '<input type="email" id="emailTo" placeholder="recipient@example.com">' +
-            '</div>' +
-            '<div class="email-field">' +
-                '<span class="email-field-label">Subject:</span>' +
-                '<input type="text" id="emailSubject" placeholder="Email subject">' +
-            '</div>' +
-        '</div>' +
-        '<div class="email-compose-body">' +
-            '<textarea id="emailBody" placeholder="Andika barua pepe hapa..."></textarea>' +
-        '</div>' +
-        '<div class="email-compose-actions">' +
-            '<span style="font-size: 12px; color: var(--on-background);">Kutumia Firestore</span>' +
-            '<button class="email-send-btn" id="emailSendBtn" onclick="sendEmail()">' +
-                '<span>📤</span> Tuma' +
-            '</button>' +
-        '</div>' +
-    '</div>';
-    var actions = document.getElementById('appActions');
-    if (actions) actions.innerHTML = '';
-}
-
-function sendEmail() {
-    var to = document.getElementById('emailTo').value.trim();
-    var subject = document.getElementById('emailSubject').value.trim();
-    var bodyText = document.getElementById('emailBody').value.trim();
-    var sendBtn = document.getElementById('emailSendBtn');
-
-    if (!to || !subject || !bodyText) {
-        showToast('Jaza sehemu zote zilizo haja');
-        return;
-    }
-
-    if (sendBtn) {
-        sendBtn.disabled = true;
-        sendBtn.classList.add('sending');
-        sendBtn.innerHTML = '<span>⏳</span> Inatuma...';
-    }
-
-    if (firebaseInitialized && db) {
-        showConnectionStatus('syncing', 'Inatuma barua pepe...');
-        db.collection('emails').add({
-            to: to,
-            from: 'me@android.com',
-            subject: subject,
-            body: bodyText,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            status: 'sent',
-            deviceId: 'android-16-launcher'
-        }).then(function() {
-            showConnectionStatus('online', 'Barua pepe umetumwa', 2000);
-            showToast('Barua pepe umetumwa kupitia Firestore!');
-        }).catch(function(e) {
-            console.error('Email send error:', e);
-            showConnectionStatus('offline', 'Imeshindwa kutuma - umehifadhiwa', 3000);
-            showToast('Imeshindwa kutuma kwenye Firestore');
-        });
-    } else {
-        showToast('Barua pepe umetumwa (offline mode)');
-    }
-
-    state.emails.unshift({
-        id: Date.now(),
-        from: 'me@android.com',
-        to: to,
-        subject: subject,
-        preview: bodyText.substring(0, 50) + '...',
-        time: 'Just now',
-        unread: false,
-        body: bodyText
-    });
-
-    renderEmailApp(document.getElementById('appBody'));
-    var actions = document.getElementById('appActions');
-    if (actions) actions.innerHTML = '<div class="app-action" onclick="composeEmail()">✏️</div>';
-}
-
-function replyEmail(id) {
-    var email = state.emails.find(function(e) { return e.id === id; });
-    if (!email) return;
-    composeEmail();
-    document.getElementById('emailTo').value = email.from;
-    document.getElementById('emailSubject').value = 'Re: ' + email.subject;
-}
-
-function deleteEmail(id) {
-    var idx = state.emails.findIndex(function(e) { return e.id === id; });
-    if (idx > -1) {
-        state.emails.splice(idx, 1);
-        renderEmailApp(document.getElementById('appBody'));
-        showToast('Barua pepe imefutwa');
-    }
-}
-
-function listenForEmails() {
-    if (!db) return;
-    db.collection('emails').where('to', '==', 'me@android.com')
-        .orderBy('timestamp', 'desc')
-        .onSnapshot(function(snapshot) {
-            snapshot.docChanges().forEach(function(change) {
-                if (change.type === 'added') {
-                    var data = change.doc.data();
-                    state.emails.unshift({
-                        id: Date.now() + Math.random(),
-                        from: data.from,
-                        to: data.to,
-                        subject: data.subject,
-                        preview: data.body.substring(0, 50) + '...',
-                        time: 'Just now',
-                        unread: true,
-                        body: data.body
-                    });
-                    var appTitle = document.getElementById('appTitle').textContent;
-                    if (appTitle === 'Email') {
-                        renderEmailApp(document.getElementById('appBody'));
-                    }
-                    showToast('Barua pepe mpya kutoka ' + data.from);
-                }
-            });
-        });
-}
-
-// ==================== FILES APP ====================
-function renderFilesApp(container) {
-    container.innerHTML = '<div class="file-toolbar">' +
-        '<button class="file-tool" onclick="createFolder()">📁 New Folder</button>' +
-        '<button class="file-tool" onclick="createNote()">📝 New Note</button>' +
-        '<button class="file-tool" onclick="showToast(\'Upload coming soon\')">📤 Upload</button>' +
-        '<button class="file-tool" onclick="showRecycleBin()">🗑️ Recycle</button>' +
-    '</div>' +
-    '<div class="file-categories">' +
-        '<div class="file-category" onclick="filterFiles(\'all\')">' +
-            '<div class="file-category-icon" style="background: #1a73e820; color: #1a73e8">📁</div>' +
-            '<div class="file-category-info"><div class="file-category-name">All Files</div><div class="file-category-count">' + state.files.length + ' items</div></div>' +
-        '</div>' +
-        '<div class="file-category" onclick="filterFiles(\'image\')">' +
-            '<div class="file-category-icon" style="background: #ea433520; color: #ea4335">🖼️</div>' +
-            '<div class="file-category-info"><div class="file-category-name">Images</div><div class="file-category-count">Photos & Videos</div></div>' +
-        '</div>' +
-        '<div class="file-category" onclick="filterFiles(\'document\')">' +
-            '<div class="file-category-icon" style="background: #34a85320; color: #34a853">📄</div>' +
-            '<div class="file-category-info"><div class="file-category-name">Documents</div><div class="file-category-count">PDF, Word, Excel</div></div>' +
-        '</div>' +
-        '<div class="file-category" onclick="filterFiles(\'archive\')">' +
-            '<div class="file-category-icon" style="background: #fbbc0520; color: #fbbc05">📦</div>' +
-            '<div class="file-category-info"><div class="file-category-name">Archives</div><div class="file-category-count">ZIP & Others</div></div>' +
-        '</div>' +
-    '</div>' +
-    '<div class="file-list" id="fileList">' + renderFileList() + '</div>';
-}
-
-function renderFileList(filter) {
-    filter = filter || 'all';
-    var files = state.files;
-    if (filter === 'image') files = files.filter(function(f) { return ['jpg','png','gif','mp4'].indexOf(f.type) > -1; });
-    if (filter === 'document') files = files.filter(function(f) { return ['pdf','word','excel','text'].indexOf(f.type) > -1; });
-    if (filter === 'archive') files = files.filter(function(f) { return f.type === 'zip'; });
-    var html = '';
-    for (var i = 0; i < files.length; i++) {
-        var f = files[i];
-        var icon = '📎';
-        if (f.type === 'folder') icon = '📁';
-        else if (f.type === 'pdf') icon = '📕';
-        else if (f.type === 'excel') icon = '📗';
-        else if (f.type === 'word') icon = '📘';
-        else if (f.type === 'zip') icon = '📦';
-        else if (f.type === 'text') icon = '📄';
-        var meta = f.type === 'folder' ? f.count + ' items' : f.size;
-        html += '<div class="file-item" onclick="openFile(' + f.id + ')">' +
-            '<div class="file-icon" style="background: ' + f.color + '20; color: ' + f.color + '">' + icon + '</div>' +
-            '<div class="file-info"><div class="file-name">' + f.name + '</div><div class="file-meta">' + meta + '</div></div>' +
-            '<div class="file-menu" onclick="event.stopPropagation(); showFileMenu(' + f.id + ')">⋮</div>' +
-        '</div>';
-    }
-    return html;
-}
-function filterFiles(type) { document.getElementById('fileList').innerHTML = renderFileList(type); }
-function openFile(id) { var file = state.files.find(function(f) { return f.id === id; }); showToast('Opening ' + file.name + '...'); }
-function showFileMenu(id) {
-    var file = state.files.find(function(f) { return f.id === id; });
-    showModal('File Options', '<div style="display: flex; flex-direction: column; gap: 12px;">' +
-        '<button class="file-tool" style="width: 100%;" onclick="renameFile(' + id + ')">✏️ Rename</button>' +
-        '<button class="file-tool" style="width: 100%;" onclick="copyFile(' + id + ')">📋 Copy</button>' +
-        '<button class="file-tool" style="width: 100%;" onclick="moveFile(' + id + ')">📤 Move</button>' +
-        '<button class="file-tool" style="width: 100%;" onclick="deleteFile(' + id + ')">🗑️ Delete</button>' +
-    '</div>', []);
-}
-function createFolder() {
-    showModal('New Folder', '<input type="text" class="modal-input" id="folderName" placeholder="Folder name">', [
-        { text: 'Cancel', action: closeModal },
-        { text: 'Create', action: function() {
-            var name = document.getElementById('folderName').value;
-            if (name) { state.files.unshift({ id: Date.now(), name: name, type: 'folder', size: '', count: 0, color: '#1a73e8' }); closeModal(); renderFilesApp(document.getElementById('appBody')); showToast('Folder created'); }
-        }, primary: true }
-    ]);
-}
-function createNote() {
-    showModal('New Note', '<input type="text" class="modal-input" id="noteName" placeholder="Note name" style="margin-bottom: 8px;"><textarea class="modal-input" id="noteContent" placeholder="Write your note here..." style="height: 120px; resize: none;"></textarea>', [
-        { text: 'Cancel', action: closeModal },
-        { text: 'Save', action: function() {
-            var name = document.getElementById('noteName').value || 'Untitled Note';
-            var content = document.getElementById('noteContent').value;
-            if (content) { state.files.unshift({ id: Date.now(), name: name + '.txt', type: 'text', size: content.length + ' B', count: 0, color: '#5f6368' }); closeModal(); renderFilesApp(document.getElementById('appBody')); showToast('Note saved'); }
-        }, primary: true }
-    ]);
-}
-function renameFile(id) {
-    var file = state.files.find(function(f) { return f.id === id; });
-    showModal('Rename', '<input type="text" class="modal-input" id="renameInput" value="' + file.name + '">', [
-        { text: 'Cancel', action: closeModal },
-        { text: 'Rename', action: function() { file.name = document.getElementById('renameInput').value; closeModal(); renderFilesApp(document.getElementById('appBody')); }, primary: true }
-    ]);
-}
-function copyFile(id) { showToast('File copied to clipboard'); closeModal(); }
-function moveFile(id) { showToast('Select destination folder'); closeModal(); }
-function deleteFile(id) {
-    var idx = state.files.findIndex(function(f) { return f.id === id; });
-    if (idx > -1) { state.files.splice(idx, 1); renderFilesApp(document.getElementById('appBody')); showToast('File moved to recycle bin'); }
-    closeModal();
-}
-function showRecycleBin() {
-    showModal('Recycle Bin', '<div style="text-align: center; padding: 40px; color: var(--on-background);"><div style="font-size: 48px; margin-bottom: 16px;">🗑️</div><p>Recycle bin is empty</p><p style="font-size: 12px; margin-top: 8px;">Deleted files will appear here</p></div>', [{ text: 'Close', action: closeModal }]);
-}
-
-// ==================== SETTINGS APP ====================
-function renderSettingsApp(container) {
-    var cloudStatus = firebaseInitialized ? 'On' : 'Off';
-    var themeActive = state.theme === 'dark' ? 'active' : '';
-    container.innerHTML = '<div class="settings-list">' +
-        '<div class="settings-section">' +
-            '<div class="settings-section-title">Network & Internet</div>' +
-            '<div class="settings-item" onclick="showToast(\'Wi-Fi settings\')"><div class="settings-icon">📶</div><div class="settings-info"><div class="settings-label">Wi-Fi</div><div class="settings-desc">Connected to HomeNetwork</div></div><div class="settings-toggle active"></div></div>' +
-            '<div class="settings-item" onclick="showToast(\'Bluetooth settings\')"><div class="settings-icon">🔷</div><div class="settings-info"><div class="settings-label">Bluetooth</div><div class="settings-desc">Off</div></div><div class="settings-toggle"></div></div>' +
-            '<div class="settings-item" onclick="showToast(\'Mobile data settings\')"><div class="settings-icon">📡</div><div class="settings-info"><div class="settings-label">Mobile Data</div><div class="settings-desc">5G - 2.4 GB used</div></div><div class="settings-toggle active"></div></div>' +
-        '</div>' +
-        '<div class="settings-section">' +
-            '<div class="settings-section-title">Personalization</div>' +
-            '<div class="settings-item" onclick="changeWallpaper()"><div class="settings-icon">🖼️</div><div class="settings-info"><div class="settings-label">Wallpaper</div><div class="settings-desc">Change home screen background</div></div><div style="color: var(--on-background);">›</div></div>' +
-            '<div class="settings-item" onclick="toggleThemeSetting()"><div class="settings-icon">🌙</div><div class="settings-info"><div class="settings-label">Dark Mode</div><div class="settings-desc">Use dark theme</div></div><div class="settings-toggle ' + themeActive + '" id="themeToggle"></div></div>' +
-        '</div>' +
-        '<div class="settings-section">' +
-            '<div class="settings-section-title">Security</div>' +
-            '<div class="settings-item" onclick="changePin()"><div class="settings-icon">🔢</div><div class="settings-info"><div class="settings-label">Screen Lock</div><div class="settings-desc">PIN: ****</div></div><div style="color: var(--on-background);">›</div></div>' +
-            '<div class="settings-item" onclick="showToast(\'Fingerprint setup\')"><div class="settings-icon">👆</div><div class="settings-info"><div class="settings-label">Fingerprint</div><div class="settings-desc">Not set up</div></div><div class="settings-toggle"></div></div>' +
-            '<div class="settings-item" onclick="showToast(\'App lock settings\')"><div class="settings-icon">🔐</div><div class="settings-info"><div class="settings-label">App Lock</div><div class="settings-desc">Lock individual apps</div></div><div class="settings-toggle"></div></div>' +
-            '<div class="settings-item" onclick="showToast(\'Hidden vault\')"><div class="settings-icon">🕵️</div><div class="settings-info"><div class="settings-label">Hidden Vault</div><div class="settings-desc">Hide private files</div></div><div class="settings-toggle"></div></div>' +
-        '</div>' +
-        '<div class="settings-section">' +
-            '<div class="settings-section-title">Backup & Storage</div>' +
-            '<div class="settings-item" onclick="showToast(\'Cloud sync settings\')"><div class="settings-icon">☁️</div><div class="settings-info"><div class="settings-label">Cloud Backup</div><div class="settings-desc">Firebase sync: ' + cloudStatus + '</div></div><div class="settings-toggle ' + (firebaseInitialized ? 'active' : '') + '"></div></div>' +
-            '<div class="settings-item" onclick="showToast(\'Auto backup settings\')"><div class="settings-icon">🔄</div><div class="settings-info"><div class="settings-label">Auto Backup</div><div class="settings-desc">Daily at 2:00 AM</div></div><div class="settings-toggle"></div></div>' +
-            '<div class="settings-item" onclick="showStorageInfo()"><div class="settings-icon">💾</div><div class="settings-info"><div class="settings-label">Storage</div><div class="settings-desc">64 GB used of 128 GB</div></div><div style="color: var(--on-background);">›</div></div>' +
-        '</div>' +
-        '<div class="settings-section">' +
-            '<div class="settings-section-title">System</div>' +
-            '<div class="settings-item" onclick="showToast(\'Language settings\')"><div class="settings-icon">🌐</div><div class="settings-info"><div class="settings-label">Language</div><div class="settings-desc">English (US)</div></div><div style="color: var(--on-background);">›</div></div>' +
-            '<div class="settings-item" onclick="showAboutPhone()"><div class="settings-icon">📱</div><div class="settings-info"><div class="settings-label">About Phone</div><div class="settings-desc">Android 16 - Build 2026.06</div></div><div style="color: var(--on-background);">›</div></div>' +
-        '</div>' +
-    '</div>';
-}
-
-function toggleThemeSetting() {
-    toggleTheme();
-    document.getElementById('themeToggle').classList.toggle('active', state.theme === 'dark');
-}
-
-function changeWallpaper() {
-    var wallpapers = [
-        'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-        'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)'
-    ];
-    var html = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">';
-    for (var i = 0; i < wallpapers.length; i++) {
-        html += '<div style="height: 80px; border-radius: 12px; background: ' + wallpapers[i] + '; cursor: pointer;" onclick="setWallpaper(\'' + wallpapers[i] + '\')"></div>';
-    }
-    html += '</div>';
-    showModal('Choose Wallpaper', html, [{ text: 'Cancel', action: closeModal }]);
-}
-
-function setWallpaper(wallpaper) {
-    document.getElementById('wallpaper').style.background = wallpaper;
-    closeModal();
-    showToast('Wallpaper changed');
-}
-
-function changePin() {
-    showModal('Change PIN', '<input type="password" class="modal-input" id="oldPin" placeholder="Current PIN" maxlength="4"><input type="password" class="modal-input" id="newPin" placeholder="New PIN" maxlength="4" style="margin-top: 8px;"><input type="password" class="modal-input" id="confirmPin" placeholder="Confirm PIN" maxlength="4" style="margin-top: 8px;">', [
-        { text: 'Cancel', action: closeModal },
-        { text: 'Change', action: function() {
-            var oldPin = document.getElementById('oldPin').value;
-            var newPin = document.getElementById('newPin').value;
-            var confirmPin = document.getElementById('confirmPin').value;
-            if (oldPin !== state.pin) { showToast('Wrong current PIN'); return; }
-            if (newPin.length !== 4) { showToast('PIN must be 4 digits'); return; }
-            if (newPin !== confirmPin) { showToast('PINs do not match'); return; }
-            state.pin = newPin;
-            closeModal();
-            showToast('PIN changed successfully');
-        }, primary: true }
-    ]);
-}
-
-function showStorageInfo() {
-    showModal('Storage', '<div style="padding: 16px 0;"><div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>Used</span><span>64 GB</span></div><div style="height: 8px; background: var(--background); border-radius: 4px; overflow: hidden;"><div style="width: 50%; height: 100%; background: var(--primary); border-radius: 4px;"></div></div><div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--on-background);"><span>Free: 64 GB</span><span>Total: 128 GB</span></div><div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;"><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📱 System</span><span>12 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📁 Apps</span><span>28 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>🖼️ Media</span><span>18 GB</span></div><div style="display: flex; justify-content: space-between; padding: 8px; background: var(--background); border-radius: 8px;"><span>📄 Files</span><span>6 GB</span></div></div></div>', [{ text: 'Close', action: closeModal }]);
-}
-
-function showAboutPhone() {
-    showModal('About Phone', '<div style="text-align: center; padding: 16px;"><div style="font-size: 64px; margin-bottom: 16px;">📱</div><h2 style="margin-bottom: 8px; color: var(--on-surface);">Android 16</h2><p style="color: var(--on-background); margin-bottom: 24px;">Build 2026.06.21</p><div style="display: flex; flex-direction: column; gap: 12px; text-align: left;"><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Device Name</span><span style="color: var(--on-surface);">Pixel 9 Pro</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Android Version</span><span style="color: var(--on-surface);">16</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Security Patch</span><span style="color: var(--on-surface);">June 2026</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Kernel Version</span><span style="color: var(--on-surface);">6.2.0</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>RAM</span><span style="color: var(--on-surface);">12 GB</span></div><div style="display: flex; justify-content: space-between; padding: 12px; background: var(--background); border-radius: 8px;"><span>Storage</span><span style="color: var(--on-surface);">128 GB</span></div></div></div>', [{ text: 'Close', action: closeModal }]);
-}
-
-// ==================== MODAL & TOAST ====================
-function showModal(title, body, actions) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalBody').innerHTML = body;
-    var actionsContainer = document.getElementById('modalActions');
-    if (actions && actions.length > 0) {
-        var html = '';
-        for (var i = 0; i < actions.length; i++) {
-            var a = actions[i];
-            html += '<button class="modal-btn ' + (a.primary ? 'primary' : '') + '" onclick="modalAction' + i + '()">' + a.text + '</button>';
-        }
-        actionsContainer.innerHTML = html;
-        // Store actions for execution
-        for (var i = 0; i < actions.length; i++) {
-            window['modalAction' + i] = actions[i].action;
-        }
-    } else {
-        actionsContainer.innerHTML = '<button class="modal-btn" onclick="closeModal()">OK</button>';
-    }
-    document.getElementById('modalOverlay').classList.add('open');
-}
-
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-
-function showToast(message) {
-    var toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 2500);
-}
-
-// ==================== LOCAL STORAGE ====================
-function saveData() {
-    var data = { contacts: state.contacts, messages: state.messages, calls: state.calls, files: state.files, settings: state.settings, theme: state.theme, emails: state.emails };
-    localStorage.setItem('androidLauncherData', JSON.stringify(data));
-    showToast('Data saved locally');
-}
-
-function loadData() {
-    var saved = localStorage.getItem('androidLauncherData');
-    if (saved) {
-        try {
-            var data = JSON.parse(saved);
-            state.contacts = data.contacts || state.contacts;
-            state.messages = data.messages || state.messages;
-            state.calls = data.calls || state.calls;
-            state.files = data.files || state.files;
-            state.settings = data.settings || state.settings;
-            state.emails = data.emails || state.emails;
-            if (data.theme) { state.theme = data.theme; document.documentElement.setAttribute('data-theme', state.theme); }
-        } catch(e) { console.log('Error loading data'); }
-    }
-}
-
-// ==================== INIT APP ====================
-document.addEventListener('DOMContentLoaded', function() {
-    loadData();
-    init();
-    setInterval(saveData, 30000);
-    document.addEventListener('visibilitychange', function() { if (document.hidden) saveData(); });
-});
-
-document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+/* ===== ANZA ===== */
+const mn=$('#mn');NAV.forEach(n=>mn.append(h('button',{c:'item',type:'button','data-v':n[0],t:n[1],onclick:()=>go(n[0])})));
+$('#mb').onclick=()=>$('#menu').classList.add('on');
+$('#menu').onclick=e=>{if(e.target.id==='menu')$('#menu').classList.remove('on')};
+$('#nw').onclick=()=>{msgs=[];jw('fw_msgs',[]);go('chat')};
+$('#fm').onsubmit=e=>{e.preventDefault();send($('#q').value)};
+const net=()=>{$('#off').style.display=navigator.onLine?'none':'block'};
+addEventListener('online',net);addEventListener('offline',net);net();
+go('chat');
+})();
 </script>
 </body>
 </html>
