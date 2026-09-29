@@ -1,692 +1,237 @@
 <!DOCTYPE html>
-<html lang="sw">
-<head>
-<meta charset="utf-8">
+<html lang="sw"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Report Search</title>
+<title>Fire Rescue Command &amp; Training</title>
 <style>
-:root{--bg:#fff;--fg:#202124;--mut:#5f6368;--ln:#dfe1e5;--sf:#f1f3f4;--lk:#1a0dab;--gr:#188038;--grbg:#e6f4ea;--cd:#fff;--wn:#b06000;--wnbg:#fef7e0;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--bg:#202124;--fg:#e8eaed;--mut:#9aa0a6;--ln:#3c4043;--sf:#303134;--lk:#8ab4f8;--gr:#81c995;--grbg:#1e3a2b;--cd:#28292c;--wn:#fdd663;--wnbg:#3b3320;color-scheme:dark}}
+:root{--bg:#0f1113;--cd:#1a1d21;--ln:#2b3036;--fg:#f2f2f2;--mu:#9aa1a9;--rd:#e5322d;--gn:#2fbf71;--am:#f0a020;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Arial,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-header{display:flex;justify-content:flex-end;gap:14px;padding:12px 16px;font-size:14px}
-header a,.lnk{color:var(--fg);text-decoration:none;cursor:pointer}
-header a:hover,.lnk:hover{text-decoration:underline}
-#off{display:none;background:var(--grbg);color:var(--gr);text-align:center;font-size:13px;padding:6px 10px}
-#off::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gr);margin-right:8px;vertical-align:1px}
-.w{max-width:720px;margin:0 auto;padding:0 16px 40px}
-.logo{font-weight:700;letter-spacing:-1px;text-decoration:none;white-space:nowrap}
-.hm{text-align:center;padding-top:9vh}
-.hm .logo{font-size:clamp(40px,12vw,64px);display:block;margin-bottom:24px}
-.sb{position:relative;display:flex;align-items:center;border:1px solid var(--ln);border-radius:26px;height:48px;padding:0 14px;background:var(--bg);flex:1}
-.sb:hover,.sb:focus-within{box-shadow:0 1px 6px rgba(32,33,36,.28);border-color:transparent}
-.sb input{flex:1;border:0;outline:0;background:none;color:var(--fg);font:inherit;padding:0 10px;height:100%;min-width:0}
-.ico{display:flex;color:var(--mut)}
-.go{flex:none;border:0;background:var(--lk);color:var(--bg);border-radius:20px;padding:0 16px;height:36px;font:600 14px Arial,sans-serif;cursor:pointer}
-.go:active{opacity:.8}
-.dd{position:absolute;left:0;right:0;top:46px;background:var(--bg);border:1px solid var(--ln);border-top:0;border-radius:0 0 22px 22px;z-index:5;overflow:hidden;box-shadow:0 4px 6px rgba(32,33,36,.2)}
-.dd:empty{display:none}
-.sg{display:block;width:100%;text-align:left;background:none;border:0;color:var(--fg);font:inherit;padding:9px 18px;cursor:pointer}
-.sg:hover{background:var(--sf)}
-.bt{background:var(--sf);border:1px solid var(--sf);color:var(--fg);border-radius:6px;padding:9px 16px;font:14px Arial,sans-serif;cursor:pointer;margin:22px 5px 0}
-.bt:hover{border-color:var(--ln);box-shadow:0 1px 1px rgba(0,0,0,.15)}
-.chips{margin-top:26px}
-.chip{display:inline-block;border:1px solid var(--ln);border-radius:16px;padding:4px 12px;margin:4px;font-size:14px;color:var(--fg);text-decoration:none}
-.chip:hover{background:var(--sf)}
-.top{display:flex;align-items:center;gap:14px;padding:6px 0 14px;border-bottom:1px solid var(--ln);margin-bottom:10px}
-.top .logo{font-size:24px}
-.meta{color:var(--mut);font-size:14px;margin:8px 0}
-
-/* matokeo */
-.r{display:flex;gap:14px;margin:0 0 22px}
-.rb{flex:1;min-width:0}
-.u{font-size:13px;color:var(--gr)}
-.u .pl{margin:0 0 0 8px}
-.t{display:block;color:var(--lk);font-size:20px;line-height:1.3;text-decoration:none;margin:2px 0 3px}
-.t:hover{text-decoration:underline}
-.sn{margin:0;font-size:14px;color:var(--mut);line-height:1.55}
-.sv{background:none;border:1px solid var(--ln);color:var(--lk);border-radius:14px;padding:4px 12px;font:12px Arial,sans-serif;cursor:pointer;margin-top:8px}
-.sv:disabled{opacity:.6}
-.more{width:100%;border:1px solid var(--ln);background:none;color:var(--lk);border-radius:20px;padding:11px;font:inherit;cursor:pointer}
-
-/* picha ndogo (thumbnail) */
-.th{flex:none;width:88px;height:88px;border-radius:12px;overflow:hidden;background:var(--sf);display:flex;align-items:center;justify-content:center;color:#fff;font:700 30px Arial,sans-serif}
-.th img{width:100%;height:100%;object-fit:cover;display:block}
-.r .th{width:92px;height:92px}
-
-/* vidonge vidogo */
-.pls{display:flex;flex-wrap:wrap;margin:2px 0 0}
-.pl{display:inline-block;font-size:12px;line-height:1;padding:5px 9px;border-radius:10px;background:var(--sf);color:var(--mut);margin:0 6px 6px 0}
-.pl.ok{background:var(--grbg);color:var(--gr);font-weight:700}
-
-/* kadi za Hifadhi */
-.card{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--cd);border:1px solid var(--ln);border-radius:16px;padding:12px;margin:0 0 12px}
-.card:hover{background:var(--sf)}
-.card .cb{flex:1;min-width:0;padding-right:26px}
-.card .ct{display:block;color:var(--lk);font-size:17px;font-weight:700;line-height:1.3;text-decoration:none;margin:0 0 3px;overflow-wrap:anywhere}
-.card .ct::after{content:'';position:absolute;inset:0;border-radius:16px}
-.card .sn{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
-.card mark{background:rgba(251,188,5,.4);color:inherit;border-radius:3px;padding:0 1px}
-.card .x{position:absolute;top:6px;right:6px;z-index:2}
-.okc{display:flex;gap:14px;align-items:center;background:var(--grbg);border-radius:16px;padding:14px 16px;margin:8px 0 14px}
-.okc b{color:var(--gr);font-size:16px}
-.okc .meta{margin:2px 0 0}
-.dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--gr);box-shadow:0 0 0 5px rgba(24,128,56,.2)}
-.warn{background:var(--wnbg);color:var(--wn);border-radius:12px;padding:10px 14px;font-size:13px;margin:0 0 12px}
-.stk{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:4;padding:6px 0 2px}
-.empty{text-align:center;padding:36px 12px}
-.empty p{margin:0 0 10px}
-.foot{text-align:center;margin-top:24px}
-.sec{text-align:left;margin-top:34px}
-.sh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.sh h2{font-size:18px;margin:0}
-
-/* makala */
-.art h1{font-size:28px;line-height:1.25;margin:10px 0}
-.art h2{font-size:21px;margin:24px 0 6px;border-bottom:1px solid var(--ln);padding-bottom:4px}
-.art h3{font-size:17px;margin:18px 0 4px}
-.art p{margin:0 0 12px}
-.art img{max-width:100%;max-height:300px;border-radius:12px;display:block;margin:8px 0 14px;cursor:zoom-in}
-.art img.big{max-height:none;cursor:zoom-out}
-.art figure{margin:14px 0}
-.art figure img{margin:0}
-.art figcaption{font-size:13px;color:var(--mut);margin-top:4px}
-.art .card img{margin:0;max-height:none;border-radius:0;cursor:inherit}
-.wl{color:var(--lk);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
-.pt{font-size:26px;margin:6px 0}
-.row{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--ln);padding:10px 0}
-.row a{flex:1;color:var(--lk);text-decoration:none;min-width:0}
-.row small{color:var(--mut);display:block}
-.x{background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:8px}
-.x:hover{background:var(--sf)}
-.x.arm{color:#d93025;font-size:13px;font-weight:700}
-.tabs{display:flex;gap:6px;margin:12px 0}
-.tab{border:1px solid var(--ln);background:none;color:var(--fg);border-radius:18px;padding:6px 14px;font:14px Arial,sans-serif;cursor:pointer}
-.tab.on{background:var(--fg);color:var(--bg)}
-.tab.arm{border-color:#d93025;color:#d93025}
-.in{width:100%;border:1px solid var(--ln);border-radius:22px;padding:11px 16px;background:var(--bg);color:var(--fg);font:inherit}
-:focus-visible{outline:2px solid var(--lk);outline-offset:2px}
-/* picha */
-.vt{display:flex;gap:4px;margin:0 0 6px}
-.vt a{padding:8px 16px;font-size:14px;color:var(--mut);text-decoration:none;border-bottom:3px solid transparent}
-.vt a.on{color:var(--lk);border-color:var(--lk);font-weight:700}
-.sd{display:flex;gap:8px;margin:10px 0}
-.sd .tab{flex:1;text-align:center;padding:8px 10px}
-.gr{columns:2;column-gap:8px}
-@media(min-width:560px){.gr{columns:3}}
-.gi{position:relative;display:block;width:100%;break-inside:avoid;margin:0 0 8px;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--sf);cursor:zoom-in}
-.gi img{width:100%;height:100%;object-fit:cover;display:block}
-.gi .ck{position:absolute;left:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:var(--gr);color:#fff;font:700 13px/22px Arial,sans-serif;text-align:center}
-.vw{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.95);color:#fff;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.vw .bar{display:flex;justify-content:flex-end;padding:8px 10px}
-.vw .stg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
-.vw .stg img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
-.vw .nv{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:22px;cursor:pointer}
-.vw .nv.l{left:8px}.vw .nv.r{right:8px}
-.vw .inf{padding:10px 16px 4px}
-.vw .vtt{font-size:15px;margin:0 0 6px;overflow-wrap:anywhere}
-.vw .pl{background:rgba(255,255,255,.14);color:#fff}
-.vw .pl.ok{background:#1e6b3a;color:#fff}
-.vw .act{display:flex;gap:8px;padding:6px 16px 14px}
-.vb{border:0;border-radius:20px;padding:11px 20px;font:700 14px Arial,sans-serif;cursor:pointer;background:#fff;color:#202124}
-.vb.g{background:rgba(255,255,255,.16);color:#fff}
-.vb.arm{background:#d93025;color:#fff}
-.vw .x{color:#fff;font-size:22px}
-.toast{display:none;position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#323232;color:#fff;padding:10px 18px;border-radius:22px;font-size:14px;z-index:60;max-width:90%;text-align:center}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-
-/* ukurasa wa mwanzo */
-.hero{margin:0 -16px 8px;padding:34px 20px 26px;text-align:center;color:#fff;background:radial-gradient(120% 90% at 50% 0,#ff8a00 0,#e5321b 48%,#7a0f1c 100%);border-radius:0 0 28px 28px}
-.hero .logo{font-size:clamp(38px,11vw,58px);display:block;margin-bottom:6px}
-.hero .logo span{color:#fff!important}
-.hero .tag{margin:0 auto 20px;max-width:440px;font-size:15px;opacity:.95}
-.hero .sb{border:0;box-shadow:0 6px 22px rgba(0,0,0,.35)}
-.hero .bt{background:rgba(255,255,255,.18);border-color:transparent;color:#fff;margin:16px 4px 0}
-.hero .bt:hover{background:rgba(255,255,255,.3)}
-.grp{margin:18px 0 0}.grp h3{font-size:16px;margin:0 0 6px}
-.grp .chip{border-color:#e5321b55}
-.hs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
-.hs .gi{flex:none;width:150px;margin:0;scroll-snap-align:start}
-.hs::-webkit-scrollbar{height:0}
-.fg{display:grid;gap:0}
-@media(min-width:620px){.fg{grid-template-columns:1fr 1fr;column-gap:12px}}
-</style>
-</head>
-<body>
-<div id="off">Uko offline. Makala ulizohifadhi bado zinapatikana, endelea kusoma.</div>
-<header><a href="index.html" id="hr">&larr; Ripoti</a><a href="#" id="hl" style="margin-right:auto">Nyumbani</a><a href="#hifadhi" id="hs">Hifadhi</a></header>
-<div class="w" id="app" aria-live="polite"></div>
-<noscript>Washa JavaScript ili kutumia app hii.</noscript>
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+h1,h2,h3{margin:0 0 8px}a{color:var(--rd)}
+header{position:sticky;top:0;z-index:5;background:#0f1113ee;border-bottom:1px solid var(--ln);padding:calc(8px + env(safe-area-inset-top)) 14px 8px;display:flex;gap:10px;align-items:center}
+header b{font-size:18px}header small{display:block;color:var(--mu);font-size:11px}
+#gs{flex:1;min-width:0;background:var(--cd);border:1px solid var(--ln);border-radius:22px;color:var(--fg);padding:10px 14px;font:inherit}
+.st{font-size:12px;padding:4px 10px;border-radius:12px;background:var(--cd);white-space:nowrap}
+nav{position:fixed;bottom:0;left:0;right:0;background:#15181b;border-top:1px solid var(--ln);display:flex;overflow-x:auto;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:none;min-width:74px;min-height:56px;background:none;border:0;color:var(--mu);font:11px system-ui;cursor:pointer}
+nav button span{display:block;font-size:20px}nav button.on{color:var(--rd)}
+main{max-width:1000px;margin:0 auto;padding:16px}
+@media(min-width:900px){nav{top:0;bottom:auto;right:auto;width:190px;flex-direction:column;border-top:0;border-right:1px solid var(--ln);padding-top:70px}nav button{text-align:left;padding:0 18px;min-height:46px;font-size:14px}nav button span{display:inline;margin-right:8px}body{padding:0 0 0 190px}}
+.g{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.c{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px}
+.lc{padding:0;overflow:hidden;display:flex;flex-direction:column}.lc .b{padding:12px;flex:1}
+.im{height:150px;background:linear-gradient(135deg,#3a1111,#1a1d21);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
+.im.sk{animation:p 1.2s infinite alternate}@keyframes p{to{opacity:.6}}
+.im img{width:100%;height:100%;object-fit:cover}.im small{position:absolute;left:6px;bottom:4px;background:#000a;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px}
+.im small a{color:#fff}
+.tg{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--ln);color:var(--mu);margin:0 4px 4px 0}.tg.ok{background:#12351f;color:var(--gn)}
+.bt{background:var(--rd);color:#fff;border:0;border-radius:10px;padding:10px 16px;min-height:44px;font:600 14px system-ui;cursor:pointer}
+.bt.s{background:var(--ln)}.bt.d{background:#5b1a18}.bt:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,nav button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.pb{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:4px 0 12px}.pb i{display:block;height:100%;background:var(--rd)}
+.wn{background:#2a1d08;border:1px solid var(--am);color:#ffd28a;border-radius:10px;padding:10px 12px;font-size:13px;margin:12px 0}
+input,select,textarea{width:100%;background:#111417;border:1px solid var(--ln);border-radius:10px;color:var(--fg);padding:10px;font:inherit;min-height:44px}
+label{font-size:13px;color:var(--mu);display:block;margin-bottom:10px}
+.fm{display:grid;gap:0 12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.fm .w{grid-column:1/-1}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.op{display:block;width:100%;text-align:left;margin:6px 0;background:#111417;border:1px solid var(--ln);color:var(--fg);border-radius:10px;padding:12px;font:inherit;cursor:pointer}.op.y{border-color:var(--gn)}.op.n{border-color:var(--rd)}
+#tt{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#333;padding:10px 18px;border-radius:20px;z-index:20;display:none;max-width:90%}
+#pv{position:fixed;inset:0;background:#000c;z-index:15;overflow:auto;padding:16px;display:none}#pv .c{max-width:720px;margin:0 auto;background:#fff;color:#000}
+@media print{body>*:not(#pv){display:none!important}#pv{position:static;background:none;padding:0;display:block!important}#pv .no{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header><div><b>🔥 FIRE RESCUE</b><small>Firefighter Training &amp; Incident Management</small></div><input id="gs" type="search" placeholder="Search lessons, UN, reports..." aria-label="Global search"><span class="st" id="on" role="status"></span></header>
+<nav id="nv" aria-label="Main"></nav><main id="app"></main><div id="tt" role="status"></div><div id="pv"></div>
 <script>
 (()=>{'use strict';
-/* Chanzo cha maudhui kinajengwa kwa vipande ili jina lisionekane kwa mtumiaji */
-const B={sw:'https://sw.wiki'+'pedia.org',en:'https://en.wiki'+'pedia.org',co:'https://commons.wiki'+'media.org',ov:'https://api.open'+'verse.org'};
-const $=s=>document.querySelector(s),app=$('#app'),enc=encodeURIComponent;
-const h=(t,a={},k=[])=>{const e=document.createElement(t);for(const n in a){const v=a[n];if(n==='c')e.className=v;else if(n==='t')e.textContent=v;else if(n.startsWith('on'))e[n]=v;else e.setAttribute(n,v)}[].concat(k).forEach(c=>c&&e.append(c));return e};
-const sl=ms=>new Promise(r=>setTimeout(r,ms));
-const okImg=u=>/^https:\/\/upload\.wikimedia\.org\//.test(u||'')?u:'';
-const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-const SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
-const PAL=['#4285f4','#ea4335','#f29900','#188038','#a142f4','#12b5cb'];
-
-/* ===== HIFADHI (IndexedDB, na mbadala kama haifanyi kazi) ===== */
-let sm='idb',dbp=null;
-const mem={art:new Map(),q:new Map(),img:new Map()};
-const lsK=(st,id)=>'is:'+st+':'+id;
-const lsGet=(st,id)=>{try{const v=localStorage.getItem(lsK(st,id));return v?JSON.parse(v):null}catch(e){return null}};
-const lsAll=st=>{const o=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('is:'+st+':')){try{o.push(JSON.parse(localStorage.getItem(k)))}catch(e){}}}}catch(e){}return o};
-const slim=v=>Object.assign({},v,{data:'',blob:null,pics:(v.pics||[]).map(p=>({src:p.src,cap:p.cap}))});
-const lsPut=(st,v)=>{try{localStorage.setItem(lsK(st,v.id),JSON.stringify(v))}catch(e){try{localStorage.setItem(lsK(st,v.id),JSON.stringify(slim(v)))}catch(e2){}}};
-const idbOpen=()=>new Promise((res,rej)=>{
-  let done=false;const fin=(f,v)=>{if(!done){done=true;f(v)}};
-  try{const r=indexedDB.open('incident_search',2);
-    r.onupgradeneeded=()=>{const d=r.result;['art','q','img'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};
-    r.onsuccess=()=>fin(res,r.result);r.onerror=()=>fin(rej,r.error);r.onblocked=()=>fin(rej,new Error('blocked'))}
-  catch(e){fin(rej,e)}
-  setTimeout(()=>fin(rej,new Error('timeout')),4000)});
-const db=()=>dbp||(dbp=idbOpen().catch(()=>{try{localStorage.setItem('is:test','1');localStorage.removeItem('is:test');sm='ls'}catch(e){sm='mem'}return null}));
-const put=async(st,v)=>{const d=await db();
-  if(d)return new Promise(res=>{try{const t=d.transaction(st,'readwrite');t.objectStore(st).put(v);t.oncomplete=()=>res(true);t.onerror=t.onabort=()=>res(false)}catch(e){res(false)}});
-  mem[st].set(v.id,v);if(sm==='ls')lsPut(st,v);return true};
-const get=async(st,id)=>{const d=await db();
-  if(d)return new Promise(res=>{try{const r=d.transaction(st,'readonly').objectStore(st).get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)}catch(e){res(null)}});
-  return mem[st].get(id)||(sm==='ls'?lsGet(st,id):null)};
-const all=async st=>{const d=await db();
-  if(d)return new Promise(res=>{try{const r=d.transaction(st,'readonly').objectStore(st).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>res([])}catch(e){res([])}});
-  const m=new Map();if(sm==='ls')lsAll(st).forEach(x=>m.set(x.id,x));mem[st].forEach((v,k)=>m.set(k,v));return[...m.values()]};
-const del=async(st,id)=>{const d=await db();mem[st].delete(id);try{if(sm==='ls')localStorage.removeItem(lsK(st,id))}catch(e){}
-  if(d)return new Promise(res=>{try{const t=d.transaction(st,'readwrite');t.objectStore(st).delete(id);t.oncomplete=()=>res(true);t.onerror=t.onabort=()=>res(false)}catch(e){res(false)}})};
-const saved=new Map();
-const imgSaved=new Set();
-const ready=Promise.all([all('art').then(a=>a.forEach(x=>saved.set(x.id,{lang:x.lang,title:x.title}))),all('img').then(a=>a.forEach(x=>imgSaved.add(x.id)))]).catch(()=>{});
-try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-const aid=(l,t)=>l+':'+t.toLowerCase();
-
-/* ===== PICHA ===== */
-const isrc=x=>!x?'':x.data||(x.blob?URL.createObjectURL(x.blob):'');
-const toData=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.onerror=()=>r('');f.readAsDataURL(b)});
-
-/* ===== MTANDAO ===== */
-async function jget(u,n=0){
-  if(!navigator.onLine)throw{off:1};
-  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),8000);
-  try{const r=await fetch(u,{signal:ac.signal});clearTimeout(to);
-    if(r.status===429||r.status>=500){if(n<2){await sl(1200*(n+1));return jget(u,n+1)}throw{}}
-    if(!r.ok)throw{};return await r.json()}
-  catch(e){clearTimeout(to);if(n<1&&!(e&&e.off)){await sl(700);return jget(u,n+1)}throw e}
+/* ===== CONFIG: keys are entered in Settings. For production, proxy Unsplash requests through a backend/serverless function. ===== */
+const CONFIG={UNSPLASH_ACCESS_KEY:"",PIXABAY_KEY:"",SYNC_URL:""};
+const AppState={currentPage:'dashboard',currentLesson:null,user:{},online:navigator.onLine};
+const NOTE='Training reference only. Follow your department SOP/SOG and qualified instructor guidance.';
+const SAFE='⚠️ SAFETY NOTICE: This app is an educational reference. Operational firefighting, rescue, SCBA, HazMat and extrication activities require appropriate training, supervision, PPE and applicable department SOP/SOG.';
+const NAV=[['dashboard','🏠','Dashboard'],['ff','🔥','Firefighting'],['ppe','🦺','PPE & SCBA'],['hz','☣️','HazMat'],['rs','🛟','Rescue'],['incident','🚨','Incident'],['training','🎓','Training'],['equipment','🔧','Equipment'],['settings','⚙️','Settings']];
+const MOD={ff:['🔥','Firefighting'],ppe:['🦺','PPE & SCBA'],hz:['☣️','HazMat'],rs:['🛟','Rescue']};
+/* m|title|description|imageQuery|difficulty|minutes|objectives;|equipment|safety */
+const RAW=`ff|Hose Operations|Deploying, handling and inspecting hose lines|firefighter hose|Basic|30|Identify hose types;Understand deployment;Know hose inspection|Hose,Nozzle,Couplings,PPE|Watch trip hazards and keep communication clear
+ff|Hose Streams|Stream patterns and their uses|fire hose water stream|Basic|25|Compare stream patterns;Relate flow to reach;Recognise water supply limits|Nozzle,Hose|Monitor pressure and avoid steam burns
+ff|Pump Operations|Apparatus pump basics|fire truck pump firefighter|Intermediate|40|Know pump panel parts;Understand pressure and flow;Understand water sources|Pump,Gauges,Valves|Follow SOP on pressure and operator duties
+ff|Ladder Operations|Ground ladder types and handling|firefighter ladder|Basic|35|Name ladder parts;Understand carries and raises;Know ladder angles|Ground ladders,PPE|Check overhead hazards and footing
+ff|Ventilation|Why fire scenes are ventilated|firefighter ventilation|Intermediate|35|Explain ventilation goals;Compare horizontal and vertical;Recognise fire behaviour effects|Fans,Tools|Coordinate ventilation with the attack team
+ff|Forcible Entry|Concepts of gaining access|firefighter forcible entry|Intermediate|30|Assess doors and locks;Know tool categories;Prefer least-damage entry|Halligan,Axe|Practical skills need supervised training
+ff|Search & Rescue|Search patterns and team safety|firefighter search rescue|Advanced|45|Know search priorities;Understand accountability;Recognise victim signs|TIC,Rope,Radio|Never search alone; keep accountability
+ff|Fire Suppression|Extinguishing principles|firefighter fire suppression|Intermediate|40|Apply cooling and smothering;Match agent to fire class;Understand extinguishing goals|Hose,Extinguishers|Size up before attack
+ff|Overhaul|Checking for hidden fire|firefighter overhaul|Basic|25|Find hidden fire;Understand thermal imaging;Preserve evidence|TIC,Hooks|Watch structural damage and air quality
+ff|Salvage / Property Conservation|Protecting property during operations|firefighter property conservation|Basic|20|Explain salvage aims;Know covers and water control;Limit loss|Salvage covers|Never enter unsafe structures for property
+ff|Foam Firefighting|Foam types and application concepts|firefighter foam firefighting|Advanced|35|Know foam types;Understand proportioning;Match foam to fuel|Foam eductor,Nozzle|Follow manufacturer and SOP guidance
+ff|Vehicle Extrication|Scene and patient concepts|firefighter vehicle extrication|Advanced|40|Do scene size-up;Understand stabilisation concepts;Coordinate team and patient care|Hydraulic tools,Stabilisers|Requires hands-on training; no cutting guidance here
+ppe|PPE Identification|Recognise each PPE item|firefighter PPE|Basic|20|Name PPE items;State each purpose;Know the ensemble|PPE ensemble|Wear complete PPE
+ppe|PPE Inspection Checklist|Routine inspection points|firefighter gear inspection|Basic|20|Inspect for damage;Record findings;Remove defective gear|Checklist|Tag out defective gear
+ppe|SCBA Basics|Parts and purpose of SCBA|firefighter SCBA|Intermediate|35|Name SCBA components;Understand supply and regulator;Know donning principles|SCBA|Only trained users wear SCBA
+ppe|Cylinder Information|Cylinder ratings and care|SCBA cylinder|Intermediate|20|Read cylinder markings;Know pressure ratings;Know test dates|Cylinder|Never exceed rated pressure
+ppe|Air-Supply Calculations|Estimating air duration|firefighter breathing apparatus|Intermediate|25|Know the duration formula;Understand consumption variance;Plan exit margin|Calculator|Estimates only; follow manufacturer
+ppe|PASS Alarm Information|Motion alarm devices|firefighter PASS device|Basic|15|Explain PASS purpose;Know activation;Test before use|PASS device|Test before every entry
+ppe|Decontamination|Gross decon concepts|firefighter decontamination|Intermediate|30|Explain decon aims;Know gross decon;Handle contaminated gear|Wash station|Treat contaminated gear as hazardous
+ppe|PPE Maintenance|Cleaning and storage|firefighter turnout gear cleaning|Basic|20|Know cleaning basics;Store correctly;Know repair rules|Cleaning kit|Follow manufacturer care labels
+ppe|Equipment Inspection Records|Why records matter|firefighter equipment inspection|Basic|15|Keep accurate records;Track due dates;Support audits|Logbook|Record defects immediately
+hz|Hazardous Materials Identification|Recognise hazmat clues|hazmat firefighter|Intermediate|30|Use placards;Use container clues;Observe from a safe distance|Binoculars,Guidebook|Stay upwind and at distance
+hz|UN Numbers|What a UN number tells you|hazmat placard|Basic|20|Read UN numbers;Link number to name;Use reference guide|Guidebook|Verify with an official guide
+hz|Hazard Classes|The nine classes|hazmat placards classes|Basic|25|List nine classes;Know main hazards;Read placards|Guidebook|Some materials have multiple hazards
+hz|SDS Reference|Safety data sheet sections|safety data sheet chemical|Basic|25|Know SDS sections;Find fire measures;Find PPE advice|SDS|Use current manufacturer SDS
+hz|Chemical Hazards|Toxic, corrosive, flammable hazards|chemical hazard warning|Intermediate|30|Group hazards;Know exposure routes;Know basic controls|Detectors|Treat unknown as dangerous
+hz|Isolation / Evacuation Reference|Protective distances concept|emergency evacuation hazmat|Intermediate|25|Know isolation zones;Use guide tables;Communicate evacuation|Guidebook|Use official guidebook distances
+hz|PPE Reference|Protective clothing levels|hazmat suit firefighter|Advanced|30|Know protection levels;Match to hazard;Know limits|Suits|Fire gear is not chemical protection
+hz|HazMat Decontamination|Hazmat decon overview|hazmat decontamination|Advanced|30|Explain corridor layout;Control contamination;Manage runoff|Decon corridor|Follow the HazMat team lead
+hz|HazMat Incident Reporting|Recording hazmat scenes|hazmat incident report|Basic|20|Record materials;Record actions;Report exposures|Report form|Record exposures accurately
+rs|Structural Rescue|Rescue in damaged buildings|building rescue firefighter|Advanced|40|Assess structure;Set safe zones;Plan access|Rescue tools|Unstable structures endanger rescuers
+rs|Vehicle Extrication Operations|Scene, safety zones and communication|car crash rescue firefighter|Advanced|40|Do scene size-up;Know safety zones;Document the incident|Hydraulic tools,Stabilisers|Requires hands-on training
+rs|Rope Rescue|Rope system concepts|firefighter rope rescue|Advanced|45|Know rope gear;Understand anchors;Know safety checks|Ropes,Harness|Requires certified instruction
+rs|Water Rescue|Water hazards and rescuer safety|firefighter water rescue|Advanced|40|Know reach-throw-row-go;Wear flotation;Assess currents|PFD,Throw bag|Rescuer safety comes first
+rs|Confined-Space Rescue|Atmospheres and entry permits|confined space rescue firefighter|Advanced|45|Test atmosphere;Know permits;Plan retrieval|Gas monitor,Tripod|Never enter without air monitoring
+rs|Collapse Rescue|Collapse patterns|building collapse rescue|Advanced|45|Know collapse types;Mark search areas;Understand shoring concepts|Shoring,Tools|Secondary collapse risk
+rs|First Aid|Basic emergency care|firefighter first aid|Basic|30|Assess airway, breathing, circulation;Control bleeding;Know when to call EMS|First aid kit|Use gloves and follow protocols
+rs|Search Techniques|Systematic search methods|firefighter search technique|Intermediate|30|Know search patterns;Use tools;Mark cleared areas|Thermal camera,Chalk|Keep team contact`;
+const LESSONS=RAW.split('\n').map((l,i)=>{const[m,title,desc,q,diff,min,ob,eq,safety]=l.split('|');return{id:'L'+i,m,title,desc,q,diff,min:+min,obj:ob.split(';'),eq:eq.split(','),safety}});
+const PPE=[['Helmet','Protects the head from impact, heat and falling debris','Cracks, shell damage, liner, chin strap','Wipe clean; store away from heat'],['Hood','Protects neck and ears from heat and embers','Tears, thin fabric, contamination','Launder per manufacturer'],['Coat','Thermal and physical barrier for the torso','Liner, seams, reflective trim, closures','Clean after exposure; repair by qualified staff'],['Gloves','Hand protection with dexterity','Holes, seams, wrist seal','Dry fully; replace when worn'],['Boots','Protect feet from heat, puncture and water','Soles, toe cap, lining','Clean and air dry'],['SCBA','Supplies breathable air in hazardous atmospheres','Gauges, straps, hoses, cylinder pressure','Follow manufacturer service schedule'],['Facepiece','Seals to the face and delivers air','Lens, straps, seal, exhalation valve','Clean and sanitise after use'],['PASS device','Sounds an alarm if the wearer stops moving','Battery, activation test, alarm sound','Test each shift'],['Protective trousers','Lower body thermal and physical barrier','Knees, seams, suspenders, trim','Clean after exposure'],['Eye protection','Protects eyes from particles and splash','Scratches, cracks, fit','Clean lens; replace when damaged']];
+const HC=[['1','Explosives'],['2','Gases'],['3','Flammable Liquids'],['4','Flammable Solids'],['5','Oxidizers / Organic Peroxides'],['6','Toxic / Infectious'],['7','Radioactive'],['8','Corrosive'],['9','Miscellaneous']];
+/* Local demo dataset; structure can later be replaced with an API/database query. Verify with an official guidebook. */
+const UN=[['1203','Gasoline','3','Highly flammable liquid; vapours can travel to ignition sources'],['1202','Diesel fuel','3','Combustible liquid; spills create slip and fire hazards'],['1090','Acetone','3','Flammable liquid; vapours may cause dizziness'],['1075','Petroleum gases, liquefied (LPG)','2.1','Flammable gas under pressure; cylinder rupture risk'],['1978','Propane','2.1','Flammable gas under pressure'],['1005','Ammonia, anhydrous','2.3','Toxic and corrosive gas'],['1017','Chlorine','2.3','Toxic gas; strong oxidizer'],['1789','Hydrochloric acid','8','Corrosive; fumes irritate lungs and eyes'],['1830','Sulfuric acid','8','Corrosive; reacts with water and organics'],['1950','Aerosols','2.1','Flammable contents under pressure']];
+const CHK=['Helmet','Hood','Coat','Gloves','Boots','SCBA','Facepiece','Cylinder','PASS device'];
+const TYPES=['Structure Fire','Vehicle Fire','Wildland Fire','Rescue','Road Traffic Accident','HazMat','Medical Emergency','False Alarm','Other'];
+const STAT=['Draft','Submitted','Reviewed','Closed'];
+const IF=[['num','Incident Number','text'],['date','Date','date'],['time','Time','time'],['loc','Location','text'],['type','Incident Type','sel',TYPES],['by','Reported By','text'],['station','Station','text'],['crew','Crew','text'],['unit','Vehicle/Unit','text'],['weather','Weather','text'],['occ','Occupancy','text'],['fire','Fire Involved?','yn'],['inj','Injuries?','yn'],['fat','Fatalities?','yn'],['resc','Rescue Required?','yn'],['hz','HazMat Involved?','yn'],['dmg','Property Damage?','yn'],['rescued','Persons Rescued','number'],['equip','Equipment Used','text'],['act','Actions Taken','area'],['obs','Observations','area'],['notes','Additional Notes','area'],['status','Status','sel',STAT]];
+/* ===== helpers ===== */
+const $=(s,r=document)=>r.querySelector(s),enc=encodeURIComponent,app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let tm;const toast=t=>{const e=$('#tt');e.textContent=t;e.style.display='block';clearTimeout(tm);tm=setTimeout(()=>e.style.display='none',3200)};
+const jget=async u=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw 0;return await r.json()}finally{clearTimeout(t)}};
+const dl=(n,t,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3e4)};
+/* ===== IndexedDB: FireRescueDB ===== */
+const STORES=['lessons','progress','checklists','incidents','equipment','bookmarks','settings','syncQueue'];
+let dbp;const openDB=()=>dbp||(dbp=new Promise((res,rej)=>{const r=indexedDB.open('FireRescueDB',1);r.onupgradeneeded=()=>STORES.forEach(s=>{if(!r.result.objectStoreNames.contains(s))r.result.createObjectStore(s,{keyPath:'id'})});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+const tx=async(s,m,f)=>{const d=await openDB();return new Promise((res,rej)=>{const t=d.transaction(s,m),q=f(t.objectStore(s));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})};
+const addItem=(s,v)=>tx(s,'readwrite',o=>o.add(v)),updateItem=(s,v)=>tx(s,'readwrite',o=>o.put(v)),getItem=(s,id)=>tx(s,'readonly',o=>o.get(id)),getAll=s=>tx(s,'readonly',o=>o.getAll()),deleteItem=(s,id)=>tx(s,'readwrite',o=>o.delete(id));
+/* ===== images: Unsplash then Pixabay, cached; fallback icon ===== */
+async function getImage(q){
+  const k='fr:img:'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}
+  let o=null;
+  try{if(CONFIG.UNSPLASH_ACCESS_KEY){const p=(await jget(`https://api.unsplash.com/search/photos?per_page=1&content_filter=high&query=${enc(q)}&client_id=${CONFIG.UNSPLASH_ACCESS_KEY}`)).results[0];
+      if(p)o={url:p.urls.small,thumb:p.urls.thumb,alt:'Stock photo: '+(p.alt_description||q),photographer:p.user.name,photographerUrl:p.user.links.html+'?utm_source=fire_rescue&utm_medium=referral',src:'Unsplash'}}
+    if(!o&&CONFIG.PIXABAY_KEY){const p=(await jget(`https://pixabay.com/api/?key=${CONFIG.PIXABAY_KEY}&image_type=photo&safesearch=true&per_page=3&q=${enc(q)}`)).hits[0];
+      if(p)o={url:p.webformatURL,thumb:p.previewURL,alt:'Stock photo: '+p.tags,photographer:p.user,photographerUrl:p.pageURL,src:'Pixabay'}}}catch(e){}
+  if(o)try{localStorage.setItem(k,JSON.stringify(o))}catch(e){}
+  return o}
+async function blobUrl(u){try{const c=await caches.open('fr-img');let r=await c.match(u);if(!r){r=await fetch(u);if(r.ok)await c.put(u,r.clone())}return r.ok?URL.createObjectURL(await r.blob()):u}catch(e){return u}}
+const io='IntersectionObserver'in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillImg(e.target)}}),{rootMargin:'200px'}):null;
+async function fillImg(box){const o=await getImage(box.dataset.q);box.classList.remove('sk');if(!o)return;
+  const i=new Image();i.alt=o.alt;i.loading='lazy';i.src=await blobUrl(o.url);i.onload=()=>{box.textContent='';box.append(i);const s=document.createElement('small');s.innerHTML=`<a href="${esc(o.photographerUrl)}" target="_blank" rel="noopener">${esc(o.photographer)}</a> / ${o.src}`;box.append(s)}}
+const imgBox=(q,ic)=>`<div class="im sk" data-q="${esc(q)}" role="img" aria-label="Stock photo placeholder: ${esc(q)}">${ic}</div>`;
+const loadImgs=()=>app.querySelectorAll('.im[data-q]').forEach(b=>io?io.observe(b):fillImg(b));
+/* ===== data state ===== */
+let PR={},BM={};
+const loadState=async()=>{(await getAll('progress')).forEach(p=>PR[p.id]=p);(await getAll('bookmarks')).forEach(b=>BM[b.id]=1);
+  const s=await getItem('settings','keys');if(s){CONFIG.UNSPLASH_ACCESS_KEY=s.unsplash||'';CONFIG.PIXABAY_KEY=s.pixabay||''}};
+const modPct=m=>{const l=LESSONS.filter(x=>x.m===m);return Math.round(l.filter(x=>PR[x.id]&&PR[x.id].done).length/l.length*100)};
+/* ===== views ===== */
+const bar=(t,p)=>`<div class="row" style="justify-content:space-between"><span>${t}</span><b>${p}%</b></div><div class="pb"><i style="width:${p}%"></i></div>`;
+const lcard=l=>`<article class="c lc">${imgBox(l.q,MOD[l.m][0])}<div class="b"><span class="tg">${l.diff}</span><span class="tg">${l.min} min</span>${PR[l.id]&&PR[l.id].done?'<span class="tg ok">Completed</span>':'<span class="tg">Not started</span>'}<h3>${esc(l.title)}</h3><p style="color:var(--mu);font-size:14px;margin:0 0 10px">${esc(l.desc)}</p><div class="row"><button class="bt" data-a="open" data-id="${l.id}">Open Lesson</button><button class="bt s" data-a="bm" data-id="${l.id}" aria-label="Bookmark ${esc(l.title)}">${BM[l.id]?'🔖 Saved':'🔖'}</button></div></div></article>`;
+async function dashboard(){
+  const inc=(await getAll('incidents')).sort((a,b)=>b.updated-a.updated).slice(0,3),next=LESSONS.find(l=>!(PR[l.id]&&PR[l.id].done))||LESSONS[0];
+  let rec=[];try{rec=JSON.parse(localStorage.getItem('fr:recent')||'[]')}catch(e){}
+  app.innerHTML=`<h1>🔥 FIRE RESCUE COMMAND</h1><div class="g">${Object.entries(MOD).map(([m,[ic,t]])=>`<button class="c" data-a="go" data-id="${m}" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><div style="font-size:32px">${ic}</div><h3>${t}</h3><div style="color:var(--mu);font-size:13px">${LESSONS.filter(x=>x.m===m).length} lessons</div></button>`).join('')}<button class="c" data-a="go" data-id="incident" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><div style="font-size:32px">🚨</div><h3>Incident Reports</h3><div style="color:var(--mu);font-size:13px">Works offline</div></button></div>
+  <h2 style="margin-top:20px">Training Progress</h2><div class="c">${Object.entries(MOD).map(([m,[,t]])=>bar(t,modPct(m))).join('')}</div>
+  <h2 style="margin-top:20px">Continue Training</h2><div class="g">${lcard(next)}</div>
+  ${rec.length?`<h2 style="margin-top:20px">Recent Lessons</h2><div class="c">${rec.map(id=>LESSONS.find(l=>l.id===id)).filter(Boolean).map(l=>`<div><a href="#" data-a="open" data-id="${l.id}">${esc(l.title)}</a></div>`).join('')}</div>`:''}
+  <h2 style="margin-top:20px">Recently Submitted Reports</h2><div class="c">${inc.length?inc.map(i=>`<div>${esc(i.num)} · ${esc(i.type)} · ${esc(i.status)}</div>`).join(''):'No reports yet.'}</div><div class="wn">${SAFE}</div>`;
 }
-async function searchNet(q,lang,off){
-  const d=await jget(B[lang]+'/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=10&gsroffset='+off+'&gsrsearch='+enc(q)+'&prop=pageimages%7Cextracts%7Cinfo&piprop=thumbnail&pithumbsize=160&exintro=1&explaintext=1&exsentences=2&exlimit=max&inprop=url');
-  const ps=d&&d.query?Object.values(d.query.pages).sort((a,b)=>a.index-b.index):[];
-  return ps.map(p=>({title:p.title,lang,url:p.fullurl,ex:p.extract||'',img:okImg(p.thumbnail&&p.thumbnail.source)}));
-}
-const BAD=/flag|icon|logo|symbol|commons-|edit-|question|ambox|portal|folder|stub|arrow|button|wikiquote|wikisource|wiktionary|disambig|padlock|blank|pictogram/i;
-async function blobOf(u){try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),12000);const r=await fetch(u,{signal:ac.signal});clearTimeout(to);return r.ok?await r.blob():null}catch(e){return null}}
-async function dataOf(u){const b=await blobOf(u);return b?await toData(b):''}
-async function picsNet(lang,title,max){
-  try{
-    const d=await jget(B[lang]+'/w/api.php?action=query&format=json&origin=*&redirects=1&generator=images&gimlimit=40&titles='+enc(title)+'&prop=imageinfo&iiprop=url%7Csize%7Cmime&iiurlwidth=640');
-    const ps=d&&d.query?Object.values(d.query.pages):[];
-    const c=ps.filter(p=>p.imageinfo&&p.imageinfo[0]).map(p=>({t:p.title,i:p.imageinfo[0]}))
-      .filter(x=>/^image\/(jpeg|png|svg\+xml|gif|webp)/.test(x.i.mime)&&x.i.width>=220&&x.i.height>=140&&!BAD.test(x.t)&&okImg(x.i.thumburl)).slice(0,max);
-    const out=await Promise.all(c.map(async x=>{const data=await dataOf(x.i.thumburl);return data?{src:x.i.thumburl,data,cap:x.t.replace(/^[^:]+:/,'').replace(/\.[a-z]+$/i,'').replace(/_/g,' ')}:null}));
-    return out.filter(Boolean);
-  }catch(e){return null}
-}
-async function fetchArt(lang,title,deep){
-  let a=await get('art',aid(lang,title));
-  if(a&&(a.full||!deep||!navigator.onLine))return a;
-  if(!a){
-    const d=await jget(B[lang]+'/w/api.php?action=query&format=json&origin=*&redirects=1&prop=extracts%7Cpageimages%7Cinfo&explaintext=1&inprop=url&piprop=thumbnail&pithumbsize=600&titles='+enc(title));
-    const p=d&&d.query&&Object.values(d.query.pages)[0];
-    if(!p||p.missing!==undefined||!p.extract)return null;
-    a={id:aid(lang,p.title),lang,title:p.title,url:p.fullurl,text:p.extract,img:okImg(p.thumbnail&&p.thumbnail.source),t:Date.now(),pics:[],data:''};
-    if(a.img)a.data=await dataOf(a.img);
-  }else if(a.blob&&!a.data){a.data=await toData(a.blob);a.blob=null}
-  const np=await picsNet(a.lang,a.title,deep?8:3);
-  if(np){a.pics=np;a.full=!!deep}
-  if(!await put('art',a)){a.pics=(a.pics||[]).map(p=>({src:p.src,cap:p.cap}));a.data='';await put('art',a)}
-  saved.set(a.id,{lang:a.lang,title:a.title});return a;
-}
-function scoreArts(q,pool){
-  const ws=q.toLowerCase().split(/\s+/).filter(w=>w.length>1);if(!ws.length)return[];
-  return pool.map(a=>{const tl=a.title.toLowerCase(),raw=a.text||'',tx=raw.toLowerCase();let s=0;ws.forEach(w=>{if(tl.includes(w))s+=10;s+=Math.min(tx.split(w).length-1,20)});
-    const i=Math.max(0,tx.indexOf(ws.find(w=>tx.includes(w))||ws[0]));
-    return{a,s,ex:raw.slice(Math.max(0,i-40),i+220).replace(/=+\s*([^=\n]+?)\s*=+/g,'$1').replace(/\n+/g,' ')}}).filter(x=>x.s>0).sort((x,y)=>y.s-x.s)
-}
-const local=async q=>scoreArts(q,await all('art')).slice(0,15).map(({a,ex})=>({title:a.title,lang:a.lang,url:a.url,img:'',ex}));
-
-/* ===== PICHA: huduma ya picha ya Report Search ===== */
-/* Funguo za vyanzo vya premium (Access Key tu, si Secret). a = Picha Bora, b = Picha Zaidi. Ukiacha wazi, vyanzo visivyohitaji key vinatumika. */
-const K={a:'4NtGB6LtWlQTTJ6QmpKxTeEj_d9sPljUlBUkwTG7VUI',b:'57792634-5e89dd610e4c1c840f815c524'};
-const HA='https://api.uns'+'plash.com',HB='https://pix'+'abay.com';
-const okPic=u=>/^https:\/\//.test(u||'')?u:'';
-const trC=new Map();
-async function enOf(q){
-  const k=q.toLowerCase();if(trC.has(k))return trC.get(k);
-  let r='';
-  try{const d=await jget(B.sw+'/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1&generator=search&gsrlimit=1&gsrsearch='+enc(q)+'&prop=langlinks&lllang=en');
-    const p=d&&d.query&&d.query.pages&&d.query.pages[0],l=p&&p.langlinks&&p.langlinks[0];r=(l&&(l.title||l['*']))||''}catch(e){}
-  trC.set(k,r);return r;
-}
-async function commonsNet(q,page){
-  const d=await jget(B.co+'/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&gsroffset='+((page-1)*20)+'&gsrsearch='+enc(q+' filetype:bitmap')+'&prop=imageinfo&iiprop=url%7Csize%7Cmime%7Cextmetadata&iiurlwidth=500');
-  const ps=d&&d.query?Object.values(d.query.pages).sort((x,y)=>x.index-y.index):[];
-  const strip=t=>((t&&t.value)||'').replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').trim();
-  const items=ps.filter(p=>p.imageinfo&&p.imageinfo[0]&&/^image\/(jpeg|png|webp)/.test(p.imageinfo[0].mime)).map(p=>{const i=p.imageinfo[0],m=i.extmetadata||{};
-    return{id:'a:c'+p.pageid,side:'a',alt:strip(m.ObjectName)||p.title.replace(/^[^:]+:/,'').replace(/\.[a-z]+$/i,'').replace(/_/g,' '),by:strip(m.Artist).slice(0,60),w:i.thumbwidth,h:i.thumbheight,thumbUrl:okPic(i.thumburl),fullUrl:okPic((i.thumburl||'').replace(/\/\d+px-/,'/1280px-')),dl:''}}).filter(x=>x.thumbUrl);
-  return{pages:items.length>=15?page+1:page,items};
-}
-async function ovNet(q,page){
-  const d=await jget(B.ov+'/v1/images/?page_size=20&mature=false&page='+page+'&q='+enc(q));
-  return{pages:Math.min(d.page_count||0,12),items:(d.results||[]).map(p=>({id:'b:o'+p.id,side:'b',alt:p.title||'',by:p.creator||'',w:p.width,h:p.height,thumbUrl:okPic(p.thumbnail),fullUrl:okPic(p.url)||okPic(p.thumbnail),dl:'',tg:(p.tags||[]).map(t=>t.name).slice(0,8)})).filter(x=>x.thumbUrl)};
-}
-async function imgNet(side,q,page){
-  if(side==='a'){
-    if(!K.a)return commonsNet(q,page);
-    const d=await jget(HA+'/search/photos?per_page=20&content_filter=high&page='+page+'&query='+enc(q)+'&client_id='+K.a);
-    return{pages:d.total_pages||0,items:(d.results||[]).map(p=>({id:'a:'+p.id,side:'a',alt:p.alt_description||p.description||'',by:(p.user&&p.user.name)||'',w:p.width,h:p.height,thumbUrl:okPic(p.urls&&p.urls.small),fullUrl:okPic(p.urls&&p.urls.regular),dl:(p.links&&p.links.download_location)||''})).filter(x=>x.thumbUrl)};
-  }
-  if(!K.b)return ovNet(q,page);
-  const d=await jget(HB+'/api/?key='+K.b+'&image_type=photo&safesearch=true&per_page=20&page='+page+'&q='+enc(q.slice(0,100)));
-  return{pages:Math.ceil((d.totalHits||0)/20),items:(d.hits||[]).map(p=>({id:'b:'+p.id,side:'b',alt:(p.tags||'').replace(/,\s*/g,', '),by:p.user||'',w:p.webformatWidth,h:p.webformatHeight,thumbUrl:okPic(p.webformatURL),fullUrl:okPic(p.largeImageURL||p.webformatURL),dl:''})).filter(x=>x.thumbUrl)};
-}
-/* upande mmoja: neno la kwanza, kisha tafsiri ya Kiingereza kama matokeo ni machache */
-async function loadSide(side,q,S,more){
-  const st=S[side],page=more?st.page+1:1;
-  let r=await imgNet(side,st.term||q,page);
-  if(!more&&r.items.length<4){
-    const en=await enOf(q);
-    if(en&&en.toLowerCase()!==q.toLowerCase()){try{const r2=await imgNet(side,en,1);if(r2.items.length>r.items.length){r=r2;st.term=en}}catch(e){}}
-  }
-  st.page=page;st.pages=r.pages;
-  const add=[];r.items.forEach(x=>{if(!st.items.some(y=>y.id===x.id)){st.items.push(x);add.push(x)}});
-  return add;
-}
-async function saveImg(x,tags){
-  if(imgSaved.has(x.id)){
-    const r=await get('img',x.id);
-    if(r){const nt=[...new Set([...(r.tags||[]),...tags])];if(nt.length!==(r.tags||[]).length){r.tags=nt;await put('img',r)}x.thumb=r.thumb}
-    return r;
-  }
-  const thumb=await dataOf(x.thumbUrl);if(!thumb)return null;
-  const r={id:x.id,side:x.side,alt:x.alt,by:x.by,w:x.w,h:x.h,thumbUrl:x.thumbUrl,fullUrl:x.fullUrl,dl:x.dl,thumb,full:'',tags:[...new Set([...tags,...(x.tg||[]).map(t=>String(t).toLowerCase())])],t:Date.now()};
-  if(!await put('img',r))return null;
-  imgSaved.add(x.id);x.thumb=thumb;return r;
-}
-async function autosave(items,tags,cb,prog,alive){
-  let i=0,n=0;
-  const w=async()=>{while(i<items.length){if(alive&&!alive())return;const x=items[i++];
-    try{const r=await saveImg(x,tags);if(r&&cb)cb(x.id)}catch(e){}n++;if(prog)prog(n,items.length)}};
-  await Promise.all([w(),w(),w(),w()]);
-}
-function scoreImgs(q,pool){
-  const ws=q.toLowerCase().split(/\s+/).filter(w=>w.length>1);if(!ws.length)return[];
-  return pool.map(r=>{const hay=((r.alt||'')+' '+(r.tags||[]).join(' ')).toLowerCase();let s=0;ws.forEach(w=>{if(hay.includes(w))s+=5});return{r,s}})
-    .filter(x=>x.s>0).sort((a,b)=>b.s-a.s||b.r.t-a.r.t).map(x=>x.r);
-}
-const szi=r=>((r.thumb||'').length+(r.full||'').length)*.75;
-const cap1=t=>{t=(t||'').trim();return t?t[0].toUpperCase()+t.slice(1):''};
-let tt;
-const toast=m=>{let t=$('.toast');if(!t){t=h('div',{c:'toast',role:'status'});document.body.append(t)}t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>{t.style.display='none'},2600)};
-async function download(x){
-  toast('Inapakua...');
-  const rec=await get('img',x.id),dl=x.dl||(rec&&rec.dl),fu=x.fullUrl||(rec&&rec.fullUrl);
-  if(navigator.onLine&&dl&&K.a)fetch(dl+(dl.includes('?')?'&':'?')+'client_id='+K.a).catch(()=>{});
-  let blob=null;
-  if(rec&&rec.full){try{blob=await(await fetch(rec.full)).blob()}catch(e){}}
-  if(!blob&&navigator.onLine&&fu)blob=await blobOf(fu);
-  if(!blob){const t=(rec&&rec.thumb)||x.thumb;if(t){try{blob=await(await fetch(t)).blob()}catch(e){}}}
-  if(!blob){toast('Imeshindikana. Jaribu tena ukiwa online.');return}
-  const ext=(blob.type.split('/')[1]||'jpg').replace('jpeg','jpg').replace(/\+.*/,'');
-  const slug=(x.alt||'picha').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'picha';
-  const u=URL.createObjectURL(blob),a=h('a',{href:u,download:'incident-search-'+slug+'-'+x.id.replace(/\W/g,'').slice(-6)+'.'+ext});
-  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);
-  toast('Picha imepakuliwa');
-}
-function viewer(list,i0,opts){
-  opts=opts||{};let i=i0,ver=0;
-  const ov=h('div',{c:'vw',role:'dialog','aria-modal':'true','aria-label':'Picha'}),
-    img=h('img',{alt:''}),ttl=h('p',{c:'vtt'}),pls=h('div',{c:'pls'}),
-    prev=h('button',{c:'nv l',type:'button','aria-label':'Iliyotangulia',t:'‹'}),next=h('button',{c:'nv r',type:'button','aria-label':'Inayofuata',t:'›'}),
-    stg=h('div',{c:'stg'},[img,prev,next]);
-  const key=e=>{if(e.key==='Escape')close();else if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1)};
-  const close=()=>{document.removeEventListener('keydown',key);document.body.style.overflow='';ov.remove()};
-  const go=d=>{const n=i+d;if(n<0||n>=list.length)return;i=n;show()};
-  const show=async()=>{
-    const x=list[i],my=++ver;
-    ttl.textContent=cap1(x.alt)||'Picha';pls.textContent='';
-    pls.append(pill('Kutoka Report Search'));if(x.by)pls.append(pill('Picha na '+x.by));
-    prev.style.visibility=i>0?'visible':'hidden';next.style.visibility=i<list.length-1?'visible':'hidden';
-    let rec=await get('img',x.id);if(my!==ver)return;
-    if(rec)pls.append(pill('✓ Imehifadhiwa offline','ok'));
-    img.onerror=null;img.src=(rec&&(rec.full||rec.thumb))||x.thumb||x.thumbUrl||'';
-    if(rec&&rec.full)return;
-    if(!navigator.onLine||!x.fullUrl)return;
-    /* ukubwa kamili unahifadhiwa kiotomatiki unapofunguliwa */
-    const d=await dataOf(x.fullUrl);if(my!==ver)return;
-    if(d){img.src=d;const r=rec||await saveImg(x,opts.tags||[]);if(r){r.full=d;await put('img',r);if(!rec&&my===ver)pls.append(pill('✓ Imehifadhiwa offline','ok'))}}
-    else{const t=(rec&&rec.thumb)||x.thumb||x.thumbUrl;img.onerror=()=>{img.onerror=null;img.src=t};img.src=x.fullUrl}
-  };
-  prev.onclick=()=>go(-1);next.onclick=()=>go(1);
-  let x0=null;stg.ontouchstart=e=>{x0=e.touches[0].clientX};
-  stg.ontouchend=e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50)go(dx<0?1:-1)};
-  stg.onclick=e=>{if(e.target===stg)close()};
-  const cb=h('button',{c:'x',type:'button','aria-label':'Funga',t:'✕',onclick:close}),
-    dl=h('button',{c:'vb',type:'button',t:'Pakua',onclick:()=>download(list[i])}),act=h('div',{c:'act'},[dl]);
-  if(opts.onDel){const b=h('button',{c:'vb g',type:'button',t:'Ondoa'});twoStep(b,async()=>{const x=list[i];close();await opts.onDel(x)},'Ondoa','Bofya tena');act.append(b)}
-  ov.append(h('div',{c:'bar'},[cb]),stg,h('div',{c:'inf'},[ttl,pls]),act);
-  document.body.append(ov);document.body.style.overflow='hidden';document.addEventListener('keydown',key);cb.focus();show();
-}
-const tileEl=(x,list,i,opts,tiles)=>{
-  const b=h('button',{c:'gi',type:'button','aria-label':x.alt||'Picha'}),im=h('img',{alt:x.alt||'',loading:'lazy'});
-  if(x.w&&x.h)b.style.aspectRatio=x.w+' / '+x.h;
-  im.onerror=async()=>{im.onerror=()=>b.remove();const r=await get('img',x.id);if(r&&r.thumb)im.src=r.thumb;else b.remove()};
-  im.src=x.thumb||x.thumbUrl;b.append(im);
-  if(imgSaved.has(x.id))b.append(h('span',{c:'ck',t:'✓'}));
-  b.onclick=()=>viewer(list,i,opts);tiles.set(x.id,b);return b;
-};
-const vtabs=(q,on)=>h('nav',{c:'vt'},[h('a',{c:on==='s'?'on':'',href:'#s/'+enc(q),t:'Maandishi'}),h('a',{c:on==='p'?'on':'',href:'#p/'+enc(q),t:'Picha'})]);
-
-/* ===== VIPANDE ===== */
-function logo(){const a=h('a',{c:'logo',href:'#','aria-label':'Report Search'});const C=['#4285f4','#ea4335','#fbbc05','#4285f4','#34a853','#ea4335'];let i=0;
-  [...'Report Search'].forEach(ch=>{a.append(ch===' '?' ':h('span',{t:ch,style:'color:'+C[i++%6]}))});return a}
-async function sug(v,dd,go){
-  const rq=(await all('q')).filter(x=>!x.kind&&x.q.toLowerCase().includes(v.toLowerCase())).slice(0,3).map(x=>x.q);let l=[];
-  if(navigator.onLine){try{const d=await jget(B.sw+'/w/api.php?action=opensearch&format=json&origin=*&limit=6&search='+enc(v));l=(d&&d[1])||[]}catch(e){}}
-  l=[...new Set([...rq,...l])].slice(0,7);dd.textContent='';
-  l.forEach(t=>dd.append(h('button',{c:'sg',type:'button',t,onpointerdown:e=>{e.preventDefault();go(t)}})));
-}
-function box(val,mode){
-  const f=h('form',{c:'sb',autocomplete:'off',role:'search'}),ic=h('span',{c:'ico'}),dd=h('div',{c:'dd'}),
-    i=h('input',{type:'search',value:val||'',placeholder:'Tafuta au andika swali...','aria-label':'Tafuta',enterkeyhint:'search',autocapitalize:'off'});
-  ic.innerHTML=SVG;const sb=h('button',{c:'go',type:'submit',t:'Tafuta'});f.append(ic,i,sb,dd);
-  const go=q=>{q=q.trim();if(!q)return;dd.textContent='';i.blur();const pre=mode==='p'?'p/':'s/';if(decodeURIComponent(location.hash.slice(1))===pre+q)route();else location.hash=pre+enc(q)};
-  f.onsubmit=e=>{e.preventDefault();go(i.value)};
-  let tm;i.oninput=()=>{clearTimeout(tm);const v=i.value.trim();if(!v){dd.textContent='';return}tm=setTimeout(()=>sug(v,dd,go),250)};
-  i.onblur=()=>setTimeout(()=>dd.textContent='',250);
-  f._i=i;return f;
-}
-const sn=t=>{t=(t||'').replace(/\s+/g,' ').trim();return t.length>230?t.slice(0,230)+'...':t};
-const lead=t=>{for(const l of(t||'').split('\n')){const s=l.trim();if(s&&!/^=+.*=+$/.test(s))return s}return''};
-const mins=a=>Math.max(1,Math.round(((a.text||'').split(/\s+/).length)/200));
-const ago=t=>{const d=Math.floor((Date.now()-t)/864e5);return d<=0?'Leo':d===1?'Jana':d<7?'Siku '+d+' zilizopita':new Date(t).toLocaleDateString('sw-TZ',{day:'numeric',month:'short',year:'numeric'})};
-const fmt=b=>b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
-const sz=a=>(a.text||'').length+((a.data||'').length*.75)+(a.blob?a.blob.size:0)+(a.pics||[]).reduce((t,p)=>t+((p.data||'').length*.75)+(p.blob?p.blob.size:0),0);
-const pill=(t,c)=>h('span',{c:'pl'+(c?' '+c:''),t});
-const tile=(th,title)=>{th.textContent=(title[0]||'?').toUpperCase();let n=0;for(const ch of title)n+=ch.charCodeAt(0);th.style.background=PAL[n%PAL.length]};
-const hl=(t,ws)=>{if(!ws||!ws.length)return[t];try{return t.split(new RegExp('('+ws.map(esc).join('|')+')','gi')).map((p,i)=>i%2?h('mark',{t:p}):p)}catch(e){return[t]}};
-const twoStep=(b,fn,l0,l1)=>{let armed=false,tm;b.onclick=e=>{e.preventDefault();e.stopPropagation();if(!armed){armed=true;b.textContent=l1;b.classList.add('arm');tm=setTimeout(()=>{armed=false;b.textContent=l0;b.classList.remove('arm')},3000);return}clearTimeout(tm);fn()}};
-
-/* safu ya matokeo ya utafutaji */
-const item=r=>{
-  const id=aid(r.lang,r.title),th=h('div',{c:'th'}),u=h('div',{c:'u'},[r.lang==='sw'?'Kiswahili':'English']),
-    body=h('div',{c:'rb'},[u,h('a',{c:'t',href:'#a/'+r.lang+'/'+enc(r.title),t:r.title}),h('p',{c:'sn',t:sn(r.ex)})]);
-  const setImg=s=>{let i=th.querySelector('img');if(!i){i=h('img',{alt:'',loading:'lazy'});th.textContent='';th.style.background='';th.append(i)}i.src=s};
-  tile(th,r.title);
-  if(r.img){const i=h('img',{src:r.img,alt:'',loading:'lazy'});i.onerror=async()=>{i.onerror=()=>i.remove();const a=await get('art',id);const s=a&&isrc(a);if(s)i.src=s;else i.remove()};th.textContent='';th.style.background='';th.append(i)}
-  const mark=()=>u.append(pill('✓ Imehifadhiwa','ok'));
-  if(saved.has(id)){mark();get('art',id).then(a=>{const s=a&&isrc(a);if(s)setImg(s)})}
-  else if(navigator.onLine){
-    const b=h('button',{c:'sv',type:'button',t:'Hifadhi offline'});
-    b.onclick=async()=>{b.disabled=true;b.textContent='Inahifadhi...';let a=null;try{a=await fetchArt(r.lang,r.title,true)}catch(e){}
-      if(a){b.remove();mark();const s=isrc(a);if(s)setImg(s)}else{b.disabled=false;b.textContent='Imeshindikana. Jaribu tena'}};
-    body.append(b);
-  }
-  return h('div',{c:'r'},[body,th]);
-};
-/* kadi ya makala iliyohifadhiwa */
-const card=(a,ex,ws,onDel)=>{
-  const th=h('div',{c:'th'}),s=isrc(a);
-  if(s)th.append(h('img',{src:s,alt:'',loading:'lazy',onerror:e=>e.target.remove()}));else tile(th,a.title);
-  const c=h('div',{c:'card'},[th,h('div',{c:'cb'},[
-    h('a',{c:'ct',href:'#a/'+a.lang+'/'+enc(a.title),t:a.title}),
-    h('p',{c:'sn'},hl(sn(ex||lead(a.text)),ws)),
-    h('div',{c:'pls'},[pill(a.lang==='sw'?'Kiswahili':'English'),pill('Dakika '+mins(a)),pill(ago(a.t))])])]);
-  if(onDel){const x=h('button',{c:'x',type:'button','aria-label':'Ondoa '+a.title,t:'✕'});twoStep(x,onDel,'✕','Futa?');c.append(x)}
-  return c;
-};
-const zoom=i=>{i.onclick=()=>i.classList.toggle('big');return i};
-const fig=p=>{const i=zoom(h('img',{src:isrc(p)||p.src||'',alt:p.cap,loading:'lazy'}));const f=h('figure',{},[i,h('figcaption',{t:p.cap})]);i.onerror=()=>f.remove();return f};
-const offMsg='Mtandao haupatikani.';
-
-/* viungo vya ndani: majina ya makala zilizohifadhiwa yanakuwa viungo ndani ya maandishi */
-function linker(self){
-  const used=new Set(),map=new Map();let re=null;
-  try{
-    [...saved.values()].filter(s=>s.title.length>=4&&aid(s.lang,s.title)!==self).sort((x,y)=>y.title.length-x.title.length).slice(0,400)
-      .forEach(s=>{const k=s.title.toLowerCase();if(!map.has(k))map.set(k,s)});
-    if(map.size)re=new RegExp('(?<![\\p{L}\\p{N}])('+[...map.keys()].map(esc).join('|')+')(?![\\p{L}\\p{N}])','giu');
-  }catch(e){re=null}
-  return t=>{if(!re)return[t];return t.split(re).map((p,i)=>{if(i%2===0)return p;const k=p.toLowerCase(),s=map.get(k);if(!s||used.has(k))return p;used.add(k);return h('a',{c:'wl',href:'#a/'+s.lang+'/'+enc(s.title),t:p})})}
-}
-
-/* ===== MAONYESHO ===== */
-const GUIDE=[
-['🔥 Sayansi ya Moto',['Pembetatu ya moto','Mwako','Moto','Joto','Moshi','Flashover','Mlipuko','Mvuke']],
-['🚒 Zimamoto na Uokoaji',['Zimamoto','Mzimamoto','Gari la zimamoto','Uokoaji','Huduma ya kwanza','Kituo cha zimamoto']],
-['🧯 Vifaa vya Zimamoto',['Kizima moto','Hose ya zimamoto','Fire hydrant','Kengele ya moshi','Sprinkler','Kifaa cha kupumulia']],
-['⚠️ Usalama na Hatari',['Usalama wa moto','Moto wa nyika','Moto wa umeme','Kemikali hatari','Njia za kutoroka','Moto wa gesi']]];
-const FEAT=[['en','Fire extinguisher'],['en','Firefighter'],['en','Fire apparatus'],['en','Fire hose'],['en','Fire hydrant'],['en','Self-contained breathing apparatus'],['en','Smoke detector'],['en','Fire sprinkler system'],['en','Fire tetrahedron'],['en','Flashover'],['en','Combustion'],['en','Wildfire'],['en','Fire safety'],['en','Fire protection']];
-const FTAGS=['zimamoto','moto','fire','firefighter','vifaa vya zimamoto'];
-function home(){
-  const tok=rt;app.textContent='';const f=box('');
-  const hero=h('div',{c:'hero'},[logo(),h('p',{c:'tag',t:'Tafuta chochote. Kipaumbele: sayansi ya moto na zimamoto.'}),f,h('div',[
-    h('button',{c:'bt',type:'button',t:'Tafuta',onclick:()=>f.requestSubmit()}),
-    h('button',{c:'bt',type:'button',t:'Picha',onclick:()=>{const v=f._i.value.trim();if(v)location.hash='p/'+enc(v);else location.hash='p/'+enc('firefighter')}}),
-    h('button',{c:'bt',type:'button',t:'Hifadhi',onclick:()=>location.hash='hifadhi'})])]);
-  f._i.placeholder='Tafuta moto, zimamoto, vifaa, usalama...';
-  const guide=h('div',{c:'sec'},[h('div',{c:'sh'},[h('h2',{t:'Anza hapa'})])]);
-  GUIDE.forEach(([t,l])=>guide.append(h('div',{c:'grp'},[h('h3',{t}),h('div',{},l.map(x=>h('a',{c:'chip',href:'#s/'+enc(x),t:x})))])));
-  const fs=h('div',{c:'sec'},[h('div',{c:'sh'},[h('h2',{t:'Vifaa na maarifa ya zimamoto'}),h('a',{c:'lnk',href:'#hifadhi',t:'Hifadhi'})])]),
-    fm=h('div',{c:'meta',t:'Makala zinaletwa na kuhifadhiwa zenyewe.'}),fg=h('div',{c:'fg'});fs.append(fm,fg);
-  const is=h('div',{c:'sec'},[h('div',{c:'sh'},[h('h2',{t:'Picha za zimamoto'}),h('a',{c:'lnk',href:'#p/'+enc('firefighter'),t:'Picha zaidi'})])]),hs=h('div',{c:'hs'});is.append(hs);
-  const ch=h('div',{c:'chips'}),sec=h('div',{c:'sec'});
-  app.append(hero,guide,fs,is,ch,sec);
-  all('q').then(q=>q.filter(x=>!x.kind).sort((a,b)=>b.t-a.t).slice(0,8).forEach(x=>ch.append(h('a',{c:'chip',href:'#s/'+enc(x.q),t:x.q}))));
-  all('art').then(a=>{if(!a.length)return;a.sort((x,y)=>y.t-x.t);
-    sec.append(h('div',{c:'sh'},[h('h2',{t:'Zilizohifadhiwa'}),h('a',{c:'lnk',href:'#hifadhi',t:'Ona zote ('+a.length+')'})]));
-    a.slice(0,4).forEach(x=>sec.append(card(x)))});
-  /* makala za vifaa: zinaletwa na kuhifadhiwa zenyewe (maandishi na picha tu, hakuna video wala sauti) */
-  const qu=[...FEAT];let got=0;
-  const wk=async()=>{while(qu.length&&tok===rt){const [l,t]=qu.shift();try{const a=await fetchArt(l,t,false);if(a&&tok===rt){got++;fg.append(card(a))}}catch(e){}}};
-  Promise.all([wk(),wk(),wk()]).then(()=>{if(tok===rt)fm.textContent=got?'Makala '+got+' zimehifadhiwa kwa offline.':'Unganisha intaneti ili kupokea makala za zimamoto.'});
-  /* picha: zinahifadhiwa mara moja kila saa 6 ili kulinda kikomo cha huduma */
-  (async()=>{
-    const pool=await all('img'),rec=await get('q','h:feat');let L=[];
-    if(rec&&Date.now()-rec.t<216e5){const m=new Map(pool.map(r=>[r.id,r]));L=rec.ids.map(i=>m.get(i)).filter(Boolean)}
-    if(!L.length&&navigator.onLine){
-      const S={a:{items:[],page:0,pages:0,term:''},b:{items:[],page:0,pages:0,term:''}};
-      await Promise.all(['a','b'].map(k=>loadSide(k,'firefighter fire rescue',S,false).catch(()=>0)));
-      L=[];for(let i=0;i<8;i++){if(S.a.items[i])L.push(S.a.items[i]);if(S.b.items[i])L.push(S.b.items[i])}
-      if(L.length)put('q',{id:'h:feat',kind:'h',ids:L.map(x=>x.id),t:Date.now()});
-    }
-    if(!L.length)L=scoreImgs('fire moto zimamoto firefighter',pool).slice(0,16);
-    if(tok!==rt||!L.length)return;
-    const tl=new Map();L.forEach((x,i)=>hs.append(tileEl(x,L,i,{tags:FTAGS},tl)));
-    autosave(L,FTAGS,id=>{const b=tl.get(id);if(b&&!b.querySelector('.ck'))b.append(h('span',{c:'ck',t:'✓'}))},null,()=>tok===rt);
-  })();
-}
-let rt=0;
-async function results(q){
-  const tok=++rt;q=q.trim();app.textContent='';
-  const f=box(q);app.append(h('div',{c:'top'},[logo(),f]),vtabs(q,'s'));
-  const st=h('div',{c:'meta',id:'st',t:'Inatafuta...'}),list=h('div'),mb=h('div');app.append(st,list,mb);
-  const show=(items,msg)=>{st.textContent=msg;list.textContent='';items.forEach(r=>list.append(item(r)))};
-  /* matokeo ya Hifadhi tu: yanayosomeka kweli bila mtandao */
-  const cache=async()=>{const rec=await get('q',q.toLowerCase()),seen=new Set(),out=[];
-    const add=r=>{const k=aid(r.lang,r.title);if(!seen.has(k)&&saved.has(k)){seen.add(k);out.push(r)}};
-    ((rec&&rec.res)||[]).forEach(add);(await local(q)).forEach(add);return out};
-  const c=await cache();if(tok!==rt)return;
-  if(!navigator.onLine){show(c,c.length?'Matokeo '+c.length+' kutoka Hifadhi.':'Hakuna kilichopatikana kwenye Hifadhi kuhusu "'+q+'". Tafuta ukiwa online ili makala zihifadhiwe.');return}
-  if(c.length)show(c,'Matokeo '+c.length+' kutoka Hifadhi. Inasasisha...');
-  let items=[],lang='sw',off=0,note='';
-  try{
-    let r=await searchNet(q,'sw',0);
-    if(!r.length){r=await searchNet(q,'en',0);lang='en';if(r.length)note=' Hakuna matokeo ya Kiswahili, haya ni ya Kiingereza.'}
-    if(tok!==rt)return;items=r;
-  }catch(e){
-    if(tok!==rt)return;
-    show(c,c.length?'Matokeo '+c.length+' kutoka Hifadhi. '+offMsg:offMsg+' Hakuna kilichopatikana kwenye Hifadhi.');return;
-  }
-  if(!items.length){list.textContent='';st.textContent='Hakuna matokeo ya "'+q+'". Jaribu maneno mengine.';return}
-  show(items,'Matokeo '+items.length+'.'+note);
-  put('q',{id:q.toLowerCase(),q,res:items,t:Date.now()});
-  /* hifadhi ya kiotomatiki: makala 5 za juu */
-  const top=items.slice(0,5);let n=0;
-  for(const r of top){try{await fetchArt(r.lang,r.title)}catch(e){}n++;
-    if(tok!==rt)continue;st.textContent='Matokeo '+items.length+'.'+note+' Inahifadhi offline: '+n+'/'+top.length}
-  if(tok===rt){show(items,'Matokeo '+items.length+'.'+note+' Makala za juu zimehifadhiwa kwa offline.')}
-  if(items.length===10){
-    const b=h('button',{c:'more',type:'button',t:'Matokeo zaidi',onclick:async()=>{
-      b.disabled=true;b.textContent='Inapakia...';off+=10;
-      try{const r=await searchNet(q,lang,off);r.forEach(x=>list.append(item(x)));if(r.length<10)b.remove();else{b.disabled=false;b.textContent='Matokeo zaidi'}}
-      catch(e){b.disabled=false;b.textContent='Imeshindikana. Jaribu tena'}}});
-    mb.append(b);
-  }
-}
-function article(a){
-  const bx=h('article',{c:'art'}),self=a.id;
-  bx.append(h('div',{c:'pls'},[pill('✓ Imehifadhiwa offline','ok'),pill(a.lang==='sw'?'Kiswahili':'English'),pill('Dakika '+mins(a)+' za kusoma')]),h('h1',{t:a.title}));
-  const s=isrc(a)||a.img;if(s)bx.append(zoom(h('img',{src:s,alt:a.title,onerror:e=>e.target.remove()})));
-  const L=linker(self),pics=(a.pics||[]).slice();let pend=true,stop=false;
-  (a.text||'').split('\n').forEach(l=>{if(stop)return;const m=l.match(/^(=+)\s*(.+?)\s*=+$/);
-    if(m){if(/^(marejeo|tanbihi|viungo|angalia pia|references|external links|see also|notes|further reading|bibliography)/i.test(m[2])){stop=true;return}bx.append(h(m[1].length>2?'h3':'h2',{t:m[2]}));if(m[1].length<=2)pend=true}
-    else if(l.trim()){bx.append(h('p',{},L(l)));if(pend&&pics.length){bx.append(fig(pics.shift()));pend=false}}});
-  if(pics.length){bx.append(h('h2',{t:'Picha na michoro'}));pics.forEach(p=>bx.append(fig(p)))}
-  const rm=h('button',{c:'tab',type:'button',t:'Ondoa kwenye Hifadhi'});
-  twoStep(rm,async()=>{await del('art',a.id);saved.delete(a.id);history.back()},'Ondoa kwenye Hifadhi','Bofya tena kuthibitisha');
-  bx.append(h('div',{style:'margin:18px 0'},[rm]));
-  const rel=h('div');bx.append(rel);
-  all('art').then(pool=>{
-    const seen=new Set([self]),out=[];
-    scoreArts(a.title,pool).forEach(x=>{if(out.length<4&&!seen.has(x.a.id)){seen.add(x.a.id);out.push(x.a)}});
-    pool.sort((x,y)=>y.t-x.t).forEach(x=>{if(out.length<4&&!seen.has(x.id)){seen.add(x.id);out.push(x)}});
-    if(!out.length)return;rel.append(h('h2',{t:'Endelea kusoma'}));out.forEach(x=>rel.append(card(x)))});
-  return bx;
-}
-async function reader(lang,title){
-  const tok=rt,id=aid(lang,title);
-  app.textContent='';app.append(h('div',{c:'top'},[logo(),box('')]),h('div',{c:'meta',id:'ld',t:'Inapakia...'}));
-  let a=await get('art',id),er=null;
-  if(!a){try{a=await fetchArt(lang,title,false)}catch(e){er=e}}
-  if(tok!==rt)return;
-  const ld=$('#ld');if(ld)ld.remove();
-  if(!a){app.append(h('p',{t:er&&er.off?'Makala hii haijahifadhiwa. Unganisha intaneti ili kuisoma.':'Makala haikupatikana au muunganisho umeshindikana.'}),h('a',{c:'chip',href:'#',onclick:e=>{e.preventDefault();history.back()},t:'Rudi'}));return}
-  const holder=h('div');app.append(holder);
-  const draw=x=>{holder.textContent='';holder.append(article(x))};
-  draw(a);window.scrollTo(0,0);
-  /* makala inaonekana mara moja kutoka Hifadhi; picha za ziada zinaongezwa nyuma ya pazia ukiwa online */
-  if(navigator.onLine&&!a.full){fetchArt(lang,title,true).then(n=>{if(n&&n.full&&tok===rt){const y=window.scrollY;draw(n);window.scrollTo(0,y)}}).catch(()=>{})}
-}
-async function pics(q){
-  const tok=++rt;q=q.trim();app.textContent='';
-  const f=box(q,'p');app.append(h('div',{c:'top'},[logo(),f]),vtabs(q,'p'));
-  if(!q){app.append(h('p',{c:'meta',t:'Andika neno hapo juu ili kutafuta picha.'}));return}
-  const st=h('div',{c:'meta',t:'Inatafuta picha...'}),sd=h('div',{c:'sd'}),msg=h('p',{c:'meta'}),gr=h('div',{c:'gr'}),mb=h('div');
-  app.append(st,sd,msg,gr,mb);
-  const tags=[...new Set([q.toLowerCase(),...q.toLowerCase().split(/\s+/).filter(w=>w.length>1)])],opts={tags},
-    mk=()=>({a:{items:[],page:0,pages:0,term:''},b:{items:[],page:0,pages:0,term:''}}),names={a:'Picha Bora',b:'Picha Zaidi'},tiles=new Map();
-  let S=mk(),side='a',fromNet=false;
-  const mark=id=>{const b=tiles.get(id);if(b&&!b.querySelector('.ck'))b.append(h('span',{c:'ck',t:'✓'}))};
-  const alive=()=>tok===rt;
-  const draw=()=>{
-    sd.textContent='';['a','b'].forEach(k=>sd.append(h('button',{c:'tab'+(side===k?' on':''),type:'button',t:names[k]+' ('+S[k].items.length+')',onclick:()=>{side=k;draw()}})));
-    gr.textContent='';mb.textContent='';tiles.clear();const L=S[side].items;
-    msg.textContent=L.length?'':(navigator.onLine?'Hakuna picha upande huu. Jaribu upande mwingine au neno lingine.':'Hakuna picha zilizohifadhiwa upande huu kuhusu "'+q+'".');
-    L.forEach((x,i)=>gr.append(tileEl(x,L,i,opts,tiles)));
-    if(fromNet&&L.length&&S[side].page<S[side].pages){
-      const b=h('button',{c:'more',type:'button',t:'Picha zaidi'});
-      b.onclick=async()=>{b.disabled=true;b.textContent='Inapakia...';
-        try{const n=await loadSide(side,q,S,true);if(!alive())return;draw();put('q',{id:'p:'+q.toLowerCase(),kind:'p',q,ids:[...S.a.items,...S.b.items].map(x=>x.id),t:Date.now()});autosave(n,tags,mark,null,alive)}
-        catch(e){b.disabled=false;b.textContent='Imeshindikana. Jaribu tena'}};
-      mb.append(b);
-    }
-  };
-  /* picha zilizohifadhiwa: kutoka utafutaji huo huo au zinazolingana na maneno */
-  const pool=await all('img'),byId=new Map(pool.map(r=>[r.id,r])),rec=await get('q','p:'+q.toLowerCase()),seen=new Set(),c=[];
-  ((rec&&rec.ids)||[]).forEach(id=>{const r=byId.get(id);if(r&&!seen.has(id)){seen.add(id);c.push(r)}});
-  scoreImgs(q,pool).forEach(r=>{if(!seen.has(r.id)){seen.add(r.id);c.push(r)}});
-  if(tok!==rt)return;
-  S.a.items=c.filter(x=>x.side==='a');S.b.items=c.filter(x=>x.side==='b');
-  if(!S.a.items.length&&S.b.items.length)side='b';
-  if(!navigator.onLine){st.textContent=c.length?'Picha '+c.length+' kutoka Report Search.':'Hakuna picha zilizohifadhiwa kuhusu "'+q+'". Tafuta ukiwa online ili zihifadhiwe.';draw();return}
-  st.textContent=c.length?'Picha '+c.length+' zilizohifadhiwa. Inasasisha...':'Inatafuta picha...';if(c.length)draw();
-  const N=mk(),rs=await Promise.all(['a','b'].map(k=>loadSide(k,q,N,false).then(()=>({ok:1,k}),e=>({ok:0,k,e}))));
-  if(tok!==rt)return;
-  if(!rs.some(r=>r.ok)){
-    const nk=rs.every(r=>r.e&&r.e.nokey);
-    st.textContent=nk?'Huduma ya picha haijawashwa kwenye toleo hili.':(c.length?'Picha '+c.length+' kutoka Report Search. '+offMsg:offMsg+' Hakuna picha zilizohifadhiwa kuhusu "'+q+'".');
-    draw();return;
-  }
-  rs.forEach(r=>{if(!r.ok)N[r.k]=S[r.k]});
-  const tot=N.a.items.length+N.b.items.length;
-  if(tot){S=N;fromNet=true;if(!S[side].items.length)side=S.a.items.length?'a':'b'}
-  const term=[N.a.term,N.b.term].find(Boolean);if(term)tags.push(term.toLowerCase());
-  draw();
-  if(!tot){st.textContent='Hakuna picha za "'+q+'". Jaribu maneno mengine.';return}
-  const total=S.a.items.length+S.b.items.length;
-  put('q',{id:'p:'+q.toLowerCase(),kind:'p',q,ids:[...S.a.items,...S.b.items].map(x=>x.id),t:Date.now()});
-  st.textContent='Picha '+total+' kutoka Report Search.';
-  const first=S[side].items,rest=S[side==='a'?'b':'a'].items;
-  await autosave([...first,...rest],tags,mark,(n,t)=>{if(alive())st.textContent='Picha '+total+'. Inahifadhi offline: '+n+'/'+t},alive);
-  if(alive())st.textContent='Picha '+total+' kutoka Report Search. Zimehifadhiwa kwa offline.';
-}
-async function library(){
-  app.textContent='';
-  const allq=await all('q');
-  let arts=(await all('art')).sort((a,b)=>b.t-a.t),imgs=(await all('img')).sort((a,b)=>b.t-a.t),qs=allq.filter(x=>!x.kind).sort((a,b)=>b.t-a.t),tab='a';
-  const sum=h('div',{c:'meta'}),okt=h('b'),okc=h('div',{c:'okc'},[h('span',{c:'dot'}),h('div',{},[okt,sum])]),
-    inp=h('input',{c:'in',type:'search','aria-label':'Tafuta ndani ya Hifadhi'}),tabs=h('div',{c:'tabs'}),
-    stk=h('div',{c:'stk'},[inp,tabs]),box2=h('div'),foot=h('div',{c:'foot'});
-  app.append(h('div',{c:'top'},[logo()]),h('h1',{c:'pt',t:'Hifadhi'}),okc);
-  if(sm!=='idb')app.append(h('p',{c:'warn',t:sm==='ls'?'Hifadhi ya kifaa hiki ina nafasi ndogo, picha nyingi huenda zisihifadhiwe.':'Kifaa hiki hakiruhusu kuhifadhi kwa kudumu. Vitu vitapotea ukifunga app.'}));
-  app.append(stk,box2,foot);
-  const empty=()=>h('div',{c:'empty'},[h('p',{t:'Bado hakuna makala zilizohifadhiwa.'}),h('p',{c:'meta',t:'Tafuta kitu ukiwa online. Makala 5 za juu huhifadhiwa zenyewe, na unaweza kuhifadhi zaidi kwa kitufe cha "Hifadhi offline".'}),h('a',{c:'chip',href:'#',t:'Anza kutafuta'})]);
-  const emptyI=()=>h('div',{c:'empty'},[h('p',{t:'Bado hakuna picha zilizohifadhiwa.'}),h('p',{c:'meta',t:'Tafuta upande wa Picha ukiwa online. Picha zinahifadhiwa zenyewe na unaweza kuzitazama bila intaneti.'}),h('a',{c:'chip',href:'#p/',t:'Tafuta picha'})]);
-  const rmArt=a=>()=>del('art',a.id).then(()=>{saved.delete(a.id);arts=arts.filter(x=>x.id!==a.id);draw()});
-  const rmImg=async x=>{await del('img',x.id);imgSaved.delete(x.id);imgs=imgs.filter(y=>y.id!==x.id);draw()};
-  const draw=()=>{
-    const total=arts.reduce((s,a)=>s+sz(a),0)+imgs.reduce((s,r)=>s+szi(r),0);
-    okt.textContent=(arts.length||imgs.length)?'Tayari kusomwa bila intaneti':'Hifadhi ni tupu';
-    sum.textContent='Makala '+arts.length+', picha '+imgs.length+', utafutaji '+qs.length+', nafasi '+fmt(total);
-    tabs.textContent='';[['a','Makala ('+arts.length+')'],['i','Picha ('+imgs.length+')'],['q','Utafutaji ('+qs.length+')']].forEach(([k,t])=>tabs.append(h('button',{c:'tab'+(tab===k?' on':''),type:'button',t,onclick:()=>{tab=k;inp.value='';draw()}})));
-    inp.placeholder=tab==='a'?'Tafuta ndani ya makala zilizohifadhiwa':tab==='i'?'Tafuta ndani ya picha zilizohifadhiwa':'Tafuta ndani ya utafutaji wako';
-    box2.textContent='';foot.textContent='';const v=inp.value.trim();
-    if(tab==='a'){
-      let list=arts.map(a=>({a,ex:''})),ws=null;
-      if(v){list=scoreArts(v,arts);ws=v.toLowerCase().split(/\s+/).filter(w=>w.length>1)}
-      if(!list.length)box2.append(v?h('p',{c:'meta',t:'Hakuna kilichopatikana ndani ya Hifadhi.'}):empty());
-      list.forEach(x=>box2.append(card(x.a,x.ex,ws,rmArt(x.a))));
-    }else if(tab==='i'){
-      const L=v?scoreImgs(v,imgs):imgs;
-      if(!L.length)box2.append(v?h('p',{c:'meta',t:'Hakuna picha iliyopatikana ndani ya Hifadhi.'}):emptyI());
-      else{const g=h('div',{c:'gr'}),tl=new Map(),o={tags:[],onDel:rmImg};L.forEach((x,i)=>g.append(tileEl(x,L,i,o,tl)));box2.append(g)}
-    }else{
-      const l=v?qs.filter(x=>x.q.toLowerCase().includes(v.toLowerCase())):qs;
-      if(!l.length)box2.append(h('p',{c:'meta',t:v?'Hakuna kilichopatikana.':'Bado hujatafuta chochote.'}));
-      l.forEach(x=>{const n=x.res.filter(r=>saved.has(aid(r.lang,r.title))).length;
-        const rx=h('button',{c:'x',type:'button','aria-label':'Ondoa',t:'✕'});
-        const row=h('div',{c:'row'},[h('a',{href:'#s/'+enc(x.q)},[h('span',{t:x.q}),h('small',{t:n+' kati ya '+x.res.length+' zimehifadhiwa - '+ago(x.t)})]),rx]);
-        twoStep(rx,()=>del('q',x.id).then(()=>{qs=qs.filter(y=>y.id!==x.id);draw()}),'✕','Futa?');box2.append(row)});
-    }
-    if(arts.length||qs.length||imgs.length){const cl=h('button',{c:'tab',type:'button',t:'Futa Hifadhi yote'});
-      twoStep(cl,async()=>{for(const a of arts)await del('art',a.id);for(const r of imgs)await del('img',r.id);for(const x of allq)await del('q',x.id);saved.clear();imgSaved.clear();arts=[];imgs=[];qs=[];draw()},'Futa Hifadhi yote','Bofya tena kuthibitisha');foot.append(cl)}
-  };
-  inp.oninput=draw;draw();
-}
-function route(){
-  rt++;const x=decodeURIComponent(location.hash.slice(1)||'');
-  if(x.startsWith('s/'))return results(x.slice(2));
-  if(x.startsWith('p/'))return pics(x.slice(2));
-  if(x.startsWith('a/')){const p=x.slice(2).split('/');return reader(p[0],p.slice(1).join('/'))}
-  if(x==='hifadhi')return library();
-  home();
-}
-const net=()=>{$('#off').style.display=navigator.onLine?'none':'block'};
-addEventListener('online',net);addEventListener('offline',net);net();
-addEventListener('hashchange',route);ready.then(route);
+const modPage=async m=>{const l=LESSONS.filter(x=>x.m===m);let x='';
+  if(m==='ppe')x=await ppeExtras();if(m==='hz')x=hzExtras();
+  app.innerHTML=`<h1>${MOD[m][0]} ${MOD[m][1]}</h1>${bar('Progress',modPct(m))}<div class="wn">${SAFE}</div><div class="g">${l.map(lcard).join('')}</div>${x}`};
+const ppeExtras=async()=>{const c=await getItem('checklists','ppe'),s=(c&&c.items)||[];
+  return `<h2 style="margin-top:24px">PPE Identification</h2><div class="g">${PPE.map((p,i)=>`<button class="c" data-a="ppe" data-id="${i}" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><h3>${p[0]}</h3><span style="color:var(--mu);font-size:13px">Tap for details</span></button>`).join('')}</div>
+  <h2 style="margin-top:24px">PPE Inspection Checklist</h2><div class="c" id="ck">${CHK.map(t=>`<label style="color:var(--fg)"><input type="checkbox" style="width:auto;min-height:0" value="${t}" ${s.includes(t)?'checked':''}> ${t}</label>`).join('')}<p id="ckc">${s.length} / ${CHK.length} completed</p><button class="bt" data-a="ckSave">SAVE INSPECTION</button></div>
+  <h2 style="margin-top:24px">SCBA Air-Supply Calculator</h2><div class="c"><div class="fm"><label>Cylinder pressure (bar)<input id="cp" type="number" min="0" value="300"></label><label>Cylinder capacity (litres)<input id="cc" type="number" min="0" value="6.8" step="0.1"></label><label>Consumption (L/min)<input id="cr" type="number" min="1" value="40"></label></div><button class="bt" data-a="calc">Calculate</button><p id="cout"></p><div class="wn">Training estimate only: not a replacement for manufacturer instructions, fit testing, physiological monitoring or department procedures.</div></div>`};
+const hzExtras=()=>`<h2 style="margin-top:24px">Hazard Classes</h2><div class="g">${HC.map(([n,t])=>`<div class="c"><b>Class ${n}</b><br>${t}</div>`).join('')}</div>
+<h2 style="margin-top:24px">UN Number Search</h2><div class="c"><input id="un" placeholder="e.g. UN 1203" aria-label="Search UN number"><div id="unr"></div></div>`;
+const unRows=q=>{q=q.replace(/un/i,'').trim().toLowerCase();const r=q?UN.filter(u=>u[0].includes(q)||u[1].toLowerCase().includes(q)):UN;return r.map(u=>`<div class="c" style="margin-top:8px"><b>UN ${u[0]}</b> · ${esc(u[1])}<br>Class ${u[2]} · ${esc(u[3])}</div>`).join('')||'<p>No match in demo dataset.</p>'};
+function lesson(id){const l=LESSONS.find(x=>x.id===id);if(!l)return;AppState.currentLesson=id;
+  try{const r=JSON.parse(localStorage.getItem('fr:recent')||'[]').filter(x=>x!==id);r.unshift(id);localStorage.setItem('fr:recent',JSON.stringify(r.slice(0,5)))}catch(e){}
+  const pool=LESSONS.filter(x=>x.id!==id).flatMap(x=>x.obj),ans=l.obj[0],opts=[ans,...pool.sort(()=>Math.random()-.5).filter(x=>!l.obj.includes(x)).slice(0,3)].sort(()=>Math.random()-.5);
+  const li=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`,p=PR[id];
+  app.innerHTML=`<button class="bt s" data-a="go" data-id="${l.m}">← Back</button><div class="c lc" style="margin-top:12px">${imgBox(l.q,MOD[l.m][0])}<div class="b"><h1>${esc(l.title)}</h1><span class="tg">${l.diff}</span><span class="tg">${l.min} min</span><h3>Overview</h3><p>${esc(l.desc)}. ${NOTE}</p><h3>Learning objectives</h3>${li(l.obj)}<h3>Equipment</h3>${li(l.eq)}<h3>Safety considerations</h3>${li([l.safety,'Wear appropriate PPE and follow local SOP/SOG'])}<h3>Common mistakes</h3>${li(['Skipping size-up or communication','Working outside training and authority'])}<h3>Key points</h3>${li([l.obj[0],l.obj[l.obj.length-1]])}</div></div><div class="wn">${SAFE}</div>
+  <div class="c"><h2>Quiz</h2><p>Which of these is a learning objective of “${esc(l.title)}”?</p>${opts.map((o,i)=>`<button class="op" data-a="ans" data-o="${esc(o)}" data-ok="${esc(ans)}">${'ABCD'[i]}. ${esc(o)}</button>`).join('')}<div id="qr" aria-live="polite"></div><div class="row" style="margin-top:12px"><button class="bt" data-a="done" data-id="${id}">${p&&p.done?'✓ Completed':'Mark as completed'}</button><button class="bt s" data-a="bm" data-id="${id}">${BM[id]?'🔖 Saved':'🔖 Bookmark'}</button></div></div>`;
+  loadImgs();window.scrollTo(0,0)}
+/* ===== incidents ===== */
+const fld=([k,l,t,o],v={})=>{const a=`name="${k}" id="f_${k}"`,val=v[k]??'';
+  if(t==='sel')return `<label>${l}<select ${a}>${o.map(x=>`<option ${x===val||(!val&&x==='Draft')?'selected':''}>${x}</option>`).join('')}</select></label>`;
+  if(t==='yn')return `<label>${l}<select ${a}>${['No','Yes'].map(x=>`<option ${x===val?'selected':''}>${x}</option>`).join('')}</select></label>`;
+  if(t==='area')return `<label class="w">${l}<textarea ${a} rows="3">${esc(val)}</textarea></label>`;
+  return `<label>${l}<input ${a} type="${t}" value="${esc(val)}"></label>`};
+let EDIT=null,IFILT={q:'',t:'',s:''};
+async function incident(){const v=EDIT||{num:'INC-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.floor(Math.random()*9e3+1e3),date:new Date().toISOString().slice(0,10),status:'Draft'};
+  app.innerHTML=`<h1>🚨 Incident Report</h1><p style="color:var(--mu)">Saved on this device first (IndexedDB). Works offline.</p><form id="if" class="c"><div class="fm">${IF.map(f=>fld(f,v)).join('')}</div><div class="row"><button type="button" class="bt s" data-a="isave" data-s="Draft">SAVE DRAFT</button><button type="button" class="bt" data-a="isave" data-s="Submitted">SUBMIT REPORT</button><button type="button" class="bt d" data-a="iclear">CLEAR FORM</button></div></form><h2 style="margin-top:20px">Recent Incidents</h2><div class="row"><input id="iq" placeholder="Search" value="${esc(IFILT.q)}" style="flex:2"><select id="it" style="flex:1"><option value="">All types</option>${TYPES.map(t=>`<option ${t===IFILT.t?'selected':''}>${t}</option>`).join('')}</select><select id="is" style="flex:1"><option value="">All status</option>${STAT.map(t=>`<option ${t===IFILT.s?'selected':''}>${t}</option>`).join('')}</select></div><div id="il"></div><div class="row" style="margin-top:12px"><button class="bt s" data-a="ejson">EXPORT JSON</button><button class="bt s" data-a="ecsv">EXPORT CSV</button></div>`;
+  if(EDIT)EDIT=null;incList()}
+const incFilter=async()=>(await getAll('incidents')).filter(i=>(!IFILT.t||i.type===IFILT.t)&&(!IFILT.s||i.status===IFILT.s)&&(!IFILT.q||JSON.stringify(i).toLowerCase().includes(IFILT.q.toLowerCase()))).sort((a,b)=>b.updated-a.updated);
+async function incList(){const l=await incFilter(),e=$('#il');if(!e)return;
+  e.innerHTML=l.map(i=>`<div class="c" style="margin-top:8px"><b>${esc(i.num)}</b> · ${esc(i.type)}<br><span style="color:var(--mu);font-size:13px">${esc(i.loc)} · ${esc(i.date)} · ${esc(i.status)}${i.synced?' · synced':' · local only'}</span><div class="row" style="margin-top:8px"><button class="bt s" data-a="iview" data-id="${i.id}">VIEW</button><button class="bt s" data-a="iedit" data-id="${i.id}">EDIT</button><button class="bt d" data-a="idel" data-id="${i.id}">DELETE</button><button class="bt s" data-a="iprint" data-id="${i.id}">EXPORT / PRINT</button></div></div>`).join('')||'<p>No reports found.</p>'}
+async function trySync(){if(!CONFIG.SYNC_URL){toast('Saved locally. No sync server configured, so the report stays in the queue.');return}
+  if(!navigator.onLine){toast('Offline: queued for sync.');return}
+  for(const q of await getAll('syncQueue')){try{const r=await fetch(CONFIG.SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(q.data)});if(!r.ok)throw 0;const i=await getItem('incidents',q.id);if(i){i.synced=true;await updateItem('incidents',i)}await deleteItem('syncQueue',q.id)}catch(e){toast('Sync failed; will retry later.');return}}
+  toast('Synced.')}
+const csv=l=>{const k=['id',...IF.map(f=>f[0])];return [k.join(','),...l.map(i=>k.map(x=>'"'+String(i[x]??'').replace(/"/g,'""')+'"').join(','))].join('\n')};
+const pview=i=>{const p=$('#pv');p.innerHTML=`<div class="c"><h2>Fire Rescue Incident Report</h2>${IF.map(f=>`<p><b>${f[1]}:</b> ${esc(i[f[0]])}</p>`).join('')}<div class="row no"><button class="bt" onclick="window.print()">PRINT REPORT</button><button class="bt s" onclick="document.getElementById('pv').style.display='none'">Close</button></div></div>`;p.style.display='block'};
+/* ===== equipment ===== */
+async function equipment(){const l=await getAll('equipment'),today=new Date().toISOString().slice(0,10);
+  app.innerHTML=`<h1>🔧 Equipment</h1><form id="ef" class="c"><div class="fm"><label>Name<select name="name">${['Fire hose','Nozzle','Pump','Ladder','SCBA','PPE','Radio','Halligan/tool','Rescue tools','Foam equipment'].map(x=>`<option>${x}</option>`).join('')}</select></label><label>Category<input name="cat"></label><label>Serial Number<input name="serial"></label><label>Condition<select name="cond"><option>GOOD</option><option>OUT OF SERVICE</option></select></label><label>Last Inspection<input type="date" name="last"></label><label>Next Inspection<input type="date" name="next"></label><label>Assigned Station<input name="stn"></label><label class="w">Notes<textarea name="notes" rows="2"></textarea></label></div><button type="button" class="bt" data-a="esave">SAVE</button></form><div style="margin-top:12px">${l.map(e=>{const s=e.cond==='GOOD'&&e.next&&e.next<today?'INSPECTION DUE':e.cond;return `<div class="c" style="margin-top:8px"><b>${esc(e.name)}</b> · ${esc(e.serial)} <span class="tg ${s==='GOOD'?'ok':''}">${s}</span><br><span style="color:var(--mu);font-size:13px">${esc(e.cat)} · ${esc(e.stn)} · next ${esc(e.next)}</span><br><button class="bt d" data-a="edel" data-id="${e.id}">DELETE</button></div>`}).join('')||'<p>No equipment recorded.</p>'}</div>`}
+/* ===== training / settings / search ===== */
+async function training(){app.innerHTML=`<h1>🎓 Training</h1><div class="c">${Object.entries(MOD).map(([m,[,t]])=>bar(t,modPct(m))).join('')}<p>Completed lessons: ${Object.values(PR).filter(p=>p.done).length} / ${LESSONS.length}</p><p style="color:var(--mu)">Certificate: placeholder. Issued by your department, not by this app.</p></div><h2 style="margin-top:20px">My Bookmarks</h2><div class="g">${LESSONS.filter(l=>BM[l.id]).map(lcard).join('')||'<p>No bookmarks yet.</p>'}</div>`;loadImgs()}
+async function settings(){app.innerHTML=`<h1>⚙️ Settings</h1><div class="c"><h3>Image keys</h3><label>Unsplash Access Key (never paste a Secret key)<input id="ku" value="${esc(CONFIG.UNSPLASH_ACCESS_KEY)}" autocomplete="off"></label><label>Pixabay API key<input id="kp" value="${esc(CONFIG.PIXABAY_KEY)}" autocomplete="off"></label><label>Sync server URL (optional)<input id="ks" value="${esc(CONFIG.SYNC_URL)}"></label><button class="bt" data-a="ksave">SAVE</button></div><div class="c" style="margin-top:12px"><h3>Data</h3><div class="row"><button class="bt s" data-a="eall">EXPORT APP DATA</button><label class="bt s" style="margin:0;color:#fff">IMPORT APP DATA<input type="file" accept="application/json" id="imp" hidden></label><button class="bt d" data-a="clr">Clear local data</button></div></div><div class="c" style="margin-top:12px">Fire Rescue Command &amp; Training. ${NOTE}</div>`}
+async function search(q){q=q.trim().toLowerCase();if(!q){route();return}
+  const m=[...LESSONS.filter(l=>(l.title+l.desc+l.obj.join(' ')+l.eq.join(' ')).toLowerCase().includes(q)).map(l=>`<div class="c" style="margin-top:8px"><a href="#" data-a="open" data-id="${l.id}">${esc(l.title)}</a> <span class="tg">${MOD[l.m][1]}</span></div>`),
+   ...PPE.filter(p=>p.join(' ').toLowerCase().includes(q)).map(p=>`<div class="c" style="margin-top:8px">PPE: <a href="#" data-a="go" data-id="ppe">${p[0]}</a></div>`),
+   ...UN.filter(u=>u.join(' ').toLowerCase().includes(q)).map(u=>`<div class="c" style="margin-top:8px">UN ${u[0]} · ${esc(u[1])} · Class ${u[2]}</div>`),
+   ...(await getAll('incidents')).filter(i=>JSON.stringify(i).toLowerCase().includes(q)).map(i=>`<div class="c" style="margin-top:8px">Report: <a href="#" data-a="go" data-id="incident">${esc(i.num)}</a> · ${esc(i.type)}</div>`),
+   ...(await getAll('equipment')).filter(e=>JSON.stringify(e).toLowerCase().includes(q)).map(e=>`<div class="c" style="margin-top:8px">Equipment: ${esc(e.name)} ${esc(e.serial)}</div>`)];
+  app.innerHTML=`<h1>Search: ${esc(q)}</h1>${m.join('')||'<p>No results.</p>'}`}
+/* ===== router ===== */
+function route(){const p=AppState.currentPage;$('#nv').innerHTML=NAV.map(([k,i,t])=>`<button data-a="go" data-id="${k}" class="${k===p?'on':''}" ${k===p?'aria-current="page"':''}><span>${i}</span>${t}</button>`).join('');
+  ({dashboard,incident,equipment,training,settings}[p]||(()=>modPage(p)))();if(MOD[p]||p==='dashboard')setTimeout(loadImgs,0);window.scrollTo(0,0)}
+const go=p=>{AppState.currentPage=p;$('#gs').value='';history.replaceState(null,'','#'+p);route()};
+/* ===== events (delegation) ===== */
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id;if(b.tagName==='A')e.preventDefault();
+  if(a==='go')go(id);
+  else if(a==='open')lesson(id);
+  else if(a==='bm'){if(BM[id]){delete BM[id];await deleteItem('bookmarks',id)}else{BM[id]=1;await updateItem('bookmarks',{id})}toast(BM[id]?'Bookmarked':'Bookmark removed');$('#qr')?lesson(id):route()}
+  else if(a==='ans'){const ok=b.dataset.o===b.dataset.ok;b.classList.add(ok?'y':'n');$('#qr').innerHTML=`<p><b>${ok?'Correct':'Incorrect'}</b>. Explanation: “${esc(b.dataset.ok)}” is one of this lesson’s objectives.</p>`;const l=LESSONS.find(x=>x.id===AppState.currentLesson),p=PR[l.id]||{id:l.id};p.score=ok?100:0;PR[l.id]=p;await updateItem('progress',p)}
+  else if(a==='done'){const p=PR[id]||{id};p.done=true;PR[id]=p;await updateItem('progress',p);toast('Lesson completed');b.textContent='✓ Completed'}
+  else if(a==='ppe'){const p=PPE[id];$('#pv').innerHTML=`<div class="c" style="background:var(--cd);color:var(--fg)"><h2>${p[0]}</h2><p><b>Purpose:</b> ${p[1]}</p><p><b>Inspection points:</b> ${p[2]}</p><p><b>Maintenance:</b> ${p[3]}</p><button class="bt" onclick="document.getElementById('pv').style.display='none'">Close</button></div>`;$('#pv').style.display='block'}
+  else if(a==='ckSave'){const items=[...document.querySelectorAll('#ck input:checked')].map(x=>x.value);await updateItem('checklists',{id:'ppe',items,t:Date.now()});$('#ckc').textContent=items.length+' / '+CHK.length+' completed';toast('Inspection saved')}
+  else if(a==='calc'){const P=+$('#cp').value,C=+$('#cc').value,R=+$('#cr').value;$('#cout').textContent=P>0&&C>0&&R>0?`Estimated air: ${Math.round(P*C)} L, about ${(P*C/R).toFixed(1)} minutes at ${R} L/min (before reserve margin).`:'Enter positive values.'}
+  else if(a==='isave'){const f=$('#if'),v=Object.fromEntries(new FormData(f));v.status=b.dataset.s==='Submitted'&&v.status==='Draft'?'Submitted':v.status==='Draft'?b.dataset.s:v.status;if(!v.num||!v.loc){toast('Incident number and location are required');return}
+    const old=(await getAll('incidents')).find(i=>i.num===v.num);const rec={...(old||{}),...v,id:old?old.id:String(Date.now()),updated:Date.now(),synced:false};await updateItem('incidents',rec);
+    if(rec.status!=='Draft'){await updateItem('syncQueue',{id:rec.id,data:rec});await trySync()}else toast('Draft saved');incList()}
+  else if(a==='iclear'){EDIT=null;incident()}
+  else if(a==='iedit'){EDIT=await getItem('incidents',id);incident();window.scrollTo(0,0)}
+  else if(a==='iview'||a==='iprint')pview(await getItem('incidents',id));
+  else if(a==='idel'){if(confirm('Delete this report?')){await deleteItem('incidents',id);await deleteItem('syncQueue',id);incList()}}
+  else if(a==='ejson')dl('incidents.json',JSON.stringify(await incFilter(),null,1),'application/json');
+  else if(a==='ecsv')dl('incidents.csv',csv(await incFilter()),'text/csv');
+  else if(a==='esave'){const v=Object.fromEntries(new FormData($('#ef')));await updateItem('equipment',{...v,id:String(Date.now())});toast('Saved');equipment()}
+  else if(a==='edel'){await deleteItem('equipment',id);equipment()}
+  else if(a==='ksave'){CONFIG.UNSPLASH_ACCESS_KEY=$('#ku').value.trim();CONFIG.PIXABAY_KEY=$('#kp').value.trim();CONFIG.SYNC_URL=$('#ks').value.trim();await updateItem('settings',{id:'keys',unsplash:CONFIG.UNSPLASH_ACCESS_KEY,pixabay:CONFIG.PIXABAY_KEY});toast('Saved')}
+  else if(a==='eall'){const o={};for(const s of['progress','incidents','checklists','equipment','bookmarks','settings'])o[s]=await getAll(s);dl('fire-rescue-backup.json',JSON.stringify(o,null,1),'application/json')}
+  else if(a==='clr'){if(confirm('Delete ALL local data?')){for(const s of STORES)for(const r of await getAll(s))await deleteItem(s,r.id);PR={};BM={};toast('Cleared');route()}}
+});
+document.addEventListener('change',async e=>{if(e.target.id==='imp'){try{const o=JSON.parse(await e.target.files[0].text());for(const s in o)if(STORES.includes(s))for(const r of o[s])await updateItem(s,r);await loadState();toast('Data imported');route()}catch(x){toast('Import failed: invalid file')}}
+  if(e.target.id==='it'||e.target.id==='is'){IFILT.t=$('#it').value;IFILT.s=$('#is').value;incList()}});
+let dt;document.addEventListener('input',e=>{const i=e.target.id;if(i==='gs'){clearTimeout(dt);dt=setTimeout(()=>search(e.target.value),250)}
+  else if(i==='iq'){IFILT.q=e.target.value;clearTimeout(dt);dt=setTimeout(incList,200)}
+  else if(i==='un')$('#unr').innerHTML=unRows(e.target.value)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#pv').style.display='none'});
+$('#pv').addEventListener('click',e=>{if(e.target.id==='pv')e.target.style.display='none'});
+/* ===== online status (navigator.onLine plus a real reachability probe) ===== */
+async function ping(){let ok=navigator.onLine;if(ok){try{await fetch('https://www.gstatic.com/generate_204',{mode:'no-cors',cache:'no-store'})}catch(e){ok=false}}
+  AppState.online=ok;$('#on').textContent=ok?'🟢 ONLINE':'🔴 OFFLINE';$('#on').title=ok?'':'Offline Mode: Core training and saved reports remain available.';if(!ok)toast('Offline Mode: Core training and saved reports remain available.');else trySync()}
+addEventListener('online',ping);addEventListener('offline',ping);setInterval(ping,6e4);
+document.addEventListener('DOMContentLoaded',()=>0);
+(async()=>{try{await loadState()}catch(e){toast('Local storage unavailable: data will not persist.')}
+  const h=location.hash.slice(1);if(NAV.some(n=>n[0]===h))AppState.currentPage=h;route();ping()})();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
