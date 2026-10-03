@@ -92,16 +92,81 @@ main{padding:0 0 40px}
 #lb{position:fixed;inset:0;background:#000e;z-index:50;display:none;align-items:center;justify-content:center;padding:14px}
 #lb.on{display:flex}
 #lb img,#lb video{max-width:100%;max-height:86vh;border-radius:10px}
-#lb button{position:absolute;top:10px;right:14px;color:#fff;font-size:34px}
+
 @media(min-width:760px){.card{border-radius:0}.sb input{font-size:19px;padding:17px 24px}.mas{columns:3}.vgrid{grid-template-columns:1fr 1fr}.story{width:132px;height:190px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+
+/* Muonekano wa feed ya simu */
+:root{--bg:#dcdfe3}
+.top{padding:12px 14px 6px}
+.logo{font-size:34px;letter-spacing:-.05em}
+.ic{gap:10px}.ic button{width:50px;height:50px;font-size:26px;background:#e4e6ea;font-weight:700}
+nav{border-top:0;padding:4px 0 0}
+nav button{flex:1;padding:10px 0 12px;color:#5b6370;display:grid;place-items:center}
+nav button[aria-selected=true]{color:var(--acc)}
+nav svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+header{border-bottom:1px solid var(--line)}
+.sb{padding:14px 14px;gap:10px;border-bottom:6px solid var(--bg)}
+.sb .av{width:58px;height:58px;font-size:22px;border:0;box-shadow:none}
+.sb form{background:#eceef1;border:0}
+.sb input{font-size:19px;padding:15px 6px 15px 22px}
+.sb form button{background:none;color:var(--ink);margin:0;padding:0 16px}
+.sb form button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.pk{flex:none;display:grid;justify-items:center;gap:2px;font-size:14px;font-weight:600}
+.pk svg{width:32px;height:32px;fill:#2fb15d;stroke:none}
+.card{border-bottom:6px solid var(--bg)}
+.stories{padding:12px 10px 14px;gap:8px}
+.story{width:clamp(104px,28vw,150px);height:auto;aspect-ratio:3/5.2;border-radius:16px}
+.story em{position:absolute;left:8px;top:8px;min-width:30px;height:30px;padding:0 8px;border-radius:9px;background:var(--acc);color:#fff;font:700 18px/30px "Segoe UI",sans-serif;text-align:center;font-style:normal}
+.story span{font-weight:700;font-size:15px;padding:30px 9px 10px}
+.story.add{display:block;padding:0;background:#f3f5f7;border:1px solid var(--line);text-align:center}
+.story.add .tp{height:74%;background:#cfd6dc;overflow:hidden}
+.story.add i{position:absolute;left:50%;top:74%;transform:translate(-50%,-50%);width:48px;height:48px;font-size:32px;line-height:42px;border:3px solid #fff}
+.story.add b{position:absolute;inset:auto 0 12px;font-size:15px}
+.ph{padding:14px 14px 10px;gap:12px}
+.ph .av{width:58px;height:58px;font-size:22px;border:3px solid #fff;box-shadow:0 0 0 3px var(--acc)}
+.ph b{font-size:19px}.ph small{font-size:15px}
+.ph .x button{width:40px;height:40px;font-size:22px;color:#4b5260;font-weight:700}
+.q{font-size:17px;padding:0 14px 8px}
+.body h3{font-size:21px}.body{font-size:18px}
+.rt{font-size:19px;padding:4px 14px}.sn{font-size:17px}
+.sec{background:#fff;border-bottom:6px solid var(--bg);padding:14px}
+@media(min-width:760px){.story{width:150px}}
+
+/* Rangi na tabia za feed ya kisasa */
+:root{--acc:#1877f2;--ink:#050505;--mut:#65676b;--line:#ced0d4;--bg:#d8dadf}
+body{font-family:"Segoe UI",Helvetica,Arial,sans-serif}
+.logo b{color:inherit}
+.ic button{background:#e4e6eb;color:#050505}
+.sb form{background:#f0f2f5}
+.sb form button svg{stroke:#65676b}
+.pf{position:relative;overflow:visible;background:#cfd6dc;color:#fff}
+.pf img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.pf .on{position:absolute;right:-1px;bottom:1px;width:17px;height:17px;border-radius:50%;background:#31a24c;border:3px solid #fff}
+.ph .pf .on{display:none}
+.more{color:var(--mut);font-weight:600;padding:0}
+.act button{color:#65676b;font-weight:600}
+.story em{background:var(--acc)}
+
+nav button{font-size:27px;filter:grayscale(1);opacity:.6}
+nav button[aria-selected=true]{filter:none;opacity:1}
+.pk span{font-size:28px;line-height:1.1}
+.sb form button{font-size:22px}
+.ic button{font-size:22px}
+#menu{max-height:75vh;overflow:auto}
+#menu h4{padding:8px 6px 2px}
+#lb>button{position:absolute;top:10px;right:14px;color:#fff;font-size:34px}
+#lb button:not(:first-child){position:static}
+#lbc{max-width:100%;text-align:center}
+.lbb{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.lbb button{background:#fff;color:#050505;border-radius:20px;padding:9px 18px;font-weight:600;font-size:16px}
 </style></head>
 <body>
 <header><div class="wrap">
  <div class="top"><div class="logo">R<b>-Search</b></div>
-  <div class="ic"><button id="plus" aria-label="Utafutaji mpya">+</button><button id="mag" aria-label="Tafuta">&#9906;</button><button id="mn" aria-label="Menyu">&#9776;</button></div></div>
+  <div class="ic"><button id="plus" aria-label="Utafutaji mpya">➕</button><button id="mag" aria-label="Tafuta">🔍</button><button id="mn" aria-label="Menyu">&#9776;</button></div></div>
  <div id="menu"></div>
- <div class="sb"><div class="av">R</div><form id="f"><input id="q" type="search" placeholder="Unatafuta nini?" autocomplete="off" aria-label="Unatafuta nini?"><button>Tafuta</button></form></div>
+ <div class="sb"><div class="av pf">R<img src="profile.jpg" alt="" onerror="this.remove()"><i class="on"></i></div><form id="f"><input id="q" type="search" placeholder="Unatafuta nini?" autocomplete="off" aria-label="Unatafuta nini?"><button aria-label="Tafuta">🔍</button></form><button type="button" id="pk" class="pk"><span>🖼️</span>Picha</button></div>
  <nav role="tablist"></nav>
 </div></header>
 <div class="wrap"><main id="out"></main></div>
@@ -110,7 +175,7 @@ main{padding:0 0 40px}
 const $=s=>document.querySelector(s),TK="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",PX="57792634-5e89dd610e4c1c840f815c524";
 const TABS=[["all","Yote","🔎"],["img","Picha","🖼️"],["vid","Video","🎥"],["aud","Audio","🎧"]];
 const EX=["Mafunzo ya zimamoto","Moto wa nyumba","Hali ya hewa Lindi","How to use SCBA","Fire safety training"];
-let tab="all",q="",S={},run=0,cur=null;
+let tab="all",q="",S={},run=0,cur=null,view=null;
 const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
 const safe=u=>{try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:"#"}catch(e){return"#"}};
 const host=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}};
@@ -123,25 +188,34 @@ async function jget(u,o){let r;try{r=await fetch(u,o)}catch(e){throw new Error("
  if(!r.ok)throw new Error("Hitilafu imetokea ("+r.status+").");return r.json()}
 /* Tabs */
 const nav=$("nav");
-TABS.forEach(([k,l,ic])=>{const b=el("button");b.append(el("span",null,ic),l);b.role="tab";b.dataset.k=k;b.onclick=()=>setTab(k);nav.append(b)});
-function setTab(k){tab=k;nav.querySelectorAll("button").forEach(b=>b.setAttribute("aria-selected",b.dataset.k===k));scrollTo(0,0);if(q)render();else home()}
+TABS.forEach(([k,l,ic])=>{const b=el("button");b.textContent=ic;b.setAttribute("aria-label",l);b.title=l;b.role="tab";b.dataset.k=k;b.onclick=()=>setTab(k);nav.append(b)});
+function setTab(k){tab=k;view=null;nav.querySelectorAll("button").forEach(b=>b.setAttribute("aria-selected",b.dataset.k===k));scrollTo(0,0);if(q)render();else home()}
 /* Search */
 $("#f").onsubmit=e=>{e.preventDefault();const v=$("#q").value.trim();if(v){$("#q").blur();go(v)}};
+$("#pk").onclick=()=>q?setTab("img"):$("#q").focus();
 $("#plus").onclick=$("#mag").onclick=()=>{$("#q").focus();$("#q").select()};
-$("#mn").onclick=()=>{const m=$("#menu");m.replaceChildren(el("h4",null,"Ulizotafuta hivi karibuni"));
- const h=hist();if(!h.length)m.append(el("p","msg","Bado hakuna."));
- h.forEach(x=>{const b=el("button","h",x);b.onclick=()=>{m.classList.remove("on");go(x)};m.append(b)});
- if(h.length){const c=el("button","h","Futa historia");c.onclick=()=>{try{localStorage.removeItem("rs_h")}catch(e){}m.classList.remove("on")};m.append(c)}
- m.classList.toggle("on")};
+$("#mn").onclick=async()=>{const m=$("#menu");if(m.classList.contains("on")){m.classList.remove("on");return}
+ const all=await dball(),ss=all.filter(x=>x.k[0]==="s").sort((a,b)=>b.t-a.t),im=all.filter(x=>x.k[0]==="i");
+ m.replaceChildren();
+ const add=(t,f)=>{const b=el("button","h",t);b.onclick=()=>{m.classList.remove("on");f()};m.append(b)};
+ add("📥 Hifadhi za offline ("+ss.length+")",()=>showSaved(ss));
+ add("🖼️ Picha zilizohifadhiwa ("+im.length+")",()=>showSavedImgs(im));
+ m.append(el("h4",null,"🕘 Ulizotafuta hivi karibuni"));
+ const h=hist();if(!h.length)m.append(el("h4",null,"Bado hakuna."));
+ h.forEach(x=>add(x,()=>go(x)));
+ if(h.length)add("🗑️ Futa historia",()=>{try{localStorage.removeItem("rs_h")}catch(e){}});
+ m.classList.add("on")};
 document.addEventListener("click",e=>{if(!e.target.closest("#menu,#mn"))$("#menu").classList.remove("on")});
-function go(v){q=v;$("#q").value=v;saveH(v);S={};const id=++run;
+function go(v){q=v;view=null;$("#q").value=v;saveH(v);S={};const id=++run;
  $("#out").replaceChildren(el("div","sk"),el("div","sk"),el("div","sk"));
  const pe=tr(v,"en").then(en=>en.slice(0,100));
  S.imgP=pe.then(en=>jget("https://pixabay.com/api/?key="+PX+"&q="+encodeURIComponent(en)+"&per_page=24&safesearch=true")).then(d=>S.imgs=(d.hits||[]).map(h=>({u:h.webformatURL,l:h.largeImageURL,t:h.tags||v}))).catch(()=>S.imgs=[]);
  S.webP=jget("https://api.tavily.com/search",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+TK},body:JSON.stringify({query:v,search_depth:"advanced",max_results:10,include_answer:true,include_images:true})})
   .then(async d=>{S.web={ans:d.answer?await tr(d.answer,"sw"):"",res:d.results||[],ims:(d.images||[]).map(x=>typeof x==="string"?x:x.url).filter(Boolean)}}).catch(e=>{S.web={err:e.message,res:[],ims:[]}});
  S.pe=pe;
- Promise.all([S.imgP,S.webP]).then(()=>{if(id===run){render();if(S.web&&!S.web.err)try{localStorage.setItem("rs_cache",JSON.stringify({q:v,web:S.web,imgs:S.imgs||[]}))}catch(e){}}});
+ Promise.all([S.imgP,S.webP]).then(async()=>{if(id!==run)return;
+ if(S.web.err){const c=await dbget("s:"+v.toLowerCase());if(c){S.web=c.web;S.imgs=c.imgs||[];S.note="Hakuna intaneti: unaona matokeo yaliyohifadhiwa."}}
+ render();if(!S.web.err&&!S.note)saveSearch(v)});
  if(tab!=="all")render()}
 function home(){const o=$("#out");const b=el("div","msg");b.append(el("p",null,"Andika swali au neno unalotafuta."));
  const c=el("div","chips");EX.forEach(x=>{const k=el("button",null,x);k.onclick=()=>go(x);c.append(k)});b.append(c);o.replaceChildren(b)}
@@ -153,38 +227,40 @@ async function lazy(kind){const en=await S.pe,id=run;
  }catch(e){S[kind]=[];S[kind+"Err"]=e.message}
  if(id===run&&tab===kind)render()}
 /* Render */
-function render(){const o=$("#out");if(!q)return home();
- if(tab==="all"){if(!S.web){return}o.replaceChildren(stories(),ai(),results());return}
+function render(){const o=$("#out");if(view)return;if(!q)return home();
+ if(tab==="all"){if(!S.web){return}o.replaceChildren(...[S.note&&el("p","msg",S.note),stories(),ai(),results()].filter(Boolean));return}
  if(tab==="img"){if(!S.imgs){o.replaceChildren(el("div","sk"));return}o.replaceChildren(grid());return}
  if(!S[tab]){o.replaceChildren(el("div","sk"),el("div","sk"));lazy(tab);return}
  if(S[tab+"Err"])return void o.replaceChildren(el("p","msg err",S[tab+"Err"]));
  if(!S[tab].length)return void o.replaceChildren(el("p","msg","Hakuna "+(tab==="vid"?"video":"audio")+' za "'+q+'".'));
  o.replaceChildren(tab==="vid"?vids():auds())}
-function img(u,alt){const i=el("img");i.src=safe(u);i.alt=alt||"";i.loading="lazy";i.referrerPolicy="no-referrer";return i}
-function stories(){const c=el("div","card"),r=el("div","stories");const pool=[...(S.imgs||[]).slice(0,8)];
- if(!pool.length)return document.createDocumentFragment();
- c.append(el("div","sec","Picha Zinazohusiana"));
- const ad=el("button","story add");ad.append(el("i",null,"+"),"Picha zote");ad.onclick=()=>setTab("img");r.append(ad);
- pool.forEach(p=>{const s=el("button","story"),sp=el("span",null,p.t.split(",")[0]);sp.append(el("small",null,"Pixabay"));
-  const i=img(p.u,p.t);i.onerror=()=>s.remove();s.append(i,sp);s.onclick=()=>lb(img(p.l||p.u,p.t));r.append(s)});
+function img(u,alt,b){const i=el("img");i.src=b?URL.createObjectURL(b):safe(u);i.alt=alt||"";i.loading="lazy";i.referrerPolicy="no-referrer";return i}
+function stories(){const c=el("div","card"),r=el("div","stories"),I=S.imgs||[];
+ if(!I.length)return document.createDocumentFragment();
+ const cnt={},pool=[];I.forEach(p=>{const k=p.t.split(",")[0].trim().toLowerCase();cnt[k]=(cnt[k]||0)+1;if(cnt[k]===1)pool.push([k,p])});
+ const P=(pool.length<4?I.map(p=>[p.t.split(",")[0].trim().toLowerCase(),p]):pool).slice(0,8);
+ const ad=el("button","story add"),tp=el("div","tp"),i0=img(I[0].u,"",I[0].b);i0.onerror=()=>i0.remove();tp.append(i0);
+ ad.append(tp,el("i",null,"+"),el("b",null,I.length+" picha"));ad.onclick=()=>setTab("img");r.append(ad);
+ P.forEach(([k,p])=>{const s=el("button","story"),sp=el("span",null,p.t.split(",")[0]),bd=el("em",null,String(cnt[k]||1));
+  const i=img(p.u,p.t,p.b);i.onerror=()=>s.remove();s.append(i,bd,sp);s.onclick=()=>lb(img(p.l||p.u,p.t),p);r.append(s)});
  c.append(r);return c}
 function ai(){const c=el("article","card"),W=S.web;
- const h=el("div","ph");h.append(el("div","av","R"));const n=el("div");n.append(el("b",null,"R-Search AI"),el("small",null,"Jibu la AI · sasa hivi 🌐"));h.append(n);
- const xs=el("div","x"),d1=el("button",null,"⋯"),d2=el("button",null,"✕");d2.setAttribute("aria-label","Ficha jibu");d1.setAttribute("aria-label","Zaidi");d2.onclick=()=>c.remove();xs.append(d1,d2);h.append(xs);
+ const h=el("div","ph"),pa=el("div","av pf","R"),pi=el("img");pi.src="profile.jpg";pi.alt="";pi.onerror=()=>pi.remove();pa.append(pi);h.append(pa);const n=el("div");n.append(el("b",null,"R-Search AI"),el("small",null,"Jibu la AI • sasa hivi 🌐"));h.append(n);
+ const xs=el("div","x"),d1=el("button",null,"•••"),d2=el("button",null,"✕");d2.setAttribute("aria-label","Ficha jibu");d1.setAttribute("aria-label","Zaidi");d2.onclick=()=>c.remove();xs.append(d1,d2);h.append(xs);
  c.append(h,el("div","q","Umeuliza: "+q));
  d1.onclick=()=>{const a=c.querySelector(".act button:nth-child(3)");if(a)a.click()};
  if(W.err||!W.ans){c.append(el("p","msg",W.err||"AI haikuweza kuandaa jibu la swali hili. Tazama matokeo hapa chini."));return c}
  const ss=W.ans.split(/(?<=[.!?])\s+/).filter(Boolean),b=el("div","body");
- b.append(el("h3",null,q),el("p",null,ss.slice(0,2).join(" ")));
- if(ss.length>2){const u=el("ul");ss.slice(2,8).forEach(x=>u.append(el("li",null,x)));b.append(u)}
+ const p1=el("p",null,ss.slice(0,2).join(" ")+" ");b.append(el("h3",null,q),p1);
+ if(ss.length>2){const u=el("ul");ss.slice(2,8).forEach(x=>u.append(el("li",null,x)));u.hidden=true;const mo=el("button","more","... Ona zaidi");mo.onclick=()=>{u.hidden=false;mo.remove()};p1.append(mo);b.append(u)}
  c.append(b);
  const pool=W.ims.length?W.ims:(S.imgs||[]).map(x=>x.l||x.u);
  if(pool[0]){const f=el("figure","pic"),i=img(pool[0],q);i.onerror=()=>f.remove();f.append(i,el("small",null,"Picha inayohusiana na jibu"));c.append(f)}
  const s=el("div","src");s.id="src";s.append(el("b",null,"Vyanzo"));
  W.res.slice(0,4).forEach(x=>{const a=el("a",null,"• "+host(x.url));a.href=safe(x.url);a.target="_blank";a.rel="noopener noreferrer";s.append(a)});c.append(s);
- const ac=el("div","act"),b1=el("button",null,"Vyanzo"),b2=el("button",null,"Nakili"),b3=el("button",null,"Shiriki");
+ const ac=el("div","act"),b1=el("button",null,"🔗 Vyanzo"),b2=el("button",null,"📋 Nakili"),b3=el("button",null,"↗ Shiriki");
  b1.onclick=()=>s.scrollIntoView({behavior:"smooth",block:"center"});
- b2.onclick=async()=>{try{await navigator.clipboard.writeText(W.ans);b2.textContent="Imenakiliwa"}catch(e){b2.textContent="Imeshindikana"}setTimeout(()=>b2.textContent="Nakili",1800)};
+ b2.onclick=async()=>{try{await navigator.clipboard.writeText(W.ans);b2.textContent="✔ Imenakiliwa"}catch(e){b2.textContent="Imeshindikana"}setTimeout(()=>b2.textContent="📋 Nakili",1800)};
  b3.onclick=()=>{const d={title:"R-Search: "+q,text:W.ans.slice(0,200),url:location.href};navigator.share?navigator.share(d).catch(()=>{}):b2.click()};
  ac.append(b1,b2,b3);c.append(ac);return c}
 function results(){const f=document.createDocumentFragment(),W=S.web;
@@ -192,7 +268,8 @@ function results(){const f=document.createDocumentFragment(),W=S.web;
  f.append(el("div","sec","Matokeo ya Utafutaji"));
  const pool=W.ims.slice(1);
  W.res.forEach((x,i)=>{const c=el("article","card");
-  const m=el("div","meta");m.append(el("b",null,host(x.url)));if(x.published_date)m.append(el("span",null,x.published_date.slice(0,16)));
+  const m=el("div","ph"),mn=el("div");mn.append(el("b",null,host(x.url)),el("small",null,(x.published_date?x.published_date.slice(0,16):"Chanzo cha wavuti")+" \u2022 \u{1F310}"));
+  const mx=el("div","x"),m1=el("button",null,"•••"),m2=el("button",null,"✕");m2.setAttribute("aria-label","Ficha");m2.onclick=()=>c.remove();m1.onclick=()=>window.open(safe(x.url),"_blank","noopener");mx.append(m1,m2);m.append(el("div","av",(host(x.url)[0]||"R").toUpperCase()),mn,mx);
   const t=el("div","rt",x.title||x.url),sn=el("p","sn",(x.content||"").slice(0,240)+((x.content||"").length>240?"...":""));
   c.append(m,t,sn);
   if(pool[i]){const fg=el("figure","pic"),im=img(pool[i],x.title);im.onerror=()=>fg.remove();fg.append(im);c.append(fg)}
@@ -201,18 +278,18 @@ function results(){const f=document.createDocumentFragment(),W=S.web;
  return f}
 function grid(){const g=el("div","mas");
  if(!S.imgs.length)return el("p","msg",'Hakuna picha za "'+q+'".');
- S.imgs.forEach(p=>{const f=el("figure"),i=img(p.u,p.t);i.onerror=()=>f.remove();f.append(i,el("figcaption",null,p.t.split(",").slice(0,2).join(",")+" · Pixabay"));f.onclick=()=>lb(img(p.l||p.u,p.t));g.append(f)});return g}
+ S.imgs.forEach(p=>{const f=el("figure"),i=img(p.u,p.t,p.b);i.onerror=()=>f.remove();f.append(i,el("figcaption",null,p.t.split(",").slice(0,2).join(",")));f.onclick=()=>lb(img(p.l||p.u,p.t),p);g.append(f)});return g}
 function vids(){const g=el("div","vgrid");
  S.vid.forEach(v=>{const c=el("div","card"),b=el("button","vid"),th=el("div","th");
   if(v.p){const i=img(v.p,v.t);i.onerror=()=>i.remove();th.append(i)}
   th.append(el("div","pl","▶"),el("span","du",mmss(v.d)));
-  b.append(th,el("div","rt",v.t.split(",").slice(0,3).join(", ")),el("div","sn","Pixabay · "+(v.by||"")));
+  b.append(th,el("div","rt",v.t.split(",").slice(0,3).join(", ")),el("div","sn",(v.by||"")));
   b.onclick=()=>{const vd=el("video");vd.src=safe(v.u);vd.controls=true;vd.autoplay=true;vd.playsInline=true;lb(vd)};
   c.append(b);g.append(c)});return g}
 function auds(){const f=document.createDocumentFragment();
  S.aud.forEach(a=>{const c=el("div","card au"),p=el("button","p","▶"),i=el("div","i"),bar=el("div","bar"),fill=el("i");bar.append(fill);
   const tm=el("div","tm"),t1=el("span",null,"0:00"),t2=el("span",null,a.d?mmss(a.d):"");tm.append(t1,t2);
-  i.append(el("small",null,"🎧 Audio"),el("b",null,a.t),el("small",null,[a.src,a.by].filter(Boolean).join(" · ")),bar,tm);
+  i.append(el("small",null,"🎧 Audio"),el("b",null,a.t),el("small",null,a.by),bar,tm);
   const au=new Audio();au.preload="none";au.src=safe(a.u);
   p.setAttribute("aria-label","Cheza");
   p.onclick=()=>{if(au.paused){if(cur&&cur!==au)cur.pause();cur=au;au.play().catch(()=>{t2.textContent="Haichezi"})}else au.pause()};
@@ -221,12 +298,37 @@ function auds(){const f=document.createDocumentFragment();
   au.onloadedmetadata=()=>t2.textContent=mmss(au.duration);
   bar.onclick=e=>{if(au.duration)au.currentTime=au.duration*(e.offsetX/bar.clientWidth)};
   c.append(p,i);f.append(c)});return f}
+/* Hifadhi ya offline (IndexedDB) */
+const DB=new Promise(res=>{try{const r=indexedDB.open("rsearch",1);r.onupgradeneeded=()=>r.result.createObjectStore("c",{keyPath:"k"});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});
+async function dbop(w,f){const d=await DB;if(!d)return null;return new Promise(r=>{try{const t=d.transaction("c",w?"readwrite":"readonly"),q=f(t.objectStore("c"));t.oncomplete=()=>r(q&&q.result!==undefined?q.result:null);t.onerror=t.onabort=()=>r(null)}catch(e){r(null)}})}
+const dbput=o=>dbop(1,s=>s.put(o)),dbget=k=>dbop(0,s=>s.get(k)),dbdel=k=>dbop(1,s=>s.delete(k)),dball=()=>dbop(0,s=>s.getAll()).then(x=>x||[]);
+async function saveSearch(v){const rec={k:"s:"+v.toLowerCase(),t:Date.now(),q:v,web:S.web,imgs:(S.imgs||[]).map(x=>({u:x.u,l:x.l,t:x.t}))};
+ await dbput(rec);
+ await Promise.all(rec.imgs.slice(0,12).map(async x=>{try{const r=await fetch(x.u);if(r.ok)x.b=await r.blob()}catch(e){}}));
+ await dbput(rec)}
+function back(t){const d=el("div","sec"),b=el("button","more","← Rudi");b.onclick=()=>{view=null;q?render():home()};d.append(b,document.createTextNode("   "+t));return d}
+function showSaved(ss){view="saved";const o=$("#out");o.replaceChildren(back("📥 Hifadhi za offline"));scrollTo(0,0);
+ if(!ss.length){o.append(el("p","msg","Bado hakuna. Kila unachotafuta kinahifadhiwa kiotomatiki, na kinafunguka hata bila intaneti."));return}
+ ss.forEach(x=>{const c=el("div","card"),b=el("button","vid");b.append(el("div","rt","🔎 "+x.q),el("div","sn",new Date(x.t).toLocaleString("sw")+" • matokeo "+((x.web&&x.web.res)||[]).length));
+  b.onclick=()=>{view=null;q=x.q;$("#q").value=q;S={web:x.web,imgs:x.imgs||[],pe:tr(q,"en").then(v=>v.slice(0,100)),note:navigator.onLine?"":"Unaona matokeo yaliyohifadhiwa."};setTab("all")};
+  const d=el("button","more","🗑️ Futa");d.style.margin="0 14px 12px";d.onclick=async()=>{await dbdel(x.k);c.remove()};c.append(b,d);o.append(c)})}
+function showSavedImgs(im){view="simg";const o=$("#out");o.replaceChildren(back("🖼️ Picha zilizohifadhiwa"));scrollTo(0,0);
+ if(!im.length){o.append(el("p","msg","Bado hujahifadhi picha. Fungua picha yoyote kisha bonyeza 💾 Hifadhi."));return}
+ const g=el("div","mas");im.sort((a,b)=>b.t-a.t).forEach(p=>{const f=el("figure"),i=el("img");i.src=URL.createObjectURL(p.blob);i.alt=p.tags||"";f.append(i);
+  f.onclick=()=>{const n=el("img");n.src=i.src;lb(n,{u:p.u,t:p.tags,blob:p.blob},1)};g.append(f)});o.append(g)}
+async function dlImg(p){try{const bl=p.blob||await(await fetch(p.l||p.u)).blob();const a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="R-Search-"+Date.now()+".jpg";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}catch(e){window.open(safe(p.l||p.u),"_blank")}}
 /* Lightbox */
-function lb(n){const b=$("#lbc");b.replaceChildren(n);$("#lb").classList.add("on")}
+function lb(n,p,sv){const b=$("#lbc");b.replaceChildren(n);
+ if(p){const bar=el("div","lbb"),dl=el("button",null,"⬇️ Pakua"),sa=el("button",null,sv?"🗑️ Futa":"💾 Hifadhi");
+  dl.onclick=()=>dlImg(p);
+  sa.onclick=async()=>{if(sv){await dbdel("i:"+p.u);lbx();showSavedImgs((await dball()).filter(x=>x.k[0]==="i"));return}
+   try{const bl=await(await fetch(p.l||p.u)).blob();await dbput({k:"i:"+p.u,t:Date.now(),u:p.u,tags:p.t,blob:bl});sa.textContent="✔ Imehifadhiwa"}catch(e){sa.textContent="Imeshindikana"}};
+  bar.append(dl,sa);b.append(bar)}
+ $("#lb").classList.add("on")}
 function lbx(){$("#lb").classList.remove("on");$("#lbc").replaceChildren()}
-$("#lb").onclick=e=>{if(e.target.id!=="lbc"&&e.target.tagName!=="IMG"&&e.target.tagName!=="VIDEO")lbx()};
+$("#lb").onclick=e=>{if(!e.target.closest("#lbc"))lbx()};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")lbx()});
 setTab("all");
-(function(){let c=null;try{c=JSON.parse(localStorage.getItem("rs_cache")||"null")}catch(e){}
- if(c&&c.q&&c.web){q=c.q;$("#q").value=q;S={web:c.web,imgs:c.imgs||[],pe:tr(q,"en").then(x=>x.slice(0,100))};render()}})();
+dball().then(a=>{const l=a.filter(x=>x.k[0]==="s").sort((x,y)=>y.t-x.t)[0];
+ if(l&&!q&&!view){q=l.q;$("#q").value=q;S={web:l.web,imgs:l.imgs||[],pe:tr(q,"en").then(x=>x.slice(0,100))};render()}});
 </script></body></html>
