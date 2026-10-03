@@ -1,237 +1,171 @@
 <!DOCTYPE html>
-<html lang="sw"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Fire Rescue Command &amp; Training</title>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIRE ACADEMY TZ</title>
+<meta name="description" content="Jukwaa la kujifunza maarifa ya Zimamoto na Uokoaji kwa Kiswahili.">
 <style>
-:root{--bg:#0f1113;--cd:#1a1d21;--ln:#2b3036;--fg:#f2f2f2;--mu:#9aa1a9;--rd:#e5322d;--gn:#2fbf71;--am:#f0a020;color-scheme:dark}
+:root{--bg:#fff;--tx:#3c4043;--mu:#70757a;--cd:#fff;--bd:#dadce0;--ac:#c62828;--ab:#fdecea;--sh:0 1px 2px rgba(60,64,67,.15)}
+:root[data-theme=dark]{--bg:#16181b;--tx:#e8eaed;--mu:#9aa0a6;--cd:#202327;--bd:#3c4043;--ac:#ef6c63;--ab:#3a2220;--sh:none}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
-h1,h2,h3{margin:0 0 8px}a{color:var(--rd)}
-header{position:sticky;top:0;z-index:5;background:#0f1113ee;border-bottom:1px solid var(--ln);padding:calc(8px + env(safe-area-inset-top)) 14px 8px;display:flex;gap:10px;align-items:center}
-header b{font-size:18px}header small{display:block;color:var(--mu);font-size:11px}
-#gs{flex:1;min-width:0;background:var(--cd);border:1px solid var(--ln);border-radius:22px;color:var(--fg);padding:10px 14px;font:inherit}
-.st{font-size:12px;padding:4px 10px;border-radius:12px;background:var(--cd);white-space:nowrap}
-nav{position:fixed;bottom:0;left:0;right:0;background:#15181b;border-top:1px solid var(--ln);display:flex;overflow-x:auto;padding-bottom:env(safe-area-inset-bottom);z-index:6}
-nav button{flex:none;min-width:74px;min-height:56px;background:none;border:0;color:var(--mu);font:11px system-ui;cursor:pointer}
-nav button span{display:block;font-size:20px}nav button.on{color:var(--rd)}
-main{max-width:1000px;margin:0 auto;padding:16px}
-@media(min-width:900px){nav{top:0;bottom:auto;right:auto;width:190px;flex-direction:column;border-top:0;border-right:1px solid var(--ln);padding-top:70px}nav button{text-align:left;padding:0 18px;min-height:46px;font-size:14px}nav button span{display:inline;margin-right:8px}body{padding:0 0 0 190px}}
-.g{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.c{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px}
-.lc{padding:0;overflow:hidden;display:flex;flex-direction:column}.lc .b{padding:12px;flex:1}
-.im{height:150px;background:linear-gradient(135deg,#3a1111,#1a1d21);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
-.im.sk{animation:p 1.2s infinite alternate}@keyframes p{to{opacity:.6}}
-.im img{width:100%;height:100%;object-fit:cover}.im small{position:absolute;left:6px;bottom:4px;background:#000a;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px}
-.im small a{color:#fff}
-.tg{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--ln);color:var(--mu);margin:0 4px 4px 0}.tg.ok{background:#12351f;color:var(--gn)}
-.bt{background:var(--rd);color:#fff;border:0;border-radius:10px;padding:10px 16px;min-height:44px;font:600 14px system-ui;cursor:pointer}
-.bt.s{background:var(--ln)}.bt.d{background:#5b1a18}.bt:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,nav button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.pb{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:4px 0 12px}.pb i{display:block;height:100%;background:var(--rd)}
-.wn{background:#2a1d08;border:1px solid var(--am);color:#ffd28a;border-radius:10px;padding:10px 12px;font-size:13px;margin:12px 0}
-input,select,textarea{width:100%;background:#111417;border:1px solid var(--ln);border-radius:10px;color:var(--fg);padding:10px;font:inherit;min-height:44px}
-label{font-size:13px;color:var(--mu);display:block;margin-bottom:10px}
-.fm{display:grid;gap:0 12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.fm .w{grid-column:1/-1}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.op{display:block;width:100%;text-align:left;margin:6px 0;background:#111417;border:1px solid var(--ln);color:var(--fg);border-radius:10px;padding:12px;font:inherit;cursor:pointer}.op.y{border-color:var(--gn)}.op.n{border-color:var(--rd)}
-#tt{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#333;padding:10px 18px;border-radius:20px;z-index:20;display:none;max-width:90%}
-#pv{position:fixed;inset:0;background:#000c;z-index:15;overflow:auto;padding:16px;display:none}#pv .c{max-width:720px;margin:0 auto;background:#fff;color:#000}
-@media print{body>*:not(#pv){display:none!important}#pv{position:static;background:none;padding:0;display:block!important}#pv .no{display:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body>
-<header><div><b>🔥 FIRE RESCUE</b><small>Firefighter Training &amp; Incident Management</small></div><input id="gs" type="search" placeholder="Search lessons, UN, reports..." aria-label="Global search"><span class="st" id="on" role="status"></span></header>
-<nav id="nv" aria-label="Main"></nav><main id="app"></main><div id="tt" role="status"></div><div id="pv"></div>
+body{margin:0;font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:76px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 8px}
+header b{font-size:1.05rem;letter-spacing:.5px}
+button,select,input{font:inherit;color:inherit}
+.ib{background:none;border:0;min-width:44px;min-height:44px;font-size:1.25rem;cursor:pointer;border-radius:50%}
+select{background:var(--bg);border:1px solid var(--bd);border-radius:8px;min-height:40px;padding:0 6px}
+main{max-width:860px;margin:0 auto;padding:16px}
+.hero{text-align:center;padding:28px 0 12px}.hero .f{font-size:3rem}
+.hero h1{margin:.2em 0;font-size:1.9rem}.tag{color:var(--ac);font-weight:600}.hero p{color:var(--mu);max-width:620px;margin:10px auto}
+.sb{width:100%;min-height:54px;border:1px solid var(--bd);border-radius:28px;padding:0 22px;background:var(--cd);box-shadow:var(--sh);font-size:1.05rem}
+.sb:focus{outline:2px solid var(--ac)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));margin:14px 0}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:16px;box-shadow:var(--sh)}
+.card h3{margin:.2em 0}.card p{margin:.4em 0;color:var(--mu);font-size:.95rem}
+.pill{display:inline-block;font-size:.8rem;background:var(--ab);color:var(--ac);border-radius:20px;padding:1px 10px}
+.btn{display:inline-block;min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer;text-decoration:none;margin:4px 6px 4px 0;font-weight:600;font-size:.95rem}
+.btn.o{background:none;color:var(--ac)}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;background:var(--bg);border-top:1px solid var(--bd)}
+nav button{flex:1;background:none;border:0;min-height:64px;font-size:.72rem;color:var(--mu);cursor:pointer}
+nav button span{display:block;font-size:1.3rem}nav button.on{color:var(--ac);font-weight:700}
+.t{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.t.d span:first-child{text-decoration:line-through;color:var(--mu)}
+.warn{border-left:4px solid var(--ac);background:var(--ab);padding:10px 14px;border-radius:6px;margin:14px 0;font-size:.95rem}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--cd);cursor:pointer;min-height:48px}
+.opt.ok{border-color:#2e7d32;background:rgba(46,125,50,.15)}.opt.no{border-color:var(--ac);background:var(--ab)}
+a{color:var(--ac)}footer{text-align:center;color:var(--mu);font-size:.85rem;padding:20px 16px}
+.mu{color:var(--mu);font-size:.9rem}
+#rs:empty{display:none}
+#rb{max-width:680px}.rb{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin:10px 0;box-shadow:var(--sh);font-size:1rem}
+h3.rb{background:var(--ab);border-color:transparent;color:var(--ac);font-size:1.05rem}
+@media(min-width:800px){body{padding:0 0 0 92px}nav{top:56px;bottom:0;right:auto;width:92px;flex-direction:column;justify-content:flex-start;border-top:0;border-right:1px solid var(--bd)}nav button{flex:none}header{margin-left:-92px;padding-left:100px}}
+</style>
+</head>
+<body>
+<header>
+<button class="ib" id="mb" aria-label="Menu">☰</button>
+<b>🔥 FIRE ACADEMY TZ</b>
+<div><select id="lg" aria-label="Language"><option value="sw">🇹🇿 Kiswahili</option><option value="en">🇬🇧 English</option></select><button class="ib" id="th" aria-label="Theme">🌙</button></div>
+</header>
+<main id="app"></main>
+<footer id="ft"></footer>
+<nav id="nv" aria-label="Navigation"></nav>
 <script>
-(()=>{'use strict';
-/* ===== CONFIG: keys are entered in Settings. For production, proxy Unsplash requests through a backend/serverless function. ===== */
-const CONFIG={UNSPLASH_ACCESS_KEY:"",PIXABAY_KEY:"",SYNC_URL:""};
-const AppState={currentPage:'dashboard',currentLesson:null,user:{},online:navigator.onLine};
-const NOTE='Training reference only. Follow your department SOP/SOG and qualified instructor guidance.';
-const SAFE='⚠️ SAFETY NOTICE: This app is an educational reference. Operational firefighting, rescue, SCBA, HazMat and extrication activities require appropriate training, supervision, PPE and applicable department SOP/SOG.';
-const NAV=[['dashboard','🏠','Dashboard'],['ff','🔥','Firefighting'],['ppe','🦺','PPE & SCBA'],['hz','☣️','HazMat'],['rs','🛟','Rescue'],['incident','🚨','Incident'],['training','🎓','Training'],['equipment','🔧','Equipment'],['settings','⚙️','Settings']];
-const MOD={ff:['🔥','Firefighting'],ppe:['🦺','PPE & SCBA'],hz:['☣️','HazMat'],rs:['🛟','Rescue']};
-/* m|title|description|imageQuery|difficulty|minutes|objectives;|equipment|safety */
-const RAW=`ff|Hose Operations|Deploying, handling and inspecting hose lines|firefighter hose|Basic|30|Identify hose types;Understand deployment;Know hose inspection|Hose,Nozzle,Couplings,PPE|Watch trip hazards and keep communication clear
-ff|Hose Streams|Stream patterns and their uses|fire hose water stream|Basic|25|Compare stream patterns;Relate flow to reach;Recognise water supply limits|Nozzle,Hose|Monitor pressure and avoid steam burns
-ff|Pump Operations|Apparatus pump basics|fire truck pump firefighter|Intermediate|40|Know pump panel parts;Understand pressure and flow;Understand water sources|Pump,Gauges,Valves|Follow SOP on pressure and operator duties
-ff|Ladder Operations|Ground ladder types and handling|firefighter ladder|Basic|35|Name ladder parts;Understand carries and raises;Know ladder angles|Ground ladders,PPE|Check overhead hazards and footing
-ff|Ventilation|Why fire scenes are ventilated|firefighter ventilation|Intermediate|35|Explain ventilation goals;Compare horizontal and vertical;Recognise fire behaviour effects|Fans,Tools|Coordinate ventilation with the attack team
-ff|Forcible Entry|Concepts of gaining access|firefighter forcible entry|Intermediate|30|Assess doors and locks;Know tool categories;Prefer least-damage entry|Halligan,Axe|Practical skills need supervised training
-ff|Search & Rescue|Search patterns and team safety|firefighter search rescue|Advanced|45|Know search priorities;Understand accountability;Recognise victim signs|TIC,Rope,Radio|Never search alone; keep accountability
-ff|Fire Suppression|Extinguishing principles|firefighter fire suppression|Intermediate|40|Apply cooling and smothering;Match agent to fire class;Understand extinguishing goals|Hose,Extinguishers|Size up before attack
-ff|Overhaul|Checking for hidden fire|firefighter overhaul|Basic|25|Find hidden fire;Understand thermal imaging;Preserve evidence|TIC,Hooks|Watch structural damage and air quality
-ff|Salvage / Property Conservation|Protecting property during operations|firefighter property conservation|Basic|20|Explain salvage aims;Know covers and water control;Limit loss|Salvage covers|Never enter unsafe structures for property
-ff|Foam Firefighting|Foam types and application concepts|firefighter foam firefighting|Advanced|35|Know foam types;Understand proportioning;Match foam to fuel|Foam eductor,Nozzle|Follow manufacturer and SOP guidance
-ff|Vehicle Extrication|Scene and patient concepts|firefighter vehicle extrication|Advanced|40|Do scene size-up;Understand stabilisation concepts;Coordinate team and patient care|Hydraulic tools,Stabilisers|Requires hands-on training; no cutting guidance here
-ppe|PPE Identification|Recognise each PPE item|firefighter PPE|Basic|20|Name PPE items;State each purpose;Know the ensemble|PPE ensemble|Wear complete PPE
-ppe|PPE Inspection Checklist|Routine inspection points|firefighter gear inspection|Basic|20|Inspect for damage;Record findings;Remove defective gear|Checklist|Tag out defective gear
-ppe|SCBA Basics|Parts and purpose of SCBA|firefighter SCBA|Intermediate|35|Name SCBA components;Understand supply and regulator;Know donning principles|SCBA|Only trained users wear SCBA
-ppe|Cylinder Information|Cylinder ratings and care|SCBA cylinder|Intermediate|20|Read cylinder markings;Know pressure ratings;Know test dates|Cylinder|Never exceed rated pressure
-ppe|Air-Supply Calculations|Estimating air duration|firefighter breathing apparatus|Intermediate|25|Know the duration formula;Understand consumption variance;Plan exit margin|Calculator|Estimates only; follow manufacturer
-ppe|PASS Alarm Information|Motion alarm devices|firefighter PASS device|Basic|15|Explain PASS purpose;Know activation;Test before use|PASS device|Test before every entry
-ppe|Decontamination|Gross decon concepts|firefighter decontamination|Intermediate|30|Explain decon aims;Know gross decon;Handle contaminated gear|Wash station|Treat contaminated gear as hazardous
-ppe|PPE Maintenance|Cleaning and storage|firefighter turnout gear cleaning|Basic|20|Know cleaning basics;Store correctly;Know repair rules|Cleaning kit|Follow manufacturer care labels
-ppe|Equipment Inspection Records|Why records matter|firefighter equipment inspection|Basic|15|Keep accurate records;Track due dates;Support audits|Logbook|Record defects immediately
-hz|Hazardous Materials Identification|Recognise hazmat clues|hazmat firefighter|Intermediate|30|Use placards;Use container clues;Observe from a safe distance|Binoculars,Guidebook|Stay upwind and at distance
-hz|UN Numbers|What a UN number tells you|hazmat placard|Basic|20|Read UN numbers;Link number to name;Use reference guide|Guidebook|Verify with an official guide
-hz|Hazard Classes|The nine classes|hazmat placards classes|Basic|25|List nine classes;Know main hazards;Read placards|Guidebook|Some materials have multiple hazards
-hz|SDS Reference|Safety data sheet sections|safety data sheet chemical|Basic|25|Know SDS sections;Find fire measures;Find PPE advice|SDS|Use current manufacturer SDS
-hz|Chemical Hazards|Toxic, corrosive, flammable hazards|chemical hazard warning|Intermediate|30|Group hazards;Know exposure routes;Know basic controls|Detectors|Treat unknown as dangerous
-hz|Isolation / Evacuation Reference|Protective distances concept|emergency evacuation hazmat|Intermediate|25|Know isolation zones;Use guide tables;Communicate evacuation|Guidebook|Use official guidebook distances
-hz|PPE Reference|Protective clothing levels|hazmat suit firefighter|Advanced|30|Know protection levels;Match to hazard;Know limits|Suits|Fire gear is not chemical protection
-hz|HazMat Decontamination|Hazmat decon overview|hazmat decontamination|Advanced|30|Explain corridor layout;Control contamination;Manage runoff|Decon corridor|Follow the HazMat team lead
-hz|HazMat Incident Reporting|Recording hazmat scenes|hazmat incident report|Basic|20|Record materials;Record actions;Report exposures|Report form|Record exposures accurately
-rs|Structural Rescue|Rescue in damaged buildings|building rescue firefighter|Advanced|40|Assess structure;Set safe zones;Plan access|Rescue tools|Unstable structures endanger rescuers
-rs|Vehicle Extrication Operations|Scene, safety zones and communication|car crash rescue firefighter|Advanced|40|Do scene size-up;Know safety zones;Document the incident|Hydraulic tools,Stabilisers|Requires hands-on training
-rs|Rope Rescue|Rope system concepts|firefighter rope rescue|Advanced|45|Know rope gear;Understand anchors;Know safety checks|Ropes,Harness|Requires certified instruction
-rs|Water Rescue|Water hazards and rescuer safety|firefighter water rescue|Advanced|40|Know reach-throw-row-go;Wear flotation;Assess currents|PFD,Throw bag|Rescuer safety comes first
-rs|Confined-Space Rescue|Atmospheres and entry permits|confined space rescue firefighter|Advanced|45|Test atmosphere;Know permits;Plan retrieval|Gas monitor,Tripod|Never enter without air monitoring
-rs|Collapse Rescue|Collapse patterns|building collapse rescue|Advanced|45|Know collapse types;Mark search areas;Understand shoring concepts|Shoring,Tools|Secondary collapse risk
-rs|First Aid|Basic emergency care|firefighter first aid|Basic|30|Assess airway, breathing, circulation;Control bleeding;Know when to call EMS|First aid kit|Use gloves and follow protocols
-rs|Search Techniques|Systematic search methods|firefighter search technique|Intermediate|30|Know search patterns;Use tools;Mark cleared areas|Thermal camera,Chalk|Keep team contact`;
-const LESSONS=RAW.split('\n').map((l,i)=>{const[m,title,desc,q,diff,min,ob,eq,safety]=l.split('|');return{id:'L'+i,m,title,desc,q,diff,min:+min,obj:ob.split(';'),eq:eq.split(','),safety}});
-const PPE=[['Helmet','Protects the head from impact, heat and falling debris','Cracks, shell damage, liner, chin strap','Wipe clean; store away from heat'],['Hood','Protects neck and ears from heat and embers','Tears, thin fabric, contamination','Launder per manufacturer'],['Coat','Thermal and physical barrier for the torso','Liner, seams, reflective trim, closures','Clean after exposure; repair by qualified staff'],['Gloves','Hand protection with dexterity','Holes, seams, wrist seal','Dry fully; replace when worn'],['Boots','Protect feet from heat, puncture and water','Soles, toe cap, lining','Clean and air dry'],['SCBA','Supplies breathable air in hazardous atmospheres','Gauges, straps, hoses, cylinder pressure','Follow manufacturer service schedule'],['Facepiece','Seals to the face and delivers air','Lens, straps, seal, exhalation valve','Clean and sanitise after use'],['PASS device','Sounds an alarm if the wearer stops moving','Battery, activation test, alarm sound','Test each shift'],['Protective trousers','Lower body thermal and physical barrier','Knees, seams, suspenders, trim','Clean after exposure'],['Eye protection','Protects eyes from particles and splash','Scratches, cracks, fit','Clean lens; replace when damaged']];
-const HC=[['1','Explosives'],['2','Gases'],['3','Flammable Liquids'],['4','Flammable Solids'],['5','Oxidizers / Organic Peroxides'],['6','Toxic / Infectious'],['7','Radioactive'],['8','Corrosive'],['9','Miscellaneous']];
-/* Local demo dataset; structure can later be replaced with an API/database query. Verify with an official guidebook. */
-const UN=[['1203','Gasoline','3','Highly flammable liquid; vapours can travel to ignition sources'],['1202','Diesel fuel','3','Combustible liquid; spills create slip and fire hazards'],['1090','Acetone','3','Flammable liquid; vapours may cause dizziness'],['1075','Petroleum gases, liquefied (LPG)','2.1','Flammable gas under pressure; cylinder rupture risk'],['1978','Propane','2.1','Flammable gas under pressure'],['1005','Ammonia, anhydrous','2.3','Toxic and corrosive gas'],['1017','Chlorine','2.3','Toxic gas; strong oxidizer'],['1789','Hydrochloric acid','8','Corrosive; fumes irritate lungs and eyes'],['1830','Sulfuric acid','8','Corrosive; reacts with water and organics'],['1950','Aerosols','2.1','Flammable contents under pressure']];
-const CHK=['Helmet','Hood','Coat','Gloves','Boots','SCBA','Facepiece','Cylinder','PASS device'];
-const TYPES=['Structure Fire','Vehicle Fire','Wildland Fire','Rescue','Road Traffic Accident','HazMat','Medical Emergency','False Alarm','Other'];
-const STAT=['Draft','Submitted','Reviewed','Closed'];
-const IF=[['num','Incident Number','text'],['date','Date','date'],['time','Time','time'],['loc','Location','text'],['type','Incident Type','sel',TYPES],['by','Reported By','text'],['station','Station','text'],['crew','Crew','text'],['unit','Vehicle/Unit','text'],['weather','Weather','text'],['occ','Occupancy','text'],['fire','Fire Involved?','yn'],['inj','Injuries?','yn'],['fat','Fatalities?','yn'],['resc','Rescue Required?','yn'],['hz','HazMat Involved?','yn'],['dmg','Property Damage?','yn'],['rescued','Persons Rescued','number'],['equip','Equipment Used','text'],['act','Actions Taken','area'],['obs','Observations','area'],['notes','Additional Notes','area'],['status','Status','sel',STAT]];
-/* ===== helpers ===== */
-const $=(s,r=document)=>r.querySelector(s),enc=encodeURIComponent,app=$('#app');
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let tm;const toast=t=>{const e=$('#tt');e.textContent=t;e.style.display='block';clearTimeout(tm);tm=setTimeout(()=>e.style.display='none',3200)};
-const jget=async u=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw 0;return await r.json()}finally{clearTimeout(t)}};
-const dl=(n,t,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3e4)};
-/* ===== IndexedDB: FireRescueDB ===== */
-const STORES=['lessons','progress','checklists','incidents','equipment','bookmarks','settings','syncQueue'];
-let dbp;const openDB=()=>dbp||(dbp=new Promise((res,rej)=>{const r=indexedDB.open('FireRescueDB',1);r.onupgradeneeded=()=>STORES.forEach(s=>{if(!r.result.objectStoreNames.contains(s))r.result.createObjectStore(s,{keyPath:'id'})});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
-const tx=async(s,m,f)=>{const d=await openDB();return new Promise((res,rej)=>{const t=d.transaction(s,m),q=f(t.objectStore(s));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})};
-const addItem=(s,v)=>tx(s,'readwrite',o=>o.add(v)),updateItem=(s,v)=>tx(s,'readwrite',o=>o.put(v)),getItem=(s,id)=>tx(s,'readonly',o=>o.get(id)),getAll=s=>tx(s,'readonly',o=>o.getAll()),deleteItem=(s,id)=>tx(s,'readwrite',o=>o.delete(id));
-/* ===== images: Unsplash then Pixabay, cached; fallback icon ===== */
-async function getImage(q){
-  const k='fr:img:'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}
-  let o=null;
-  try{if(CONFIG.UNSPLASH_ACCESS_KEY){const p=(await jget(`https://api.unsplash.com/search/photos?per_page=1&content_filter=high&query=${enc(q)}&client_id=${CONFIG.UNSPLASH_ACCESS_KEY}`)).results[0];
-      if(p)o={url:p.urls.small,thumb:p.urls.thumb,alt:'Stock photo: '+(p.alt_description||q),photographer:p.user.name,photographerUrl:p.user.links.html+'?utm_source=fire_rescue&utm_medium=referral',src:'Unsplash'}}
-    if(!o&&CONFIG.PIXABAY_KEY){const p=(await jget(`https://pixabay.com/api/?key=${CONFIG.PIXABAY_KEY}&image_type=photo&safesearch=true&per_page=3&q=${enc(q)}`)).hits[0];
-      if(p)o={url:p.webformatURL,thumb:p.previewURL,alt:'Stock photo: '+p.tags,photographer:p.user,photographerUrl:p.pageURL,src:'Pixabay'}}}catch(e){}
-  if(o)try{localStorage.setItem(k,JSON.stringify(o))}catch(e){}
-  return o}
-async function blobUrl(u){try{const c=await caches.open('fr-img');let r=await c.match(u);if(!r){r=await fetch(u);if(r.ok)await c.put(u,r.clone())}return r.ok?URL.createObjectURL(await r.blob()):u}catch(e){return u}}
-const io='IntersectionObserver'in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillImg(e.target)}}),{rootMargin:'200px'}):null;
-async function fillImg(box){const o=await getImage(box.dataset.q);box.classList.remove('sk');if(!o)return;
-  const i=new Image();i.alt=o.alt;i.loading='lazy';i.src=await blobUrl(o.url);i.onload=()=>{box.textContent='';box.append(i);const s=document.createElement('small');s.innerHTML=`<a href="${esc(o.photographerUrl)}" target="_blank" rel="noopener">${esc(o.photographer)}</a> / ${o.src}`;box.append(s)}}
-const imgBox=(q,ic)=>`<div class="im sk" data-q="${esc(q)}" role="img" aria-label="Stock photo placeholder: ${esc(q)}">${ic}</div>`;
-const loadImgs=()=>app.querySelectorAll('.im[data-q]').forEach(b=>io?io.observe(b):fillImg(b));
-/* ===== data state ===== */
-let PR={},BM={};
-const loadState=async()=>{(await getAll('progress')).forEach(p=>PR[p.id]=p);(await getAll('bookmarks')).forEach(b=>BM[b.id]=1);
-  const s=await getItem('settings','keys');if(s){CONFIG.UNSPLASH_ACCESS_KEY=s.unsplash||'';CONFIG.PIXABAY_KEY=s.pixabay||''}};
-const modPct=m=>{const l=LESSONS.filter(x=>x.m===m);return Math.round(l.filter(x=>PR[x.id]&&PR[x.id].done).length/l.length*100)};
-/* ===== views ===== */
-const bar=(t,p)=>`<div class="row" style="justify-content:space-between"><span>${t}</span><b>${p}%</b></div><div class="pb"><i style="width:${p}%"></i></div>`;
-const lcard=l=>`<article class="c lc">${imgBox(l.q,MOD[l.m][0])}<div class="b"><span class="tg">${l.diff}</span><span class="tg">${l.min} min</span>${PR[l.id]&&PR[l.id].done?'<span class="tg ok">Completed</span>':'<span class="tg">Not started</span>'}<h3>${esc(l.title)}</h3><p style="color:var(--mu);font-size:14px;margin:0 0 10px">${esc(l.desc)}</p><div class="row"><button class="bt" data-a="open" data-id="${l.id}">Open Lesson</button><button class="bt s" data-a="bm" data-id="${l.id}" aria-label="Bookmark ${esc(l.title)}">${BM[l.id]?'🔖 Saved':'🔖'}</button></div></div></article>`;
-async function dashboard(){
-  const inc=(await getAll('incidents')).sort((a,b)=>b.updated-a.updated).slice(0,3),next=LESSONS.find(l=>!(PR[l.id]&&PR[l.id].done))||LESSONS[0];
-  let rec=[];try{rec=JSON.parse(localStorage.getItem('fr:recent')||'[]')}catch(e){}
-  app.innerHTML=`<h1>🔥 FIRE RESCUE COMMAND</h1><div class="g">${Object.entries(MOD).map(([m,[ic,t]])=>`<button class="c" data-a="go" data-id="${m}" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><div style="font-size:32px">${ic}</div><h3>${t}</h3><div style="color:var(--mu);font-size:13px">${LESSONS.filter(x=>x.m===m).length} lessons</div></button>`).join('')}<button class="c" data-a="go" data-id="incident" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><div style="font-size:32px">🚨</div><h3>Incident Reports</h3><div style="color:var(--mu);font-size:13px">Works offline</div></button></div>
-  <h2 style="margin-top:20px">Training Progress</h2><div class="c">${Object.entries(MOD).map(([m,[,t]])=>bar(t,modPct(m))).join('')}</div>
-  <h2 style="margin-top:20px">Continue Training</h2><div class="g">${lcard(next)}</div>
-  ${rec.length?`<h2 style="margin-top:20px">Recent Lessons</h2><div class="c">${rec.map(id=>LESSONS.find(l=>l.id===id)).filter(Boolean).map(l=>`<div><a href="#" data-a="open" data-id="${l.id}">${esc(l.title)}</a></div>`).join('')}</div>`:''}
-  <h2 style="margin-top:20px">Recently Submitted Reports</h2><div class="c">${inc.length?inc.map(i=>`<div>${esc(i.num)} · ${esc(i.type)} · ${esc(i.status)}</div>`).join(''):'No reports yet.'}</div><div class="wn">${SAFE}</div>`;
-}
-const modPage=async m=>{const l=LESSONS.filter(x=>x.m===m);let x='';
-  if(m==='ppe')x=await ppeExtras();if(m==='hz')x=hzExtras();
-  app.innerHTML=`<h1>${MOD[m][0]} ${MOD[m][1]}</h1>${bar('Progress',modPct(m))}<div class="wn">${SAFE}</div><div class="g">${l.map(lcard).join('')}</div>${x}`};
-const ppeExtras=async()=>{const c=await getItem('checklists','ppe'),s=(c&&c.items)||[];
-  return `<h2 style="margin-top:24px">PPE Identification</h2><div class="g">${PPE.map((p,i)=>`<button class="c" data-a="ppe" data-id="${i}" style="text-align:left;color:inherit;cursor:pointer;font:inherit"><h3>${p[0]}</h3><span style="color:var(--mu);font-size:13px">Tap for details</span></button>`).join('')}</div>
-  <h2 style="margin-top:24px">PPE Inspection Checklist</h2><div class="c" id="ck">${CHK.map(t=>`<label style="color:var(--fg)"><input type="checkbox" style="width:auto;min-height:0" value="${t}" ${s.includes(t)?'checked':''}> ${t}</label>`).join('')}<p id="ckc">${s.length} / ${CHK.length} completed</p><button class="bt" data-a="ckSave">SAVE INSPECTION</button></div>
-  <h2 style="margin-top:24px">SCBA Air-Supply Calculator</h2><div class="c"><div class="fm"><label>Cylinder pressure (bar)<input id="cp" type="number" min="0" value="300"></label><label>Cylinder capacity (litres)<input id="cc" type="number" min="0" value="6.8" step="0.1"></label><label>Consumption (L/min)<input id="cr" type="number" min="1" value="40"></label></div><button class="bt" data-a="calc">Calculate</button><p id="cout"></p><div class="wn">Training estimate only: not a replacement for manufacturer instructions, fit testing, physiological monitoring or department procedures.</div></div>`};
-const hzExtras=()=>`<h2 style="margin-top:24px">Hazard Classes</h2><div class="g">${HC.map(([n,t])=>`<div class="c"><b>Class ${n}</b><br>${t}</div>`).join('')}</div>
-<h2 style="margin-top:24px">UN Number Search</h2><div class="c"><input id="un" placeholder="e.g. UN 1203" aria-label="Search UN number"><div id="unr"></div></div>`;
-const unRows=q=>{q=q.replace(/un/i,'').trim().toLowerCase();const r=q?UN.filter(u=>u[0].includes(q)||u[1].toLowerCase().includes(q)):UN;return r.map(u=>`<div class="c" style="margin-top:8px"><b>UN ${u[0]}</b> · ${esc(u[1])}<br>Class ${u[2]} · ${esc(u[3])}</div>`).join('')||'<p>No match in demo dataset.</p>'};
-function lesson(id){const l=LESSONS.find(x=>x.id===id);if(!l)return;AppState.currentLesson=id;
-  try{const r=JSON.parse(localStorage.getItem('fr:recent')||'[]').filter(x=>x!==id);r.unshift(id);localStorage.setItem('fr:recent',JSON.stringify(r.slice(0,5)))}catch(e){}
-  const pool=LESSONS.filter(x=>x.id!==id).flatMap(x=>x.obj),ans=l.obj[0],opts=[ans,...pool.sort(()=>Math.random()-.5).filter(x=>!l.obj.includes(x)).slice(0,3)].sort(()=>Math.random()-.5);
-  const li=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`,p=PR[id];
-  app.innerHTML=`<button class="bt s" data-a="go" data-id="${l.m}">← Back</button><div class="c lc" style="margin-top:12px">${imgBox(l.q,MOD[l.m][0])}<div class="b"><h1>${esc(l.title)}</h1><span class="tg">${l.diff}</span><span class="tg">${l.min} min</span><h3>Overview</h3><p>${esc(l.desc)}. ${NOTE}</p><h3>Learning objectives</h3>${li(l.obj)}<h3>Equipment</h3>${li(l.eq)}<h3>Safety considerations</h3>${li([l.safety,'Wear appropriate PPE and follow local SOP/SOG'])}<h3>Common mistakes</h3>${li(['Skipping size-up or communication','Working outside training and authority'])}<h3>Key points</h3>${li([l.obj[0],l.obj[l.obj.length-1]])}</div></div><div class="wn">${SAFE}</div>
-  <div class="c"><h2>Quiz</h2><p>Which of these is a learning objective of “${esc(l.title)}”?</p>${opts.map((o,i)=>`<button class="op" data-a="ans" data-o="${esc(o)}" data-ok="${esc(ans)}">${'ABCD'[i]}. ${esc(o)}</button>`).join('')}<div id="qr" aria-live="polite"></div><div class="row" style="margin-top:12px"><button class="bt" data-a="done" data-id="${id}">${p&&p.done?'✓ Completed':'Mark as completed'}</button><button class="bt s" data-a="bm" data-id="${id}">${BM[id]?'🔖 Saved':'🔖 Bookmark'}</button></div></div>`;
-  loadImgs();window.scrollTo(0,0)}
-/* ===== incidents ===== */
-const fld=([k,l,t,o],v={})=>{const a=`name="${k}" id="f_${k}"`,val=v[k]??'';
-  if(t==='sel')return `<label>${l}<select ${a}>${o.map(x=>`<option ${x===val||(!val&&x==='Draft')?'selected':''}>${x}</option>`).join('')}</select></label>`;
-  if(t==='yn')return `<label>${l}<select ${a}>${['No','Yes'].map(x=>`<option ${x===val?'selected':''}>${x}</option>`).join('')}</select></label>`;
-  if(t==='area')return `<label class="w">${l}<textarea ${a} rows="3">${esc(val)}</textarea></label>`;
-  return `<label>${l}<input ${a} type="${t}" value="${esc(val)}"></label>`};
-let EDIT=null,IFILT={q:'',t:'',s:''};
-async function incident(){const v=EDIT||{num:'INC-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.floor(Math.random()*9e3+1e3),date:new Date().toISOString().slice(0,10),status:'Draft'};
-  app.innerHTML=`<h1>🚨 Incident Report</h1><p style="color:var(--mu)">Saved on this device first (IndexedDB). Works offline.</p><form id="if" class="c"><div class="fm">${IF.map(f=>fld(f,v)).join('')}</div><div class="row"><button type="button" class="bt s" data-a="isave" data-s="Draft">SAVE DRAFT</button><button type="button" class="bt" data-a="isave" data-s="Submitted">SUBMIT REPORT</button><button type="button" class="bt d" data-a="iclear">CLEAR FORM</button></div></form><h2 style="margin-top:20px">Recent Incidents</h2><div class="row"><input id="iq" placeholder="Search" value="${esc(IFILT.q)}" style="flex:2"><select id="it" style="flex:1"><option value="">All types</option>${TYPES.map(t=>`<option ${t===IFILT.t?'selected':''}>${t}</option>`).join('')}</select><select id="is" style="flex:1"><option value="">All status</option>${STAT.map(t=>`<option ${t===IFILT.s?'selected':''}>${t}</option>`).join('')}</select></div><div id="il"></div><div class="row" style="margin-top:12px"><button class="bt s" data-a="ejson">EXPORT JSON</button><button class="bt s" data-a="ecsv">EXPORT CSV</button></div>`;
-  if(EDIT)EDIT=null;incList()}
-const incFilter=async()=>(await getAll('incidents')).filter(i=>(!IFILT.t||i.type===IFILT.t)&&(!IFILT.s||i.status===IFILT.s)&&(!IFILT.q||JSON.stringify(i).toLowerCase().includes(IFILT.q.toLowerCase()))).sort((a,b)=>b.updated-a.updated);
-async function incList(){const l=await incFilter(),e=$('#il');if(!e)return;
-  e.innerHTML=l.map(i=>`<div class="c" style="margin-top:8px"><b>${esc(i.num)}</b> · ${esc(i.type)}<br><span style="color:var(--mu);font-size:13px">${esc(i.loc)} · ${esc(i.date)} · ${esc(i.status)}${i.synced?' · synced':' · local only'}</span><div class="row" style="margin-top:8px"><button class="bt s" data-a="iview" data-id="${i.id}">VIEW</button><button class="bt s" data-a="iedit" data-id="${i.id}">EDIT</button><button class="bt d" data-a="idel" data-id="${i.id}">DELETE</button><button class="bt s" data-a="iprint" data-id="${i.id}">EXPORT / PRINT</button></div></div>`).join('')||'<p>No reports found.</p>'}
-async function trySync(){if(!CONFIG.SYNC_URL){toast('Saved locally. No sync server configured, so the report stays in the queue.');return}
-  if(!navigator.onLine){toast('Offline: queued for sync.');return}
-  for(const q of await getAll('syncQueue')){try{const r=await fetch(CONFIG.SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(q.data)});if(!r.ok)throw 0;const i=await getItem('incidents',q.id);if(i){i.synced=true;await updateItem('incidents',i)}await deleteItem('syncQueue',q.id)}catch(e){toast('Sync failed; will retry later.');return}}
-  toast('Synced.')}
-const csv=l=>{const k=['id',...IF.map(f=>f[0])];return [k.join(','),...l.map(i=>k.map(x=>'"'+String(i[x]??'').replace(/"/g,'""')+'"').join(','))].join('\n')};
-const pview=i=>{const p=$('#pv');p.innerHTML=`<div class="c"><h2>Fire Rescue Incident Report</h2>${IF.map(f=>`<p><b>${f[1]}:</b> ${esc(i[f[0]])}</p>`).join('')}<div class="row no"><button class="bt" onclick="window.print()">PRINT REPORT</button><button class="bt s" onclick="document.getElementById('pv').style.display='none'">Close</button></div></div>`;p.style.display='block'};
-/* ===== equipment ===== */
-async function equipment(){const l=await getAll('equipment'),today=new Date().toISOString().slice(0,10);
-  app.innerHTML=`<h1>🔧 Equipment</h1><form id="ef" class="c"><div class="fm"><label>Name<select name="name">${['Fire hose','Nozzle','Pump','Ladder','SCBA','PPE','Radio','Halligan/tool','Rescue tools','Foam equipment'].map(x=>`<option>${x}</option>`).join('')}</select></label><label>Category<input name="cat"></label><label>Serial Number<input name="serial"></label><label>Condition<select name="cond"><option>GOOD</option><option>OUT OF SERVICE</option></select></label><label>Last Inspection<input type="date" name="last"></label><label>Next Inspection<input type="date" name="next"></label><label>Assigned Station<input name="stn"></label><label class="w">Notes<textarea name="notes" rows="2"></textarea></label></div><button type="button" class="bt" data-a="esave">SAVE</button></form><div style="margin-top:12px">${l.map(e=>{const s=e.cond==='GOOD'&&e.next&&e.next<today?'INSPECTION DUE':e.cond;return `<div class="c" style="margin-top:8px"><b>${esc(e.name)}</b> · ${esc(e.serial)} <span class="tg ${s==='GOOD'?'ok':''}">${s}</span><br><span style="color:var(--mu);font-size:13px">${esc(e.cat)} · ${esc(e.stn)} · next ${esc(e.next)}</span><br><button class="bt d" data-a="edel" data-id="${e.id}">DELETE</button></div>`}).join('')||'<p>No equipment recorded.</p>'}</div>`}
-/* ===== training / settings / search ===== */
-async function training(){app.innerHTML=`<h1>🎓 Training</h1><div class="c">${Object.entries(MOD).map(([m,[,t]])=>bar(t,modPct(m))).join('')}<p>Completed lessons: ${Object.values(PR).filter(p=>p.done).length} / ${LESSONS.length}</p><p style="color:var(--mu)">Certificate: placeholder. Issued by your department, not by this app.</p></div><h2 style="margin-top:20px">My Bookmarks</h2><div class="g">${LESSONS.filter(l=>BM[l.id]).map(lcard).join('')||'<p>No bookmarks yet.</p>'}</div>`;loadImgs()}
-async function settings(){app.innerHTML=`<h1>⚙️ Settings</h1><div class="c"><h3>Image keys</h3><label>Unsplash Access Key (never paste a Secret key)<input id="ku" value="${esc(CONFIG.UNSPLASH_ACCESS_KEY)}" autocomplete="off"></label><label>Pixabay API key<input id="kp" value="${esc(CONFIG.PIXABAY_KEY)}" autocomplete="off"></label><label>Sync server URL (optional)<input id="ks" value="${esc(CONFIG.SYNC_URL)}"></label><button class="bt" data-a="ksave">SAVE</button></div><div class="c" style="margin-top:12px"><h3>Data</h3><div class="row"><button class="bt s" data-a="eall">EXPORT APP DATA</button><label class="bt s" style="margin:0;color:#fff">IMPORT APP DATA<input type="file" accept="application/json" id="imp" hidden></label><button class="bt d" data-a="clr">Clear local data</button></div></div><div class="c" style="margin-top:12px">Fire Rescue Command &amp; Training. ${NOTE}</div>`}
-async function search(q){q=q.trim().toLowerCase();if(!q){route();return}
-  const m=[...LESSONS.filter(l=>(l.title+l.desc+l.obj.join(' ')+l.eq.join(' ')).toLowerCase().includes(q)).map(l=>`<div class="c" style="margin-top:8px"><a href="#" data-a="open" data-id="${l.id}">${esc(l.title)}</a> <span class="tg">${MOD[l.m][1]}</span></div>`),
-   ...PPE.filter(p=>p.join(' ').toLowerCase().includes(q)).map(p=>`<div class="c" style="margin-top:8px">PPE: <a href="#" data-a="go" data-id="ppe">${p[0]}</a></div>`),
-   ...UN.filter(u=>u.join(' ').toLowerCase().includes(q)).map(u=>`<div class="c" style="margin-top:8px">UN ${u[0]} · ${esc(u[1])} · Class ${u[2]}</div>`),
-   ...(await getAll('incidents')).filter(i=>JSON.stringify(i).toLowerCase().includes(q)).map(i=>`<div class="c" style="margin-top:8px">Report: <a href="#" data-a="go" data-id="incident">${esc(i.num)}</a> · ${esc(i.type)}</div>`),
-   ...(await getAll('equipment')).filter(e=>JSON.stringify(e).toLowerCase().includes(q)).map(e=>`<div class="c" style="margin-top:8px">Equipment: ${esc(e.name)} ${esc(e.serial)}</div>`)];
-  app.innerHTML=`<h1>Search: ${esc(q)}</h1>${m.join('')||'<p>No results.</p>'}`}
-/* ===== router ===== */
-function route(){const p=AppState.currentPage;$('#nv').innerHTML=NAV.map(([k,i,t])=>`<button data-a="go" data-id="${k}" class="${k===p?'on':''}" ${k===p?'aria-current="page"':''}><span>${i}</span>${t}</button>`).join('');
-  ({dashboard,incident,equipment,training,settings}[p]||(()=>modPage(p)))();if(MOD[p]||p==='dashboard')setTimeout(loadImgs,0);window.scrollTo(0,0)}
-const go=p=>{AppState.currentPage=p;$('#gs').value='';history.replaceState(null,'','#'+p);route()};
-/* ===== events (delegation) ===== */
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id;if(b.tagName==='A')e.preventDefault();
-  if(a==='go')go(id);
-  else if(a==='open')lesson(id);
-  else if(a==='bm'){if(BM[id]){delete BM[id];await deleteItem('bookmarks',id)}else{BM[id]=1;await updateItem('bookmarks',{id})}toast(BM[id]?'Bookmarked':'Bookmark removed');$('#qr')?lesson(id):route()}
-  else if(a==='ans'){const ok=b.dataset.o===b.dataset.ok;b.classList.add(ok?'y':'n');$('#qr').innerHTML=`<p><b>${ok?'Correct':'Incorrect'}</b>. Explanation: “${esc(b.dataset.ok)}” is one of this lesson’s objectives.</p>`;const l=LESSONS.find(x=>x.id===AppState.currentLesson),p=PR[l.id]||{id:l.id};p.score=ok?100:0;PR[l.id]=p;await updateItem('progress',p)}
-  else if(a==='done'){const p=PR[id]||{id};p.done=true;PR[id]=p;await updateItem('progress',p);toast('Lesson completed');b.textContent='✓ Completed'}
-  else if(a==='ppe'){const p=PPE[id];$('#pv').innerHTML=`<div class="c" style="background:var(--cd);color:var(--fg)"><h2>${p[0]}</h2><p><b>Purpose:</b> ${p[1]}</p><p><b>Inspection points:</b> ${p[2]}</p><p><b>Maintenance:</b> ${p[3]}</p><button class="bt" onclick="document.getElementById('pv').style.display='none'">Close</button></div>`;$('#pv').style.display='block'}
-  else if(a==='ckSave'){const items=[...document.querySelectorAll('#ck input:checked')].map(x=>x.value);await updateItem('checklists',{id:'ppe',items,t:Date.now()});$('#ckc').textContent=items.length+' / '+CHK.length+' completed';toast('Inspection saved')}
-  else if(a==='calc'){const P=+$('#cp').value,C=+$('#cc').value,R=+$('#cr').value;$('#cout').textContent=P>0&&C>0&&R>0?`Estimated air: ${Math.round(P*C)} L, about ${(P*C/R).toFixed(1)} minutes at ${R} L/min (before reserve margin).`:'Enter positive values.'}
-  else if(a==='isave'){const f=$('#if'),v=Object.fromEntries(new FormData(f));v.status=b.dataset.s==='Submitted'&&v.status==='Draft'?'Submitted':v.status==='Draft'?b.dataset.s:v.status;if(!v.num||!v.loc){toast('Incident number and location are required');return}
-    const old=(await getAll('incidents')).find(i=>i.num===v.num);const rec={...(old||{}),...v,id:old?old.id:String(Date.now()),updated:Date.now(),synced:false};await updateItem('incidents',rec);
-    if(rec.status!=='Draft'){await updateItem('syncQueue',{id:rec.id,data:rec});await trySync()}else toast('Draft saved');incList()}
-  else if(a==='iclear'){EDIT=null;incident()}
-  else if(a==='iedit'){EDIT=await getItem('incidents',id);incident();window.scrollTo(0,0)}
-  else if(a==='iview'||a==='iprint')pview(await getItem('incidents',id));
-  else if(a==='idel'){if(confirm('Delete this report?')){await deleteItem('incidents',id);await deleteItem('syncQueue',id);incList()}}
-  else if(a==='ejson')dl('incidents.json',JSON.stringify(await incFilter(),null,1),'application/json');
-  else if(a==='ecsv')dl('incidents.csv',csv(await incFilter()),'text/csv');
-  else if(a==='esave'){const v=Object.fromEntries(new FormData($('#ef')));await updateItem('equipment',{...v,id:String(Date.now())});toast('Saved');equipment()}
-  else if(a==='edel'){await deleteItem('equipment',id);equipment()}
-  else if(a==='ksave'){CONFIG.UNSPLASH_ACCESS_KEY=$('#ku').value.trim();CONFIG.PIXABAY_KEY=$('#kp').value.trim();CONFIG.SYNC_URL=$('#ks').value.trim();await updateItem('settings',{id:'keys',unsplash:CONFIG.UNSPLASH_ACCESS_KEY,pixabay:CONFIG.PIXABAY_KEY});toast('Saved')}
-  else if(a==='eall'){const o={};for(const s of['progress','incidents','checklists','equipment','bookmarks','settings'])o[s]=await getAll(s);dl('fire-rescue-backup.json',JSON.stringify(o,null,1),'application/json')}
-  else if(a==='clr'){if(confirm('Delete ALL local data?')){for(const s of STORES)for(const r of await getAll(s))await deleteItem(s,r.id);PR={};BM={};toast('Cleared');route()}}
-});
-document.addEventListener('change',async e=>{if(e.target.id==='imp'){try{const o=JSON.parse(await e.target.files[0].text());for(const s in o)if(STORES.includes(s))for(const r of o[s])await updateItem(s,r);await loadState();toast('Data imported');route()}catch(x){toast('Import failed: invalid file')}}
-  if(e.target.id==='it'||e.target.id==='is'){IFILT.t=$('#it').value;IFILT.s=$('#is').value;incList()}});
-let dt;document.addEventListener('input',e=>{const i=e.target.id;if(i==='gs'){clearTimeout(dt);dt=setTimeout(()=>search(e.target.value),250)}
-  else if(i==='iq'){IFILT.q=e.target.value;clearTimeout(dt);dt=setTimeout(incList,200)}
-  else if(i==='un')$('#unr').innerHTML=unRows(e.target.value)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#pv').style.display='none'});
-$('#pv').addEventListener('click',e=>{if(e.target.id==='pv')e.target.style.display='none'});
-/* ===== online status (navigator.onLine plus a real reachability probe) ===== */
-async function ping(){let ok=navigator.onLine;if(ok){try{await fetch('https://www.gstatic.com/generate_204',{mode:'no-cors',cache:'no-store'})}catch(e){ok=false}}
-  AppState.online=ok;$('#on').textContent=ok?'🟢 ONLINE':'🔴 OFFLINE';$('#on').title=ok?'':'Offline Mode: Core training and saved reports remain available.';if(!ok)toast('Offline Mode: Core training and saved reports remain available.');else trySync()}
-addEventListener('online',ping);addEventListener('offline',ping);setInterval(ping,6e4);
-document.addEventListener('DOMContentLoaded',()=>0);
-(async()=>{try{await loadState()}catch(e){toast('Local storage unavailable: data will not persist.')}
-  const h=location.hash.slice(1);if(NAV.some(n=>n[0]===h))AppState.currentPage=h;route();ping()})();
-})();
-</script></body></html>
+/* ====== YALIYOMO / CONTENT: hariri array hizi kuongeza kozi ====== */
+const sources={
+ nfa:["U.S. Fire Administration / National Fire Academy","https://www.usfa.fema.gov/"],
+ fsri:["FSRI","https://training.fsri.org/"],
+ fema:["FEMA","https://training.fema.gov/"],
+ niosh:["NIOSH","https://www.cdc.gov/niosh/firefighters/"],
+ cfi:["CFITrainer","https://www.cfitrainer.net/"],
+ fr1:["FireRescue1","https://www.firerescue1.com/"]};
+const CAT="https://apps.usfa.fema.gov/nfacourses/catalog/search?curriculaId=1";
+const levels=[
+{n:1,sw:"Msingi wa Zimamoto",en:"Fire Service Basics",ds:"Jenga msingi wa maarifa ya moto, PPE, SCBA, vifaa na huduma ya kwanza.",de:"Build a foundation in fire science, PPE, SCBA, equipment and first aid."},
+{n:2,sw:"Operesheni",en:"Operations",ds:"Mbinu za kuzima moto majumbani, maji, uokoaji na utafutaji.",de:"Structural firefighting, water supply, rescue and search techniques."},
+{n:3,sw:"Utaalamu",en:"Specialist Skills",ds:"HazMat, uchunguzi wa moto, uongozi wa tukio na mawasiliano.",de:"HazMat, fire investigation, incident command and communication."},
+{n:4,sw:"Kinga (Prevention)",en:"Prevention",ds:"Kuzuia moto, ukaguzi, mifumo ya tahadhari na elimu kwa umma.",de:"Fire prevention, inspection, alarm systems and public education."}];
+const courses=[
+{id:"fire-science",level:1,category:"Fire Science",title_sw:"Sayansi ya Moto",title_en:"Fire Science",description_sw:"Jifunze jinsi moto unavyoanza, unakua, unasambaa na kuathiri mazingira.",description_en:"Learn how fire starts, grows, spreads and affects its surroundings.",topics:["Fire Triangle","Fire Tetrahedron","Aina za moto (Classes of Fire)","Heat","Fuel","Oxygen","Chemical Chain Reaction","Stages of Fire Development","Fire Growth","Fully Developed Fire","Decay Stage","Fire Behavior","Smoke Behavior","Flashover","Backdraft","Fire Spread","Flow Path","Ventilation"],src:"fsri",sourceUrl:"https://training.fsri.org/"},
+{id:"ppe-scba",level:1,category:"PPE & SCBA",title_sw:"Vifaa vya Kinga na SCBA",title_en:"PPE & SCBA",description_sw:"Vifaa vya kinga binafsi na kifaa cha kupumua (SCBA), pamoja na hali za dharura.",description_en:"Personal protective equipment and breathing apparatus, including emergencies.",topics:["Helmet","Protective Hood","Firefighting Gloves","Protective Boots","Turnout Gear","SCBA, Cylinder, Regulator, Face Mask","PASS Device","Air Management","Donning & Doffing","Mayday & Low Air","SCBA Failure","Firefighter Emergency"],src:"niosh",sourceUrl:"https://www.cdc.gov/niosh/firefighters/",note_sw:"KANUNI ZA USALAMA: Mafunzo ya SCBA lazima yafanywe chini ya mkufunzi mwenye sifa. Maudhui haya hayachukui nafasi ya mafunzo ya vitendo.",note_en:"SAFETY RULES: SCBA training must be done under a qualified instructor. This content does not replace hands-on training."},
+{id:"equipment",level:1,category:"Fire Equipment",title_sw:"Magari, Pampu na Vifaa",title_en:"Fire Appliances, Pumps & Equipment",description_sw:"Jina, kazi, sehemu, matumizi na tahadhari za vifaa vya zimamoto.",description_en:"Name, function, parts, use and safety of fire service equipment.",topics:["Fire Engine/Tender","Fire Pump","Water Tank","Hoses","Nozzles & Branches","Hydrants","Foam Systems","Extinguishers","Rescue Tools","Hydraulic Tools","Rescue Saw","Air Compressor"],src:"nfa",sourceUrl:CAT},
+{id:"first-aid",level:1,category:"First Aid & EMS",title_sw:"Huduma ya Kwanza",title_en:"First Aid & EMS",description_sw:"Tathmini ya majeruhi, CPR, AED, kuvuja damu, majeraha ya moto na mshtuko.",description_en:"Victim assessment, CPR, AED, bleeding, burns and shock.",topics:["Primary Assessment","CPR","AED","Bleeding Control","Burns","Fractures","Spinal Injuries","Shock","Breathing Problems"],src:"fema",sourceUrl:"https://training.fema.gov/",note_sw:"TAARIFA YA USALAMA: Maudhui haya ni ya kujifunza na hayachukui nafasi ya mafunzo rasmi ya huduma ya kwanza/EMS.",note_en:"SAFETY NOTICE: This content is for learning and does not replace formal first aid/EMS training."},
+{id:"structural",level:2,category:"Structural Firefighting",title_sw:"Kuzima Moto Majumbani",title_en:"Structural Firefighting",description_sw:"Mbinu, mkakati na usalama wa kuzima moto kwenye majengo.",description_en:"Tactics, strategy and safety for fighting fires in buildings.",topics:["Building Construction","Fire Attack","Primary Search","Secondary Search","Door Control","Stairways & Corridors","Ventilation","Crew Coordination","Tactical Positioning","Hose Line Placement","Offensive Operations","Defensive Operations","Risk Assessment"],src:"fsri",sourceUrl:"https://training.fsri.org/"},
+{id:"pump-water",level:2,category:"Pump & Water Supply",title_sw:"Pampu na Maji",title_en:"Pump & Water Supply",description_sw:"Misingi ya pampu, mifumo ya maji na usambazaji wa maji kwenye tukio.",description_en:"Pump basics, water systems and water supply at incidents.",topics:["Pump Operations","Water Sources","Hydrants","Hose Layouts","Friction Loss","Nozzle Pressure"],src:"nfa",sourceUrl:CAT},
+{id:"rescue",level:2,category:"Rescue Techniques",title_sw:"Mbinu za Uokoaji",title_en:"Rescue Techniques",description_sw:"Uokoaji wa ajali, kamba, maeneo finyu, maji na majengo yaliyoanguka.",description_en:"Road, rope, confined space, water and collapse rescue.",topics:["Road Traffic Collision","Rope Rescue","High Angle Rescue","Confined Space Rescue","Water Rescue","Structural Collapse","Victim Handling","Evacuation","Ladder Rescue"],src:"nfa",sourceUrl:CAT,note_sw:"ONYO: Mbinu za uokoaji wa vitendo zinahitaji mkufunzi na vifaa sahihi.",note_en:"WARNING: Practical rescue techniques require an instructor and proper equipment."},
+{id:"search-rescue",level:2,category:"Search & Rescue",title_sw:"Utafutaji na Uokoaji",title_en:"Search & Rescue",description_sw:"Mpangilio wa utafutaji wa waliopotea au walionaswa.",description_en:"Organising the search for missing or trapped victims.",topics:["Search Planning","Primary Search","Secondary Search","Victim Location","Search Safety"],src:"nfa",sourceUrl:CAT},
+{id:"hazmat",level:3,category:"HazMat",title_sw:"Vitu Hatari (HazMat)",title_en:"HazMat",description_sw:"Kutambua na kudhibiti vitu hatari kwa tahadhari kamili.",description_en:"Recognising and controlling hazardous materials safely.",topics:["Hazard Identification","Dangerous Goods","Chemical Spills","Toxic Gases","H₂S","O₂","Gas Detection","Isolation Zones","Decontamination","Chemical Protective Clothing","Risk Assessment","Container Identification"],src:"fema",sourceUrl:"https://training.fema.gov/",note_sw:"HAZMAT GOLDEN RULES: Identify • Isolate • Protect • Notify • Control. Usiingie hatarini bila mafunzo na vifaa sahihi.",note_en:"HAZMAT GOLDEN RULES: Identify • Isolate • Protect • Notify • Control. Never enter danger without training and proper equipment."},
+{id:"investigation",level:3,category:"Fire Investigation",title_sw:"Uchunguzi wa Moto",title_en:"Fire Investigation",description_sw:"Kutafuta chanzo cha moto kwa njia ya kisayansi.",description_en:"Determining the cause of fire using the scientific method.",topics:["Scene Preservation","Fire Patterns","Area of Origin","Point of Origin","Ignition Sources","Evidence Collection","Witness Interviews","Photography","Documentation","Electrical Fire Investigation","Scientific Method","Investigation Report"],src:"cfi",sourceUrl:"https://www.cfitrainer.net/"},
+{id:"ics",level:3,category:"Incident Command",title_sw:"Uongozi wa Tukio (ICS)",title_en:"Incident Command",description_sw:"Mfumo wa uongozi, uwajibikaji na usimamizi wa rasilimali kwenye tukio.",description_en:"Command structure, accountability and resource management.",topics:["Incident Command System","Incident Commander","Command Structure","Accountability","Resource Management","Incident Planning","Risk Assessment"],src:"fema",sourceUrl:"https://training.fema.gov/"},
+{id:"comms",level:3,category:"Communication",title_sw:"Mawasiliano",title_en:"Communication",description_sw:"Mawasiliano ya redio na ya dharura wakati wa tukio.",description_en:"Radio and emergency communication at incidents.",topics:["Radio Communication","Crew Coordination","Emergency Communication","Mayday Calls"],src:"fema",sourceUrl:"https://training.fema.gov/"},
+{id:"prevention",level:4,category:"Fire Prevention",title_sw:"Kuzuia Moto",title_en:"Fire Prevention",description_sw:"Vifaa vya kuzimia, tahadhari, ukaguzi na elimu kwa umma.",description_en:"Extinguishers, alarms, inspection and public education.",topics:["Fire Extinguishers","Fire Alarms","Smoke Detectors","Heat Detectors","Emergency Exits","Fire Inspection","Inspection Checklist","Evacuation Plans","Public Education","Fire Safety Education","Industrial Fire Safety"],src:"nfa",sourceUrl:CAT}];
+const quiz=[
+{q:["Flashover ni nini?","What is flashover?"],o:[["Kupungua kwa moto","Fire dying down"],["Kuwaka kwa haraka kwa vitu vingi ndani ya chumba","Near-simultaneous ignition of most combustibles in a compartment"],["Kuisha kwa oksijeni","Oxygen running out"],["Kuzima moto","Putting out fire"]],a:1,e:["Flashover ni mpito wa ghafla hadi moto unaowaka kila mahali ndani ya compartment.","Flashover is a sudden transition to full involvement of a compartment."]},
+{q:["Fire Tetrahedron ina vipengele vingapi?","How many elements in the fire tetrahedron?"],o:[["3","3"],["4","4"],["5","5"],["2","2"]],a:1,e:["Joto, mafuta, oksijeni na mmenyuko wa mnyororo wa kemikali.","Heat, fuel, oxygen and the chemical chain reaction."]},
+{q:["Backdraft hutokea lini?","When does a backdraft occur?"],o:[["Oksijeni mpya inapoingia kwenye eneo lenye gesi moto zisizokwisha kuwaka","Fresh air enters an oxygen-starved space with hot unburned gases"],["Maji mengi yanapomwagwa","Too much water is applied"],["Moto unapoanza","When fire starts"],["Wakati wa mvua","During rain"]],a:0,e:["Kufungua mlango bila udhibiti kunaweza kusababisha mlipuko wa moto.","Uncontrolled opening can cause an explosive ignition."]},
+{q:["Kifaa cha PASS hufanya nini?","What does a PASS device do?"],o:[["Hupima joto","Measures heat"],["Hulia kengele askari asiposonga au yuko hatarini","Sounds an alarm if a firefighter is motionless or in distress"],["Huzima moto","Extinguishes fire"],["Huongeza hewa","Adds air"]],a:1,e:["PASS ni kifaa cha tahadhari ya askari aliye kwenye dhiki.","PASS is a personal alert for a firefighter in distress."]},
+{q:["Golden Rules za HazMat ni zipi?","Which are the HazMat golden rules?"],o:[["Run, Hide, Call","Run, Hide, Call"],["Identify, Isolate, Protect, Notify, Control","Identify, Isolate, Protect, Notify, Control"],["Stop, Drop, Roll","Stop, Drop, Roll"],["Attack, Wait, Leave","Attack, Wait, Leave"]],a:1,e:["Tambua, tenga, linda, arifu na dhibiti.","Identify, isolate, protect, notify and control."]},
+{q:["Hatua ya kwanza kwenye eneo la uchunguzi wa moto ni ipi?","What comes first at a fire scene investigation?"],o:[["Kuondoa kila kitu","Remove everything"],["Kuhifadhi eneo (Scene Preservation)","Preserve the scene"],["Kuosha eneo","Wash the scene"],["Kuondoka","Leave"]],a:1,e:["Ushahidi lazima ulindwe kabla ya kuguswa.","Evidence must be protected before it is disturbed."]},
+{q:["Nini maana ya 'Accountability' kwenye ICS?","What is accountability in ICS?"],o:[["Kujua mahali na hali ya kila askari kwenye tukio","Knowing the location and status of every responder"],["Kulipa gharama","Paying costs"],["Kuandika ripoti tu","Only writing reports"],["Kupiga picha","Taking photos"]],a:0,e:["Ni msingi wa usalama wa timu.","It is the foundation of crew safety."]},
+{q:["Kwa mtu asiyepumua, ni nini cha muhimu mapema?","For a person not breathing, what matters early?"],o:[["CPR na kuita msaada","CPR and calling for help"],["Kumwacha","Leave him"],["Kumpa chakula","Give food"],["Kusubiri saa moja","Wait an hour"]],a:0,e:["Muda ni muhimu; fuata mafunzo rasmi ya huduma ya kwanza.","Time is critical; follow formal first aid training."]}];
+/* ====== TAFSIRI / I18N ====== */
+const T={sw:{home:"Mwanzo",courses:"Mafunzo",search:"Tafuta",progress:"Maendeleo",settings:"Mipangilio",tag:"Jifunze. Fanya Mazoezi. Kuwa Tayari.",intro:"Jukwaa la kujifunza maarifa ya Zimamoto na Uokoaji kwa Kiswahili, likiwa na mada za Fire Science, Firefighting, Rescue, HazMat, Fire Investigation, Incident Command na Fire Prevention.",ph:"Tafuta Fire Science, SCBA, Rescue, HazMat...",view:"ANGALIA MAFUNZO",start:"ANZA KUJIFUNZA",srcb:"CHANZO RASMI",open:"FUNGUA CHANZO RASMI",back:"← Rudi",type:"Aina",obj:"Malengo",topics:"Mada kuu",done:"Weka kuwa nimekamilisha",isdone:"✓ Imekamilika",mine:"MAENDELEO YAKO",total:"masomo yamekamilika",src:"Chanzo",srcs:"🌐 VYANZO VYA MAFUNZO",ext:"Tovuti za nje (zinahitaji internet)",offline:"Unaweza kusoma somo hili offline. Link ya chanzo rasmi inahitaji internet.",none:"Hakuna matokeo.",results:"Matokeo",qz:"Jaribio",qzs:"Anza Jaribio",score:"Alama",next:"Endelea",retry:"Jaribu Tena",ok:"✓ Jibu sahihi",bad:"✗ Jibu si sahihi",lang:"Lugha",theme:"Muonekano",light:"☀️ Nuru",dark:"🌙 Giza",reset:"Futa maendeleo yote",sure:"Futa maendeleo yote?",level:"LEVEL",ftr:"Jukwaa la kujifunza maarifa ya Zimamoto na Uokoaji",cp:"Maudhui ya vyanzo vya nje yanaendelea kuwa chini ya masharti na haki za wamiliki wake.",safe:"Mafunzo ya vitendo lazima yafanywe chini ya mkufunzi mwenye sifa.",objt:"Elewa dhana kuu, istilahi za Kiingereza na usalama wa mada hizi.",menu:"Menyu",tr:"Inatafsiri kwa Kiswahili...",orig:"Fungua ukurasa wa asili",fail:"Imeshindikana kuleta ukurasa huu (mtandao au tovuti imezuia). Tumia kitufe cha ukurasa wa asili.",showEn:"Onyesha English / Kiswahili",mt:"Tafsiri ya kompyuta (MyMemory) — inaweza kuwa na makosa. Rejea chanzo asili.",load:"Inaleta maudhui...",pv:"Faragha: hakuna login, hakuna ukusanyaji wa data; maendeleo yanabaki kwenye simu yako."},
+en:{home:"Home",courses:"Courses",search:"Search",progress:"Progress",settings:"Settings",tag:"Learn. Practice. Be Ready.",intro:"A learning platform for Fire and Rescue knowledge, covering Fire Science, Firefighting, Rescue, HazMat, Fire Investigation, Incident Command and Fire Prevention.",ph:"Search Fire Science, SCBA, Rescue, HazMat...",view:"VIEW COURSES",start:"START LEARNING",srcb:"OFFICIAL SOURCE",open:"OPEN OFFICIAL SOURCE",back:"← Back",type:"Type",obj:"Objectives",topics:"Main topics",done:"Mark as completed",isdone:"✓ Completed",mine:"YOUR PROGRESS",total:"lessons completed",src:"Source",srcs:"🌐 LEARNING SOURCES",ext:"External sites (internet required)",offline:"You can read this lesson offline. The official source link needs internet.",none:"No results.",results:"Results",qz:"Quiz",qzs:"Start Quiz",score:"Score",next:"Continue",retry:"Retry",ok:"✓ Correct",bad:"✗ Incorrect",lang:"Language",theme:"Theme",light:"☀️ Light",dark:"🌙 Dark",reset:"Clear all progress",sure:"Clear all progress?",level:"LEVEL",ftr:"A learning platform for Fire and Rescue knowledge",cp:"External source content remains subject to its owners' terms and rights.",safe:"Practical training must be done under a qualified instructor.",objt:"Understand the key concepts, terms and safety of these topics.",menu:"Menu",tr:"Translating...",orig:"Open original page",fail:"Could not load this page (network or site blocked it). Use the original page button.",showEn:"Show English / Swahili",mt:"Machine translation (MyMemory) — may contain errors. See the original source.",load:"Loading content...",pv:"Privacy: no login, no data collection; progress stays on your device."}};
+/* ====== HALI / STATE ====== */
+const ld=(k,d)=>{try{return localStorage.getItem(k)||d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let lang=ld("fa_lang","sw"),theme=ld("fa_theme","light"),prog={},view="home",cid=null,q="",qz=null;
+try{prog=JSON.parse(ld("fa_prog","{}"))}catch(e){}
+const t=k=>T[lang][k],$=s=>document.querySelector(s),pick=(o,k)=>o[k+"_"+lang],lv=n=>levels[n-1];
+const lt=l=>lang=="sw"?l.sw:l.en,ld2=l=>lang=="sw"?l.ds:l.de;
+const key=(c,i)=>c.id+":"+i,isD=(c,i)=>!!prog[key(c,i)];
+function stat(list){let n=0,d=0;list.forEach(c=>c.topics.forEach((_,i)=>{n++;if(isD(c,i))d++}));return{n,d,p:n?Math.round(d/n*100):0}}
+const bar=p=>`<div class="bar" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div>`;
+function cCard(c){const l=lv(c.level);return`<article class="card"><span class="pill">LEVEL ${c.level} — ${c.category}</span><h3>🔥 ${pick(c,"title")}</h3><p>${pick(c,"description")}</p><p>📚 ${t("type")}: ${c.category}</p><button class="btn" data-go="course:${c.id}">${t("start")}</button>${sb(c,"o","srcb")}</article>`}
+/* ====== VIEWS ====== */
+function vHome(){return`<section class="hero"><div class="f">🔥</div><h1>FIRE ACADEMY TZ</h1><div class="tag">${t("tag")}</div><p>${t("intro")}</p><input class="sb" id="hs" type="search" placeholder="${t("ph")}" aria-label="${t("search")}" autocomplete="off"></section><div class="grid">${levels.map(l=>`<article class="card"><span class="pill">${t("level")} ${l.n}</span><h3>${lt(l)}</h3><p>${ld2(l)}</p><button class="btn" data-go="courses:${l.n}">${t("view")}</button></article>`).join("")}</div><div class="warn">⚠️ ${t("safe")}</div>`}
+function vCourses(){const f=cid&&!isNaN(cid)?+cid:0;return`<div style="margin-top:8px"></div>`+levels.filter(l=>!f||l.n==f).map(l=>`<h2>${t("level")} ${l.n} — ${lt(l)}</h2><div class="grid">${courses.filter(c=>c.level==l.n).map(cCard).join("")}</div>`).join("")+`<div class="warn">⚠️ ${t("safe")}</div>`}
+function hits(s){s=s.toLowerCase().trim();if(!s)return[];return courses.filter(c=>[c.title_sw,c.title_en,c.description_sw,c.description_en,c.category,"level "+c.level,lt(lv(c.level)),c.topics.join(" ")].join(" ").toLowerCase().includes(s))}
+function vSearch(){return`<h2 style="margin-top:8px">🔍 ${t("search")}</h2><input class="sb" id="si" type="search" placeholder="${t("ph")}" value="" aria-label="${t("search")}" autocomplete="off"><div id="sr"></div>`}
+function sRes(s){const h=hits(s);$("#sr").innerHTML=!s.trim()?"":!h.length?`<p class="mu">${t("none")}</p>`:`<p class="mu">${t("results")}: ${h.length}</p><div class="grid">${h.map(c=>{const m=c.topics.filter(x=>x.toLowerCase().includes(s.toLowerCase().trim()));return cCard(c).replace("</article>",m.length?`<p class="mu">• ${m.join(" • ")}</p></article>`:"</article>")}).join("")}</div>`}
+function vCourse(){const c=courses.find(x=>x.id==cid),l=lv(c.level),s=stat([c]),sr=sources[c.src];
+return`<button class="btn o" data-go="courses:">${t("back")}</button><h1>🔥 ${pick(c,"title")}</h1><span class="pill">${t("level")} ${c.level} — ${lt(l)}</span><p>${pick(c,"description")}</p>${bar(s.p)}<p class="mu">${s.d} / ${s.n} ${t("total")}</p><h3>${t("obj")}</h3><p>${t("objt")}</p><h3>${t("topics")}</h3>${c.topics.map((x,i)=>`<div class="t ${isD(c,i)?"d":""}"><span>${i+1}. ${x}</span><button class="btn ${isD(c,i)?"":"o"}" data-tg="${i}" aria-pressed="${isD(c,i)}">${isD(c,i)?t("isdone"):t("done")}</button></div>`).join("")}<div class="warn">⚠️ ${pick(c,"note")||t("safe")}</div><p class="mu">📴 ${t("offline")}</p><p class="mu">${t("src")}: ${sr[0]}</p>${sb(c,"","open")}<button class="btn o" data-go="quiz:">${t("qz")}</button>`}
+function vProgress(){const a=stat(courses);return`<h2 style="margin-top:8px">📊 ${t("mine")}</h2>${levels.map(l=>{const s=stat(courses.filter(c=>c.level==l.n));return`<div class="card" style="margin:10px 0"><b>${t("level")} ${l.n} — ${lt(l)}</b> <span class="mu">${s.p}%</span>${bar(s.p)}</div>`}).join("")}<h3>${a.d} / ${a.n} ${t("total")}</h3>`}
+function vQuiz(){if(!qz){qz={o:quiz.map((_,i)=>i).sort(()=>Math.random()-.5).slice(0,5),i:0,s:0,a:null};}
+if(qz.i>=qz.o.length)return`<h2>${t("qz")}</h2><div class="card"><h3>${t("score")}: ${qz.s} / ${qz.o.length}</h3><button class="btn" data-qr="1">${t("retry")}</button></div>`;
+const x=quiz[qz.o[qz.i]],L=lang=="sw"?0:1;return`<h2 style="margin-top:8px">${t("qz")} ${qz.i+1}/${qz.o.length}</h2><div class="card"><h3>${x.q[L]}</h3>${x.o.map((o,i)=>`<button class="opt ${qz.a!=null?(i==x.a?"ok":i==qz.a?"no":""):""}" data-qa="${i}" ${qz.a!=null?"disabled":""}>${"ABCD"[i]}. ${o[L]}</button>`).join("")}${qz.a!=null?`<p><b>${qz.a==x.a?t("ok"):t("bad")}</b><br>${x.e[L]}</p><button class="btn" data-qn="1">${t("next")}</button>`:""}<p class="mu">${t("score")}: ${qz.s}</p></div>`}
+function vSettings(){return`<h2 style="margin-top:8px">⚙️ ${t("settings")}</h2><div class="card"><p><b>${t("lang")}</b><br><button class="btn ${lang=="sw"?"":"o"}" data-l="sw">🇹🇿 Kiswahili</button><button class="btn ${lang=="en"?"":"o"}" data-l="en">🇬🇧 English</button></p><p><b>${t("theme")}</b><br><button class="btn ${theme=="light"?"":"o"}" data-t="light">${t("light")}</button><button class="btn ${theme=="dark"?"":"o"}" data-t="dark">${t("dark")}</button></p><p><button class="btn o" data-rs="1">${t("reset")}</button></p><p class="mu">🔒 ${t("pv")}</p></div>`}
+function vMenu(){return`<h2 style="margin-top:8px">${t("menu")}</h2><div class="card">${["home","courses","search","progress","settings"].map(k=>`<p><button class="btn o" data-go="${k}:">${t(k)}</button></p>`).join("")}</div><h2>${t("srcs")}</h2><p class="mu">${t("ext")}</p>${Object.values(sources).map(s=>`<div class="card" style="margin:8px 0"><b>${s[0]}</b><br><a href="${s[1]}" target="_blank" rel="noopener noreferrer">${s[1]}</a></div>`).join("")}`}
+/* ====== READER: leta chanzo, tafsiri, onyesha kwa muundo wetu ======
+   Hosts zinazoruhusiwa (serikali/public). Ongeza host hapa ukipata ruhusa ya chanzo kingine. */
+const readable=["www.usfa.fema.gov","apps.usfa.fema.gov","training.fema.gov","www.cdc.gov"];
+const canRead=u=>{try{return readable.includes(new URL(u).hostname)}catch(e){return false}};
+const sb=(c,cl,k)=>canRead(c.sourceUrl)?`<button class="btn ${cl}" data-rd="${c.id}">📖 ${t(k)}</button>`:`<a class="btn ${cl}" href="${c.sourceUrl}" target="_blank" rel="noopener noreferrer">${t(k)}</a>`;
+const esc=s=>s.replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+let rd=null;
+async function getBlocks(u){
+const P=[["https://api.allorigins.win/raw?url=",0],["https://corsproxy.io/?url=",0],["https://r.jina.ai/",1]];
+for(const[p,m]of P){try{const ac=new AbortController();setTimeout(()=>ac.abort(),20000);
+const r=await fetch(p+(m?u:encodeURIComponent(u)),{signal:ac.signal});if(!r.ok)continue;const tx=await r.text(),seen={},b=[];
+const add=(x,h)=>{x=x.replace(/\s+/g," ").trim();if(/^(Title|URL Source|Markdown Content|Published Time):/.test(x))return;if((x.length>40||(h&&x.length>3))&&!seen[x]){seen[x]=1;b.push({g:h?"h":"p",en:x.slice(0,450)})}};
+if(m){tx.split("\n").forEach(l=>add(l.replace(/^#+\s*/,"").replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\[([^\]]*)\]\([^)]*\)/g,"$1").replace(/^[*\-]\s+/,"").replace(/[*_`]/g,""),/^#+\s/.test(l)))}
+else{const doc=new DOMParser().parseFromString(tx,"text/html");doc.querySelectorAll("script,style,nav,header,footer,form,svg,iframe,noscript,button").forEach(n=>n.remove());
+(doc.querySelector("main,article,[role=main]")||doc.body).querySelectorAll("h1,h2,h3,p,li").forEach(n=>add(n.textContent,n.tagName[0]=="H"))}
+if(b.length>=3)return b.slice(0,30)}catch(e){}}
+throw 0}
+async function trn(s){try{const r=await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(s)+"&langpair=en|sw"),j=await r.json(),x=j.responseData.translatedText;return /MYMEMORY WARNING|QUERY LENGTH/i.test(x)?null:x}catch(e){return null}}
+function rb(){const e=$("#rb");if(!e||!rd)return;e.innerHTML=rd.b.map(x=>{const s=(lang=="sw"&&!rd.en&&x.sw)?x.sw:x.en;return`<${x.g=="h"?"h3":"p"} class="rb">${esc(s)}</${x.g=="h"?"h3":"p"}>`}).join("");const s=$("#rs");if(s)s.textContent=rd.st=="load"?t("load"):rd.st=="tr"?t("tr"):rd.st=="err"?t("fail"):""}
+async function openRd(id){const c=courses.find(x=>x.id==id),ck="fa_rd_"+id;rd={c,b:[],st:"load",en:false};go("read",id);
+try{const o=ld(ck,"");if(o){rd.b=JSON.parse(o);rd.st="ok";rb();return}}catch(e){}
+try{rd.b=await getBlocks(c.sourceUrl);rd.st=lang=="sw"?"tr":"ok";rb();
+if(lang=="sw"){for(const x of rd.b){if(!rd||rd.c.id!=id)return;const s=await trn(x.en);if(s)x.sw=s;rb()}rd.st="ok";rb()}
+try{if(rd.b.every(x=>x.sw))sv(ck,JSON.stringify(rd.b))}catch(e){}}catch(e){rd.st="err";rb()}}
+function vRead(){const c=rd.c,sr=sources[c.src];return`<button class="btn o" data-go="course:${c.id}">${t("back")}</button><h1>📖 ${pick(c,"title")}</h1><p class="mu">${t("src")}: ${sr[0]}</p><div class="warn" id="rs"></div><div id="rb"></div><p class="mu">${lang=="sw"?t("mt"):""}</p><button class="btn o" data-en="1">${t("showEn")}</button><a class="btn" href="${c.sourceUrl}" target="_blank" rel="noopener noreferrer">${t("orig")}</a><p class="mu">${t("cp")}</p>`}
+/* ====== RENDER ====== */
+const NAV=[["home","🏠"],["courses","📚"],["search","🔎"],["progress","📊"],["settings","⚙️"]];
+function render(){document.documentElement.lang=lang;document.documentElement.dataset.theme=theme;$("#th").textContent=theme=="dark"?"☀️":"🌙";$("#lg").value=lang;
+$("#nv").innerHTML=NAV.map(n=>`<button class="${view==n[0]||(view=="course"&&n[0]=="courses")||(view=="quiz"&&n[0]=="courses")?"on":""}" data-go="${n[0]}:" aria-label="${t(n[0])}"><span>${n[1]}</span>${t(n[0])}</button>`).join("");
+$("#ft").innerHTML=`<b>FIRE ACADEMY TZ</b><br>${t("ftr")}<br><i>"${t("cp")}"</i>`;
+$("#app").innerHTML={home:vHome,courses:vCourses,search:vSearch,course:vCourse,progress:vProgress,quiz:vQuiz,settings:vSettings,menu:vMenu,read:vRead}[view]();if(view=="read")rb();
+const hs=$("#hs");if(hs)hs.oninput=()=>{go("search");$("#si").value=hs.value;$("#si").focus();sRes(hs.value)};
+const si=$("#si");if(si)si.oninput=()=>sRes(si.value)}
+function go(v,id){view=v;cid=id||null;if(v=="quiz")qz=null;render();scrollTo(0,0)}
+document.addEventListener("click",e=>{const b=e.target.closest("button,a");if(!b)return;const d=b.dataset;
+if(d.go){const[v,id]=d.go.split(":");if(v=="courses"&&id)go("courses",id);else if(id&&v=="course")go("course",id);else go(v)}
+else if(d.rd){openRd(d.rd)}
+else if(d.en){if(rd){rd.en=!rd.en;rb()}}
+else if(d.tg!=null){const c=courses.find(x=>x.id==cid),k=key(c,+d.tg);prog[k]?delete prog[k]:prog[k]=1;sv("fa_prog",JSON.stringify(prog));const y=scrollY;render();scrollTo(0,y)}
+else if(d.l){lang=d.l;sv("fa_lang",lang);render()}
+else if(d.t){theme=d.t;sv("fa_theme",theme);render()}
+else if(d.rs){if(confirm(t("sure"))){prog={};sv("fa_prog","{}");render()}}
+else if(d.qa!=null){if(qz.a==null){qz.a=+d.qa;if(qz.a==quiz[qz.o[qz.i]].a)qz.s++;render()}}
+else if(d.qn){qz.i++;qz.a=null;render()}
+else if(d.qr){qz=null;render()}
+else if(b.id=="mb")go("menu");
+else if(b.id=="th"){theme=theme=="dark"?"light":"dark";sv("fa_theme",theme);render()}});
+$("#lg").onchange=e=>{lang=e.target.value;sv("fa_lang",lang);render()};
+render();
+</script>
+</body>
+</html>
