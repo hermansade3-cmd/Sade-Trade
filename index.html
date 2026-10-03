@@ -100,6 +100,15 @@ async function search(q){
     show(await r.json());
   }catch(e){msg("Imeshindwa kuunganisha. Angalia intaneti yako kisha ujaribu tena.",true)}
 }
+async function sw(text){
+  try{
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=sw&dt=t&q="+encodeURIComponent(text));
+    if(!r.ok)return text;
+    const j=await r.json();
+    const out=(j[0]||[]).map(x=>x[0]).join("");
+    return out||text;
+  }catch(e){return text}
+}
 function show(d){
   const o=$("#out");o.replaceChildren();
   if(mode==="img"){
@@ -109,7 +118,7 @@ function show(d){
     imgs.forEach(u=>{const a=el("a");a.href=safeUrl(u);a.target="_blank";a.rel="noopener noreferrer";const im=el("img");im.src=safeUrl(u);im.alt=last;im.loading="lazy";a.append(im);g.append(a)});
     o.append(g);return;
   }
-  if(d.answer){const a=el("section","answer");a.append(el("h2",null,"Jibu la haraka"),el("p",null,d.answer));o.append(a)}
+  if(d.answer){const a=el("section","answer");const ap=el("p",null,"Inatafsiri kwa Kiswahili...");a.append(el("h2",null,"Jibu la haraka"),ap);o.append(a);sw(d.answer).then(t=>{ap.textContent=t})}
   const rs=d.results||[];
   if(!rs.length){o.append(el("p","msg","Hakuna matokeo ya \""+last+"\". Jaribu maneno mengine."));return}
   rs.forEach(x=>{
