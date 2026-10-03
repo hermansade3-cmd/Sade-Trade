@@ -3,198 +3,199 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1eb53a">
 <title>R-Search — Tafuta chochote</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f8f9;--card:#fff;--ink:#14232b;--mute:#5d6f78;--line:#d9e1e5;--teal:#0b7a86;--sun:#f4b400;--link:#0a5f9e;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1a20;--card:#16252d;--ink:#e8f0f3;--mute:#9bb0ba;--line:#27404b;--teal:#35b7c4;--link:#7cc4f5;color-scheme:dark}}
+:root{--g:#1eb53a;--y:#fcd116;--k:#111;--b:#00a3dd;--bg:#f6f9f4;--ink:#13200f;--mute:#5b6b57;--line:#dbe5d6;--link:#0a6ea8}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:17px/1.55 "Source Sans 3",system-ui,sans-serif;min-height:100vh}
-.wrap{max-width:760px;margin:0 auto;padding:0 16px}
-header.home{padding-top:22vh;text-align:center;transition:padding .2s}
-body.has-results header.home{padding-top:20px;display:flex;align-items:center;gap:16px;text-align:left}
-.logo{font:800 clamp(44px,12vw,72px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;margin:0;cursor:pointer}
+.hero{background:linear-gradient(to bottom right,var(--g) 0 39%,var(--y) 39% 43%,var(--k) 43% 57%,var(--y) 57% 61%,var(--b) 61% 100%);text-align:center;padding:56px 16px 74px;color:#fff}
+.logo{font:800 clamp(46px,13vw,76px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;margin:0;cursor:pointer;text-shadow:0 2px 8px rgba(0,0,0,.55)}
+.logo b{color:var(--y)}
+.tag{margin:10px 0 0;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+body.has-results .hero{padding:14px 16px 44px}
 body.has-results .logo{font-size:30px}
-.logo b{color:var(--sun)}
-.logo span{color:var(--teal)}
-.tag{color:var(--mute);margin:8px 0 24px}
 body.has-results .tag{display:none}
-form{display:flex;gap:8px;width:100%}
-body.has-results form{flex:1}
-input[type=search]{flex:1;min-width:0;font:inherit;padding:14px 18px;border:2px solid var(--line);border-radius:28px;background:var(--card);color:var(--ink)}
-input[type=search]:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-.go{font:600 16px "Source Sans 3",sans-serif;padding:0 22px;border:0;border-radius:28px;background:var(--teal);color:#fff;cursor:pointer}
-.tabs{display:none;gap:6px;margin:14px 0 6px;border-bottom:1px solid var(--line)}
-body.has-results .tabs{display:flex}
-.tab{font:600 15px "Source Sans 3",sans-serif;background:none;border:0;color:var(--mute);padding:8px 14px;cursor:pointer;border-bottom:3px solid transparent}
-.tab[aria-selected=true]{color:var(--ink);border-color:var(--sun)}
-.answer{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--sun);border-radius:10px;padding:14px 18px;margin:18px 0}
-.answer h2{font:700 15px "Bricolage Grotesque",sans-serif;margin:0 0 6px;color:var(--teal)}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+form{display:flex;gap:8px;margin-top:-30px;position:relative}
+input[type=search]{flex:1;min-width:0;font:inherit;padding:14px 20px;border:2px solid var(--g);border-radius:30px;background:#fff;color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.go{font:600 16px "Source Sans 3",sans-serif;padding:0 24px;border:0;border-radius:30px;background:var(--k);color:var(--y);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+input:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+.tabs{display:flex;gap:4px;margin:18px 0 6px;border-bottom:2px solid var(--line);overflow-x:auto}
+.tab{font:600 15px "Source Sans 3",sans-serif;background:none;border:0;color:var(--mute);padding:9px 16px;cursor:pointer;border-bottom:4px solid transparent;margin-bottom:-2px}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--g)}
+#recent{margin:18px 0}
+body.has-results #recent{display:none}
+.rt{color:var(--mute);font-size:14px;margin:0 0 8px}
+.chip{font:inherit;font-size:15px;margin:0 8px 8px 0;padding:6px 14px;border:1px solid var(--line);border-radius:20px;background:#fff;color:var(--ink);cursor:pointer}
+.answer{background:#fffbe6;border:1px solid #efe29a;border-left:6px solid var(--y);border-radius:10px;padding:14px 18px;margin:18px 0}
+.answer h2{font:800 15px "Bricolage Grotesque",sans-serif;margin:0 0 6px;color:#0f7a25}
 .answer p{margin:0;white-space:pre-wrap}
-.res{margin:22px 0}
-.res .url{font-size:14px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.res a.t{display:block;font:700 20px/1.3 "Bricolage Grotesque",sans-serif;color:var(--link);text-decoration:none;margin:2px 0 4px}
+.res{background:#fff;border:1px solid var(--line);border-left:6px solid var(--g);border-radius:10px;padding:12px 16px;margin:14px 0}
+.res .url{font-size:14px;color:#0f7a25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res a.t{display:block;font:800 19px/1.3 "Bricolage Grotesque",sans-serif;color:var(--link);text-decoration:none;margin:2px 0 4px}
 .res a.t:hover{text-decoration:underline}
-.res p{margin:0;color:var(--ink)}
-.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:18px 0}
-.imgs img{width:100%;height:130px;object-fit:cover;border-radius:8px;background:var(--line)}
-.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:18px 0}
-.vids video{width:100%;border-radius:8px;background:#000;aspect-ratio:16/9}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0}
-.card audio{width:100%;margin-top:6px}
-.card a,.vids a{color:var(--link);font-size:14px}
+.res p{margin:0}
+.imgs,.vids{display:grid;gap:12px;margin:18px 0}
+.imgs{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.vids{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.fig{position:relative;margin:0;border-radius:10px;overflow:hidden;background:var(--line)}
+.fig img{display:block;width:100%;height:150px;object-fit:cover}
+.dl{position:absolute;right:8px;bottom:8px;font:600 14px "Source Sans 3",sans-serif;padding:5px 12px;border:0;border-radius:16px;background:rgba(17,17,17,.85);color:var(--y);cursor:pointer}
+.vids video{width:100%;border-radius:10px;background:#000;aspect-ratio:16/9}
+.card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--b);border-radius:10px;padding:12px 16px;margin:12px 0}
 .card b{font-family:"Bricolage Grotesque",sans-serif}
+.card .url{font-size:14px;color:var(--mute)}
+.card audio{width:100%;margin-top:6px}
 .msg{color:var(--mute);margin:30px 0}
-.msg.err{color:#c0392b}
-.key{margin-top:40px;font-size:14px;color:var(--mute)}
-.key summary{cursor:pointer}
-.key input{width:100%;margin-top:8px;font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
-footer{padding:30px 0;color:var(--mute);font-size:14px;text-align:center}
-@media(max-width:520px){body.has-results header.home{flex-direction:column;align-items:stretch;gap:8px}}
+.msg.err{color:#b3261e}
+.note{font-size:14px;color:#8a6d00;background:#fff8d6;border-radius:8px;padding:6px 12px;margin:14px 0 0}
+footer{margin-top:40px;text-align:center;color:var(--mute);font-size:14px;padding-bottom:26px}
+footer i{display:block;height:8px;margin-bottom:16px;background:linear-gradient(to right,var(--g) 0 35%,var(--y) 35% 40%,var(--k) 40% 60%,var(--y) 60% 65%,var(--b) 65%)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="home">
-  <h1 class="logo" id="logo" title="Rudi mwanzo"><b>R</b>-<span>Search</span></h1>
-  <div style="flex:1;width:100%">
-    <p class="tag">Andika swali lako. Pata majibu kutoka mtandaoni.</p>
-    <form id="f" role="search">
-      <input type="search" id="q" placeholder="Tafuta chochote..." aria-label="Tafuta" autocomplete="off" autofocus>
-      <button class="go" type="submit">Tafuta</button>
-    </form>
-  </div>
+<header class="hero">
+  <h1 class="logo" id="logo"><b>R</b>-Search</h1>
+  <p class="tag">Tafuta chochote. Pata majibu kwa Kiswahili.</p>
 </header>
-<div class="tabs" role="tablist">
-  <button class="tab" role="tab" aria-selected="true" data-m="web">Yote</button>
-  <button class="tab" role="tab" aria-selected="false" data-m="img">Picha</button>
-  <button class="tab" role="tab" aria-selected="false" data-m="vid">Video</button>
-  <button class="tab" role="tab" aria-selected="false" data-m="aud">Sauti</button>
-</div>
-<main id="out" aria-live="polite"></main>
-<details class="key" id="keybox">
-  <summary>Mpangilio wa ufunguo wa Tavily</summary>
-  <input type="password" id="key" placeholder="tvly-..." aria-label="Ufunguo wa Tavily API">
-  <p>Ufunguo unahifadhiwa kwenye kivinjari chako tu.</p>
-</details>
-<footer>R-Search</footer>
+<div class="wrap">
+  <form id="f" role="search">
+    <input type="search" id="q" placeholder="Tafuta chochote..." aria-label="Tafuta" autocomplete="off">
+    <button class="go" type="submit">Tafuta</button>
+  </form>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-m="web">Yote</button>
+    <button class="tab" role="tab" aria-selected="false" data-m="img">Picha</button>
+    <button class="tab" role="tab" aria-selected="false" data-m="vid">Video</button>
+    <button class="tab" role="tab" aria-selected="false" data-m="aud">Sauti</button>
+  </div>
+  <div id="recent"></div>
+  <main id="out" aria-live="polite"></main>
+  <footer><i></i>R-Search · Tanzania</footer>
 </div>
 <script>
 const $=s=>document.querySelector(s);
-const KEY_DEFAULT="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";
-let mode="web", last="";
-function getKey(){try{return localStorage.getItem("rs_key")||KEY_DEFAULT}catch(e){return KEY_DEFAULT}}
-try{$("#key").value=localStorage.getItem("rs_key")||""}catch(e){}
-$("#key").addEventListener("change",e=>{try{localStorage.setItem("rs_key",e.target.value.trim())}catch(_){}});
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n}
+const TKEY="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";
+const PIX="57792634-5e89dd610e4c1c840f815c524";
+let mode="web",last="";
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n}
 function safeUrl(u){try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:"#"}catch(e){return "#"}}
 function host(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}}
-function msg(t,err){const o=$("#out");o.replaceChildren(el("p","msg"+(err?" err":""),t))}
+function msg(t,err){$("#out").replaceChildren(el("p","msg"+(err?" err":""),t))}
+/* Hifadhi ya offline (IndexedDB) */
+const DB=new Promise(res=>{try{const r=indexedDB.open("rsearch",1);r.onupgradeneeded=()=>r.result.createObjectStore("c",{keyPath:"k"});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});
+async function put(rec){const db=await DB;if(!db)return;return new Promise(r=>{try{const t=db.transaction("c","readwrite");t.objectStore("c").put(rec);t.oncomplete=t.onerror=t.onabort=()=>r()}catch(e){r()}})}
+async function get(k){const db=await DB;if(!db)return null;return new Promise(r=>{try{const q=db.transaction("c").objectStore("c").get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)}catch(e){r(null)}})}
+async function recent(){
+  const db=await DB,box=$("#recent");box.replaceChildren();if(!db)return;
+  const rs=await new Promise(r=>{try{const q=db.transaction("c").objectStore("c").getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])}catch(e){r([])}});
+  const w=rs.filter(x=>x.k.startsWith("web:")).sort((a,b)=>b.t-a.t).slice(0,8);
+  if(!w.length)return;
+  box.append(el("p","rt","Ulizotafuta hivi karibuni (zinapatikana bila intaneti)"));
+  w.forEach(x=>{const b=el("button","chip",x.q);b.type="button";b.onclick=()=>{setMode("web");go(x.q)};box.append(b)});
+}
+/* Tafsiri */
+async function tr(text,tl){
+  try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl="+tl+"&dt=t&q="+encodeURIComponent(text));
+    if(!r.ok)return text;const j=await r.json();return (j[0]||[]).map(x=>x[0]).join("")||text}catch(e){return text}
+}
+async function jget(url,opt){
+  let r;try{r=await fetch(url,opt)}catch(e){throw new Error("Imeshindwa kuunganisha.")}
+  if(r.status===401)throw new Error("Ufunguo si sahihi.");
+  if(r.status===429)throw new Error("Umefikia kikomo cha maombi. Jaribu tena baadaye.");
+  if(!r.ok)throw new Error("Hitilafu imetokea ("+r.status+").");
+  return r.json();
+}
+/* Utafutaji */
 async function search(q){
-  const key=getKey();
   document.body.classList.add("has-results");
-  if(mode!=="web")return media(q);
-  if(!key){msg("Weka ufunguo wa Tavily chini ya ukurasa kwanza.",true);$("#keybox").open=true;return}
+  const k=mode+":"+q.toLowerCase();
   msg("Inatafuta...");
   try{
-    const r=await fetch("https://api.tavily.com/search",{method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-      body:JSON.stringify({query:q,search_depth:"advanced",max_results:10,include_answer:true,include_images:mode==="img"})});
-    if(r.status===401){msg("Ufunguo si sahihi. Angalia ufunguo wako wa Tavily.",true);return}
-    if(r.status===429){msg("Umefikia kikomo cha maombi. Jaribu tena baadaye.",true);return}
-    if(!r.ok){msg("Hitilafu imetokea ("+r.status+"). Jaribu tena.",true);return}
-    show(await r.json());
-  }catch(e){msg("Imeshindwa kuunganisha. Angalia intaneti yako kisha ujaribu tena.",true)}
-}
-const PIX="57792634-5e89dd610e4c1c840f815c524";
-async function toEn(text){
-  try{
-    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q="+encodeURIComponent(text));
-    if(!r.ok)return text;
-    const j=await r.json();
-    return (j[0]||[]).map(x=>x[0]).join("")||text;
-  }catch(e){return text}
-}
-async function media(q){
-  msg("Inatafuta...");
-  const o=$("#out");
-  try{
-    const qe=(await toEn(q)).slice(0,100);
-    if(mode==="img"||mode==="vid"){
-      const base=mode==="img"?"https://pixabay.com/api/":"https://pixabay.com/api/videos/";
-      const r=await fetch(base+"?key="+PIX+"&q="+encodeURIComponent(qe)+"&per_page=24&safesearch=true");
-      if(r.status===429){msg("Umefikia kikomo cha maombi. Jaribu tena baadaye.",true);return}
-      if(!r.ok){msg("Hitilafu imetokea ("+r.status+"). Jaribu tena.",true);return}
-      const hits=(await r.json()).hits||[];
-      if(!hits.length){msg("Hakuna matokeo ya \""+q+"\".");return}
-      o.replaceChildren();
-      const g=el("div",mode==="img"?"imgs":"vids");
-      hits.forEach(h=>{
-        if(mode==="img"){
-          const a=el("a");a.href=safeUrl(h.pageURL);a.target="_blank";a.rel="noopener noreferrer";
-          const im=el("img");im.src=safeUrl(h.webformatURL);im.alt=h.tags||q;im.loading="lazy";a.append(im);g.append(a);
-        }else{
-          const v=h.videos||{};const s=(v.tiny||v.small||v.medium||{}).url;if(!s)return;
-          const box=el("div");const vd=document.createElement("video");
-          vd.src=safeUrl(s);vd.controls=true;vd.preload="none";vd.playsInline=true;
-          if(h.picture_id)vd.poster="https://i.vimeocdn.com/video/"+encodeURIComponent(h.picture_id)+"_640x360.jpg";
-          const a=el("a","","Pixabay");a.href=safeUrl(h.pageURL);a.target="_blank";a.rel="noopener noreferrer";
-          box.append(vd,a);g.append(box);
-        }
-      });
-      o.append(g);return;
-    }
-    const r=await fetch("https://api.openverse.org/v1/audio/?page_size=15&q="+encodeURIComponent(qe));
-    if(!r.ok){msg("Hitilafu imetokea ("+r.status+"). Jaribu tena.",true);return}
-    const rs=(await r.json()).results||[];
-    if(!rs.length){msg("Hakuna sauti zilizopatikana kwa \""+q+"\".");return}
-    o.replaceChildren();
-    rs.forEach(x=>{
-      const c=el("div","card");
-      c.append(el("b",null,x.title||"Bila jina"),el("div","url",(x.creator?x.creator+" · ":"")+"Leseni: "+(x.license||"")+" "+(x.license_version||"")));
-      const au=document.createElement("audio");au.controls=true;au.preload="none";au.src=safeUrl(x.url);c.append(au);
-      if(x.foreign_landing_url){const a=el("a",null,"Chanzo");a.href=safeUrl(x.foreign_landing_url);a.target="_blank";a.rel="noopener noreferrer";c.append(a)}
-      o.append(c);
-    });
-  }catch(e){msg("Imeshindwa kuunganisha. Angalia intaneti yako kisha ujaribu tena.",true)}
-}
-async function sw(text){
-  try{
-    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=sw&dt=t&q="+encodeURIComponent(text));
-    if(!r.ok)return text;
-    const j=await r.json();
-    const out=(j[0]||[]).map(x=>x[0]).join("");
-    return out||text;
-  }catch(e){return text}
-}
-function show(d){
-  const o=$("#out");o.replaceChildren();
-  if(mode==="img"){
-    const imgs=(d.images||[]).map(i=>typeof i==="string"?i:i.url).filter(Boolean);
-    if(!imgs.length){o.append(el("p","msg","Hakuna picha zilizopatikana."));return}
-    const g=el("div","imgs");
-    imgs.forEach(u=>{const a=el("a");a.href=safeUrl(u);a.target="_blank";a.rel="noopener noreferrer";const im=el("img");im.src=safeUrl(u);im.alt=last;im.loading="lazy";a.append(im);g.append(a)});
-    o.append(g);return;
+    if(!navigator.onLine)throw new Error("Hakuna intaneti.");
+    if(mode==="web")await doWeb(q,k);else if(mode==="img")await doImg(q,k);else await doMedia(q);
+  }catch(e){
+    const c=(mode==="web"||mode==="img")?await get(k):null;
+    if(c){mode==="web"?showWeb(c,true):showImg(c,true)}
+    else msg(e.message+(mode==="web"||mode==="img"?" Hakuna matokeo yaliyohifadhiwa ya utafutaji huu.":" Video na sauti zinahitaji intaneti."),true);
   }
-  if(d.answer){const a=el("section","answer");const ap=el("p",null,"Inatafsiri kwa Kiswahili...");a.append(el("h2",null,"Jibu la haraka"),ap);o.append(a);sw(d.answer).then(t=>{ap.textContent=t})}
-  const rs=d.results||[];
-  if(!rs.length){o.append(el("p","msg","Hakuna matokeo ya \""+last+"\". Jaribu maneno mengine."));return}
-  rs.forEach(x=>{
-    const b=el("article","res");
-    const a=el("a","t",x.title||x.url);a.href=safeUrl(x.url);a.target="_blank";a.rel="noopener noreferrer";
-    b.append(el("div","url",host(x.url)),a,el("p",null,(x.content||"").slice(0,260)+((x.content||"").length>260?"...":"")));
-    o.append(b);
+}
+async function doWeb(q,k){
+  const d=await jget("https://api.tavily.com/search",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+TKEY},
+    body:JSON.stringify({query:q,search_depth:"advanced",max_results:10,include_answer:true})});
+  const ans=d.answer?await tr(d.answer,"sw"):"";
+  const rec={k,t:Date.now(),q,ans,res:(d.results||[]).map(x=>({title:x.title,url:x.url,c:(x.content||"").slice(0,300)}))};
+  put(rec);showWeb(rec,false);
+}
+function showWeb(rec,cached){
+  const o=$("#out");o.replaceChildren();
+  if(cached)o.append(el("p","note","Hakuna intaneti: unaona matokeo yaliyohifadhiwa kwenye simu yako."));
+  if(rec.ans){const a=el("section","answer");a.append(el("h2",null,"Jibu la haraka"),el("p",null,rec.ans));o.append(a)}
+  if(!rec.res.length){o.append(el("p","msg","Hakuna matokeo ya \""+rec.q+"\"."));return}
+  rec.res.forEach(x=>{
+    const b=el("article","res");const a=el("a","t",x.title||x.url);a.href=safeUrl(x.url);a.target="_blank";a.rel="noopener noreferrer";
+    b.append(el("div","url",host(x.url)),a,el("p",null,x.c+(x.c.length>=300?"...":"")));o.append(b);
   });
 }
-$("#f").addEventListener("submit",e=>{e.preventDefault();const q=$("#q").value.trim();if(!q)return;last=q;history.replaceState(null,"","?q="+encodeURIComponent(q));search(q)});
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
-  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
-  mode=t.dataset.m;if(last)search(last)}));
-$("#logo").addEventListener("click",()=>{document.body.classList.remove("has-results");$("#out").replaceChildren();$("#q").value="";last="";history.replaceState(null,"",location.pathname)});
-const p=new URLSearchParams(location.search).get("q");if(p){$("#q").value=p;last=p;search(p)}
+async function doImg(q,k){
+  const en=(await tr(q,"en")).slice(0,100);
+  const d=await jget("https://pixabay.com/api/?key="+PIX+"&q="+encodeURIComponent(en)+"&per_page=24&safesearch=true");
+  const items=(d.hits||[]).map(h=>({u:h.webformatURL,l:h.largeImageURL,tags:h.tags||q,blob:null}));
+  const rec={k,t:Date.now(),q,items};
+  showImg(rec,false);
+  Promise.all(items.map(async it=>{try{const r=await fetch(it.u);if(r.ok)it.blob=await r.blob()}catch(e){}})).then(()=>{if(items.length)put(rec)});
+}
+function save(b){const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="R-Search-"+Date.now()+".jpg";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+async function dl(it){
+  try{const r=await fetch(it.l||it.u);if(!r.ok)throw 0;save(await r.blob())}
+  catch(e){if(it.blob)save(it.blob);else window.open(it.l||it.u,"_blank")}
+}
+function showImg(rec,cached){
+  const o=$("#out");o.replaceChildren();
+  if(cached)o.append(el("p","note","Hakuna intaneti: unaona picha zilizohifadhiwa kwenye simu yako."));
+  if(!rec.items.length){o.append(el("p","msg","Hakuna picha za \""+rec.q+"\"."));return}
+  const g=el("div","imgs");
+  rec.items.forEach(it=>{
+    const f=el("figure","fig"),im=el("img");
+    im.src=it.blob?URL.createObjectURL(it.blob):safeUrl(it.u);im.alt=it.tags;im.loading="lazy";
+    const b=el("button","dl","Pakua");b.type="button";b.onclick=()=>dl(it);
+    f.append(im,b);g.append(f);
+  });
+  o.append(g);
+}
+async function doMedia(q){
+  const en=(await tr(q,"en")).slice(0,100),o=$("#out");
+  if(mode==="vid"){
+    const d=await jget("https://pixabay.com/api/videos/?key="+PIX+"&q="+encodeURIComponent(en)+"&per_page=18&safesearch=true");
+    const hits=d.hits||[];
+    if(!hits.length){msg("Hakuna video za \""+q+"\".");return}
+    o.replaceChildren();const g=el("div","vids");
+    hits.forEach(h=>{const v=h.videos||{},s=(v.tiny||v.small||v.medium||{}).url;if(!s)return;
+      const vd=document.createElement("video");vd.src=safeUrl(s);vd.controls=true;vd.preload="none";vd.playsInline=true;
+      if(h.picture_id)vd.poster="https://i.vimeocdn.com/video/"+encodeURIComponent(h.picture_id)+"_640x360.jpg";
+      g.append(vd)});
+    o.append(g);return;
+  }
+  const d=await jget("https://api.openverse.org/v1/audio/?page_size=15&q="+encodeURIComponent(en));
+  const rs=d.results||[];
+  if(!rs.length){msg("Hakuna sauti za \""+q+"\".");return}
+  o.replaceChildren();
+  rs.forEach(x=>{const c=el("div","card");c.append(el("b",null,x.title||"Bila jina"));
+    if(x.creator)c.append(el("div","url",x.creator));
+    const au=document.createElement("audio");au.controls=true;au.preload="none";au.src=safeUrl(x.url);c.append(au);o.append(c)});
+}
+/* Vidhibiti */
+function setMode(m){mode=m;document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.m===m))}
+function go(q){last=q;$("#q").value=q;history.replaceState(null,"","?q="+encodeURIComponent(q));search(q)}
+$("#f").addEventListener("submit",e=>{e.preventDefault();const q=$("#q").value.trim();if(q)go(q)});
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{setMode(t.dataset.m);if(last)search(last)}));
+$("#logo").addEventListener("click",()=>{document.body.classList.remove("has-results");$("#out").replaceChildren();$("#q").value="";last="";history.replaceState(null,"",location.pathname);recent()});
+const p=new URLSearchParams(location.search).get("q");
+if(p)go(p);else recent();
 </script>
 </body>
 </html>
